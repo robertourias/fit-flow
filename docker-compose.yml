@@ -1,0 +1,141 @@
+# fit-flow — Docker Compose completo
+#
+# Profiles disponíveis:
+#   (nenhum)  →  só infra: db + redis
+#   app       →  + api + web (imagens de produção)
+#   tools     →  + maildev (SMTP local para jobs de e-mail)
+#
+# Uso comum:
+#   docker compose up                                   # só infra (dev local)
+#   docker compose --profile app up                    # stack completa
+#   docker compose --profile app --profile tools up    # tudo
+#   docker compose --profile tools up                  # infra + maildev
+#
+# Variáveis com fallback — crie um .env na raiz do projeto para sobrescrever.
+
+name: fit-flow
+
+# ─── Infra (sempre inicializada) ──────────────────────────────────────────────
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-fitflow}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fitflow}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # appendonly para persistência; maxmemory-policy evita OOM em cache crescente
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+# ─── Aplicação (profile: app) ─────────────────────────────────────────────────
+
+  api:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-fitflow}
+      REDIS_URL: redis://redis:6379
+      # Variáveis de e-mail — usadas pelos workers BullMQ; maildev em profile tools
+      MAIL_HOST: ${MAIL_HOST:-maildev}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_FROM: ${MAIL_FROM:-noreply@fitflow.local}
+      # Migrations: defina SKIP_MIGRATIONS=1 para réplicas somente-leitura
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS:-0}
+    ports:
+      - "3001:3001"
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web:
+    profiles: [app]
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      # NEXT_PUBLIC_* é compilado no bundle — deve ser acessível pelo browser (host),
+      # não pela rede interna Docker. Use http://localhost:3001 em dev local.
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
+    depends_on:
+      api:
+        condition: service_healthy
+
+# ─── Ferramentas de desenvolvimento (profile: tools) ──────────────────────────
+
+  maildev:
+    profiles: [tools]
+    image: maildev/maildev:2
+    restart: unless-stopped
+    ports:
+      - "1080:1080"   # interface web: http://localhost:1080
+      - "1025:1025"   # SMTP interno
+    networks:
+      - backend
+
+# ─── Rede e volumes ───────────────────────────────────────────────────────────
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
