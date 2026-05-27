@@ -4,7 +4,7 @@
 > Não edite manualmente durante uma sessão ativa — use `/checkpoint` antes de fechar.
 
 **Última atualização:** 2026-05-26
-**Resumo da última sessão:** Concluído T10 (validação e README de desenvolvimento) — última tarefa do plano de setup do monorepo. Build e docs validados.
+**Resumo da última sessão:** Fix do container web no Docker Compose — `outputFileTracingRoot` adicionado ao `next.config.ts` para gerar standalone com estrutura de monorepo correta (`apps/web/server.js`).
 
 ---
 
@@ -43,10 +43,10 @@
 
 - Diagrama de rede do `infra.md` corrigido: docker-compose usa duas redes (`frontend` e `backend`), não uma única `fitflow-net`
 - `REDIS_URL` adicionado ao `apps/api/.env.example` (estava faltando)
+- `outputFileTracingRoot` adicionado ao `next.config.ts` (necessário para standalone em monorepo)
 
 ---
 
 ## Bloqueadores / Perguntas abertas
 
-- Validação de containers Docker pendente (requer Docker em execução)
 - Supabase local não está no Docker Compose — as variáveis `SUPABASE_*` apontam para instância cloud ou Supabase CLI rodando separadamente
