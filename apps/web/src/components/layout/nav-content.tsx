@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -11,17 +12,18 @@ interface NavItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  href?: string;
 }
 
 const mainNavItems: NavItem[] = [
-  { id: "rotina", label: "Rotina", icon: Dumbbell },
+  { id: "rotina", label: "Rotina", icon: Dumbbell, href: "/dashboard" },
   { id: "progresso", label: "Progresso", icon: TrendingUp },
   { id: "explorar", label: "Explorar", icon: Compass },
   { id: "personal", label: "Personal", icon: User },
 ];
 
 const extraNavItems: NavItem[] = [
-  { id: "exercicios", label: "Exercícios", icon: ListChecks },
+  { id: "exercicios", label: "Exercícios", icon: ListChecks, href: "/exercises" },
   { id: "biblioteca", label: "Biblioteca", icon: BookOpen },
 ];
 
@@ -40,17 +42,35 @@ export function NavContent({
   showThemeToggle = false,
   onClose,
 }: NavContentProps) {
-  function handleNav(id: string) {
-    onItemChange(id);
-    onClose?.();
-  }
-
   function navButtonClass(id: string) {
     return cn(
       "flex items-center gap-3 w-full px-3 py-[10px] rounded-m text-sm transition-colors text-left",
       activeItem === id
         ? "bg-[hsl(var(--color-success-bg))] text-primary font-semibold"
         : "text-muted-foreground font-normal hover:bg-accent hover:text-foreground"
+    );
+  }
+
+  function renderNavItem({ id, label, icon: Icon, href }: NavItem) {
+    const cls = navButtonClass(id);
+    if (href) {
+      return (
+        <Link key={id} href={href} className={cls} onClick={onClose} aria-current={activeItem === id ? "page" : undefined}>
+          <Icon className="h-[18px] w-[18px] shrink-0" />
+          {label}
+        </Link>
+      );
+    }
+    return (
+      <button
+        key={id}
+        onClick={() => { onItemChange(id); onClose?.(); }}
+        className={cls}
+        aria-current={activeItem === id ? "page" : undefined}
+      >
+        <Icon className="h-[18px] w-[18px] shrink-0" />
+        {label}
+      </button>
     );
   }
 
@@ -66,24 +86,14 @@ export function NavContent({
 
       {/* Main nav */}
       <nav className="px-3 py-4 flex flex-col gap-1" aria-label="Navegação principal">
-        {mainNavItems.map(({ id, label, icon: Icon }) => (
-          <button key={id} onClick={() => handleNav(id)} className={navButtonClass(id)} aria-current={activeItem === id ? "page" : undefined}>
-            <Icon className="h-[18px] w-[18px] shrink-0" />
-            {label}
-          </button>
-        ))}
+        {mainNavItems.map(renderNavItem)}
       </nav>
 
       <Separator className="mx-3 w-auto" />
 
       {/* Extra nav */}
       <nav className="px-3 py-2 flex flex-col gap-1" aria-label="Biblioteca">
-        {extraNavItems.map(({ id, label, icon: Icon }) => (
-          <button key={id} onClick={() => handleNav(id)} className={navButtonClass(id)} aria-current={activeItem === id ? "page" : undefined}>
-            <Icon className="h-[18px] w-[18px] shrink-0" />
-            {label}
-          </button>
-        ))}
+        {extraNavItems.map(renderNavItem)}
       </nav>
 
       <Separator className="mx-3 w-auto" />
@@ -91,7 +101,7 @@ export function NavContent({
       {/* Premium */}
       <div className="px-3 py-2">
         <button
-          onClick={() => handleNav("premium")}
+          onClick={() => { onItemChange("premium"); onClose?.(); }}
           className="flex items-center gap-3 w-full px-3 py-[10px] rounded-m text-sm font-semibold transition-opacity bg-[hsl(var(--color-warning-bg))] text-[hsl(var(--color-warning-text))] hover:opacity-90 text-left"
         >
           <Zap className="h-[18px] w-[18px] shrink-0 text-[hsl(var(--color-warning))]" />

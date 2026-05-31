@@ -20,17 +20,7 @@ export default function DashboardPage() {
       <MetricsStrip metrics={mockMetrics} />
 
       {/* ── DESKTOP (lg+) ──────────────────────────────────────────── */}
-      {/*
-        Layout:
-          Left: [TreinoCard + UpcomingCard row, min-h 290px] + [ProgressChart fill]
-          Right: [CalendarSection] + [MuscleCard fill]
-        Setting min-h-[290px] on the top row makes TreinoCard + Upcoming equal to
-        CalendarSection height. Both ProgressChart and MuscleCard use flex-1, so
-        they fill the remaining equal height automatically.
-      */}
       <div className="hidden lg:grid lg:grid-cols-[1fr_340px] lg:gap-5 lg:flex-1 lg:min-h-0 lg:p-7 lg:pt-6">
-
-        {/* Left column */}
         <div className="flex flex-col gap-4 min-h-0">
           <div className="grid grid-cols-[1fr_300px] gap-4 min-h-[282px]">
             <TreinoCard treino={mockTreinoHoje} className="h-full" />
@@ -38,8 +28,6 @@ export default function DashboardPage() {
           </div>
           <ProgressChart data={mockVolumeData} className="flex-1 min-h-[329px]" />
         </div>
-
-        {/* Right column */}
         <div className="flex flex-col gap-4 min-h-0">
           <CalendarSection trainDates={mockTreinoDates} />
           <MuscleCard muscles={mockMuscleGroups} className="flex-1" />
@@ -65,15 +53,12 @@ export default function DashboardPage() {
           <h2 className="text-base font-semibold">Treino de hoje</h2>
           <TreinoCard treino={mockTreinoHoje} />
         </section>
-
         <section className="px-5 pb-5">
           <ProgressChart data={mockVolumeData} className="min-h-[200px]" />
         </section>
-
         <section className="px-5 pb-5">
           <CalendarSection trainDates={mockTreinoDates} />
         </section>
-
         <section className="px-5 pb-5">
           <MuscleCard muscles={mockMuscleGroups} />
         </section>

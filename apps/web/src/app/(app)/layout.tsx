@@ -1,56 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopBar } from "@/components/layout/top-bar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { TopHeader } from "@/components/layout/top-header";
 import { mockUser } from "@/lib/mock/dashboard";
 
-const sectionLabels: Record<string, string> = {
+function getActiveItem(pathname: string): string {
+  if (pathname.startsWith("/exercises")) return "exercicios";
+  if (pathname.startsWith("/progress")) return "progresso";
+  if (pathname.startsWith("/explore")) return "explorar";
+  if (pathname.startsWith("/personal")) return "personal";
+  return "rotina";
+}
+
+const sectionTitles: Record<string, string> = {
   rotina: "Dashboard",
+  exercicios: "Exercícios",
   progresso: "Progresso",
-  treino: "Iniciar treino",
   explorar: "Explorar",
-  explorar2: "Exercícios",
-  biblioteca: "Biblioteca",
   personal: "Personal",
+  biblioteca: "Biblioteca",
   premium: "Premium",
 };
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [activeItem, setActiveItem] = useState("rotina");
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const activeItem = getActiveItem(pathname);
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
       {/* Desktop sidebar */}
       <div className="hidden md:flex">
-        <Sidebar
-          activeItem={activeItem}
-          onItemChange={setActiveItem}
-          user={mockUser}
-        />
+        <Sidebar activeItem={activeItem} onItemChange={() => {}} user={mockUser} />
       </div>
 
       {/* Main column */}
       <div className="flex flex-col flex-1 min-h-0 min-w-0">
         {/* Mobile top bar */}
         <div className="md:hidden">
-          <TopBar
-            user={mockUser}
-            activeTab={activeItem}
-            onTabChange={setActiveItem}
-          />
+          <TopBar user={mockUser} activeTab={activeItem} onTabChange={() => {}} />
         </div>
 
         {/* Desktop top header */}
         <div className="hidden md:block">
           <TopHeader
-            sectionTitle={sectionLabels[activeItem] ?? activeItem}
+            sectionTitle={sectionTitles[activeItem] ?? activeItem}
             user={mockUser}
           />
         </div>
@@ -62,7 +58,7 @@ export default function DashboardLayout({
 
         {/* Mobile bottom nav */}
         <div className="md:hidden">
-          <BottomNav activeTab={activeItem} onTabChange={setActiveItem} />
+          <BottomNav activeTab={activeItem} onTabChange={() => {}} />
         </div>
       </div>
     </div>
