@@ -1,3 +1,85 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 157 54% 11%;
+    --secondary: 210 40% 95%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 95%;
+    --muted-foreground: 210 22% 39%;
+    --accent: 210 40% 95%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 160 84% 39%;
+    --radius: 0.5rem;
+
+    --color-success: 160 84% 39%;
+    --color-success-bg: 152 100% 96%;
+    --color-success-text: 161 64% 20%;
+    --color-warning: 38 92% 50%;
+    --color-warning-bg: 48 96% 96%;
+    --color-warning-text: 31 62% 30%;
+    --color-error: 0 84% 60%;
+    --color-error-bg: 0 86% 97%;
+    --color-error-text: 0 60% 33%;
+    --color-info: 217 91% 60%;
+    --color-info-bg: 214 100% 97%;
+    --color-info-text: 224 72% 40%;
+  }
+
+  .dark {
+    --background: 215 62% 8%;
+    --foreground: 210 60% 91%;
+    --card: 213 53% 12%;
+    --card-foreground: 210 60% 91%;
+    --popover: 213 53% 12%;
+    --popover-foreground: 210 60% 91%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 157 54% 11%;
+    --secondary: 212 50% 15%;
+    --secondary-foreground: 210 60% 91%;
+    --muted: 212 50% 15%;
+    --muted-foreground: 205 36% 60%;
+    --accent: 212 50% 15%;
+    --accent-foreground: 210 60% 91%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 211 50% 20%;
+    --input: 211 50% 20%;
+    --ring: 160 84% 39%;
+
+    --color-success-bg: 154 87% 10%;
+    --color-success-text: 160 60% 71%;
+    --color-warning-bg: 29 93% 11%;
+    --color-warning-text: 46 90% 59%;
+    --color-error-bg: 0 90% 13%;
+    --color-error-text: 0 91% 83%;
+    --color-info-bg: 213 86% 13%;
+    --color-info-text: 214 87% 78%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans), Inter, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

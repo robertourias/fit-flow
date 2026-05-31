@@ -8,21 +8,75 @@
 **Styling solution**: Tailwind CSS — sem CSS Modules, sem styled-components
 **Animation library**: Framer Motion — respeitar sempre `prefers-reduced-motion`
 **Icon library**: Lucide React — sem Heroicons
-**Design tokens source**: a definir — referências visuais: Lytfa e Smartfit
+**Design tokens source**: `docs/UI/fit-flow.pen` — variáveis definidas no Pencil
 
 ## Color Tokens
 
 Use variáveis semânticas — nunca valores hex diretos em componentes.
 
-<!-- a definir: tokens baseados nas referências Lytfa e Smartfit -->
 ```css
---color-primary        /* cor principal da marca, com variantes hover e active */
---color-success / --color-warning / --color-error / --color-info
---color-text-primary / --color-text-secondary / --color-text-disabled
---color-border / --color-background / --color-surface
+/* Core brand */
+--primary: #10B981                        /* verde esmeralda */
+--primary-foreground: #0D2B1F
+--ring: #10B981                           /* focus ring */
+
+/* Backgrounds / surfaces */
+--background:            light=#FFFFFF       dark=#091420
+--foreground:            light=#0F172A       dark=#D9EAF7
+--card:                  light=#FFFFFF       dark=#0D1D2E
+--card-foreground:       light=#0F172A       dark=#D9EAF7
+--muted:                 light=#F1F5F9       dark=#122338
+--muted-foreground:      light=#4F6278       dark=#7BA4C0
+--accent:                light=#F1F5F9       dark=#122338
+--accent-foreground:     light=#0F172A       dark=#D9EAF7
+--secondary:             light=#F1F5F9       dark=#122338
+--secondary-foreground:  light=#0F172A       dark=#D9EAF7
+
+/* Borders / inputs */
+--border: light=#E2E8F0  dark=#1C3550
+--input:  light=#E2E8F0  dark=#1C3550
+
+/* Feedback — success */
+--color-success: #10B981
+--color-success-bg:          light=#ECFDF5   dark=#042E1A
+--color-success-foreground:  #FFFFFF
+--color-success-text:        light=#065F46   dark=#6EE7B7
+
+/* Feedback — warning */
+--color-warning: #F59E0B
+--color-warning-bg:          light=#FFFBEB   dark=#3A1A02
+--color-warning-foreground:  #FFFFFF
+--color-warning-text:        light=#92400E   dark=#FCD34D
+
+/* Feedback — error */
+--color-error: #EF4444
+--color-error-bg:            light=#FEF2F2   dark=#3A0A0A
+--color-error-foreground:    #FFFFFF
+--color-error-text:          light=#991B1B   dark=#FCA5A5
+
+/* Feedback — info */
+--color-info: #3B82F6
+--color-info-bg:             light=#EFF6FF   dark=#0A1E3A
+--color-info-foreground:     #FFFFFF
+--color-info-text:           light=#1E40AF   dark=#93C5FD
+
+/* Destructive */
+--destructive: #EF4444
+--destructive-foreground: #FFFFFF
 ```
 
-Dark mode: todas as cores devem suportar dark mode via CSS variables ou classes `dark:` do Tailwind. Contraste mínimo: 4.5:1 para texto normal, 3:1 para texto grande.
+Dark mode: implementado via CSS variables com tema `mode: light | dark`. Contraste mínimo: 4.5:1 para texto normal, 3:1 para texto grande.
+
+## Border Radius Tokens
+
+```css
+--radius-none: 0px
+--radius-s:    4px
+--radius-m:    8px
+--radius-l:    12px
+--radius-xl:   16px
+--radius-pill: 9999px
+```
 
 ## Espaçamento & Layout
 
@@ -33,11 +87,10 @@ Dark mode: todas as cores devem suportar dark mode via CSS variables ou classes 
 
 ## Tipografia
 
-<!-- a definir: fontes a escolher com base nas referências Lytfa e Smartfit -->
 ```
-Headings: [a definir], pesos 600/700
-Body:     [a definir], pesos 400/500
-Mono:     [a definir] (blocos de código, conteúdo técnico)
+Headings: Poppins, pesos 600/700   (var: --font-secondary)
+Body:     Inter, pesos 400/500     (var: --font-primary)
+Mono:     [a definir]              (blocos de código, conteúdo técnico)
 ```
 
 Usar escala de tipo do Tailwind (`text-sm`, `text-base`, `text-lg` etc.) — sem tamanhos de fonte customizados salvo exceção justificada.

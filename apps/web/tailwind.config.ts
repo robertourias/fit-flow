@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import baseConfig from "@fitflow/config/tailwind";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
   ...baseConfig,
@@ -7,6 +8,7 @@ const config: Config = {
     "./src/**/*.{ts,tsx}",
     "../../packages/ui/src/**/*.{ts,tsx}",
   ],
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

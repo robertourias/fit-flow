@@ -73,6 +73,10 @@ Registradas aqui para que agentes não inventem convenções não acordadas.
 ### Data fetching no cliente
 - **TanStack Query** — sem SWR, sem fetch manual em componentes
 
+### Tipografia
+- **Headings**: Poppins (600/700) — `--font-secondary`
+- **Body**: Inter (400/500) — `--font-primary`
+
 ### Ícones
 - **Lucide React** — sem Heroicons, sem Phosphor
 
