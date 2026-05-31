@@ -17,10 +17,13 @@ Dependências apontam para dentro. Domain não conhece Infrastructure.
 
 ```
 apps/
-  web/        → Next.js (App Router)
+  web/        → Next.js (App Router) — site principal nico.dev
   api/        → NestJS
+  tools/      → tools.nico.dev
+  challenges/ → challenges.nico.dev
+  storybook/  → Design system reference
 packages/
-  ui/         → Biblioteca de componentes compartilhada
+  ui/         → Biblioteca de componentes compartilhada (@nico.dev/ui)
   config/     → ESLint, TypeScript, Tailwind configs
   types/      → Tipos TypeScript compartilhados
   utils/      → Funções utilitárias compartilhadas

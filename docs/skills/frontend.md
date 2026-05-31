@@ -17,6 +17,13 @@ Padrões técnicos para implementação de frontend. Carregue junto com `docs/ag
 - Sem importar de `app/` dentro de componentes compartilhados
 - Sem `console.log` no código commitado
 
+## Design System
+
+- Antes de criar qualquer elemento visual, verificar se o componente já existe em `@nico.dev/ui`
+- Se não existir, adicioná-lo ao design system ANTES de usar no app — ver `CONTRIBUTING.md`
+- Tokens de cor: sempre via classes Tailwind (`bg-primary`, `text-muted-foreground`) — nunca hex direto
+- Fonte da verdade visual: `docs/nico.dev.br.pen` (Pencil) — consultar via MCP para obter tokens e componentes
+
 ## Estrutura de arquivos
 
 ```
