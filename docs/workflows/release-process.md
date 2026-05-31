@@ -22,24 +22,19 @@
 
 ### 2. Staging Deploy & Verification
 ```bash
-# Deploy to staging (adjust command for your CI/CD setup)
 git push origin main  # triggers staging deploy via CI
-
-# Or manually:
-npm run deploy:staging
 ```
 
 **Verify on staging:**
 - [ ] New feature works end-to-end
 - [ ] Existing critical flows still work (smoke test)
-- [ ] No errors in logs (check Sentry or equivalent)
+- [ ] No errors in logs
 - [ ] DB migrations ran successfully
 - [ ] Performance metrics are normal
 
 ### 3. Production Deploy
 ```bash
-npm run deploy:production
-# or tag a release:
+# Vercel: push to main triggers production deploy automatically
 git tag v[X.Y.Z]
 git push origin v[X.Y.Z]
 ```
@@ -51,11 +46,10 @@ git push origin v[X.Y.Z]
 - [ ] Check database metrics (query times, connection pool)
 
 ### 4. Post-Deploy
-- [ ] Mover `[Unreleased]` para versão com data no `CHANGELOG.md` (ver `workflows/documentation.md`)
-- [ ] Criar ou atualizar `docs/features/<feature>.md` para cada feature entregue
+- [ ] Mover `[Unreleased]` para versão com data no `docs/changelog/releases.md`
+- [ ] Atualizar `docs/context/current-state.md` com estado pós-deploy
 - [ ] Notify stakeholders (Slack, email, etc.)
 - [ ] Close related tasks/tickets
-- [ ] Celebrate 🎉
 
 ## Hotfix Process
 
@@ -100,10 +94,8 @@ If a production issue is detected after deploy:
 4. **Communicate**: Notify team immediately; update status page if user-facing
 
 ```bash
-# Rollback code deploy (example for common platforms)
 # Vercel: vercel rollback
 # Railway: railway rollback
-# AWS/ECS: update service to previous task definition
 ```
 
 ## Changelog Format
@@ -112,13 +104,11 @@ If a production issue is detected after deploy:
 ## [1.2.0] - 2024-01-15
 
 ### Added
-- User profile photos with automatic resizing
-- Email notification preferences
+- feat: ...
 
 ### Fixed
-- Order total calculation was wrong for discounts > 100%
-- Password reset link expired too early (now 24h)
+- fix: ...
 
 ### Changed
-- Dashboard loads 3x faster (added pagination)
+- refactor: ...
 ```
