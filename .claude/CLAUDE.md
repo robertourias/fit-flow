@@ -70,7 +70,6 @@ packages/
 /back   [tarefa]            ← agente backend
 /front  [tarefa]            ← agente frontend
 /review [diff ou contexto]  ← revisão em dois estágios
-/commit                     ← atualiza docs e faz commit
 ```
 Referência completa: `docs/commands/README.md`
 

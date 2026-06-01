@@ -75,7 +75,7 @@ Abra o arquivo do comando desejado, copie o conteúdo e cole no chat da ferramen
 
 /review apps/metronome [cole o diff aqui]
 
-/commit
+/caveman-commit 
 ```
 
 ## Fluxo típico de uma feature global (monorepo)
@@ -94,7 +94,7 @@ Abra o arquivo do comando desejado, copie o conteúdo e cole no chat da ferramen
 /review [diff do backend]
 /review [diff do frontend]
 
-/commit
+/caveman-commit 
 ```
 
 ## Adicionar novos comandos
