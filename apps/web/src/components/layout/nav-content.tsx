@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
 
 const extraNavItems: NavItem[] = [
   { id: "exercicios", label: "Exercícios", icon: ListChecks, href: "/exercises" },
-  { id: "biblioteca", label: "Biblioteca", icon: BookOpen },
+  { id: "biblioteca", label: "Biblioteca", icon: BookOpen, href: "/library" },
 ];
 
 interface NavContentProps {

@@ -57,6 +57,11 @@ Registradas aqui para que agentes não inventem convenções não acordadas.
 - Server Actions para mutações internas — não API routes
 - Dados em Server Components sempre que possível — evitar `useEffect` para fetch
 
+### Estrutura de rotas autenticadas
+- **AppShell** (`src/components/layout/AppShell.tsx`) — componente de shell compartilhado (Sidebar, TopBar, BottomNav, TopHeader) com detecção de rota ativa via `usePathname`
+- Cada rota protegida (`/dashboard`, `/exercises`, `/library`, etc.) tem seu próprio `layout.tsx` que wrapa `<AppShell>` — sem Route Group `(app)`
+- Preferido a Route Group pois elimina o prefixo `(app)/` visível no editor sem introduzir acoplamento de layout
+
 ### Estilização
 - **Tailwind CSS** — sem CSS Modules, sem styled-components
 - **Framer Motion** para animações e transições

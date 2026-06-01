@@ -9,6 +9,7 @@ import { mockUser } from "@/lib/mock/dashboard";
 
 function getActiveItem(pathname: string): string {
   if (pathname.startsWith("/exercises")) return "exercicios";
+  if (pathname.startsWith("/library")) return "biblioteca";
   if (pathname.startsWith("/progress")) return "progresso";
   if (pathname.startsWith("/explore")) return "explorar";
   if (pathname.startsWith("/personal")) return "personal";
@@ -18,32 +19,28 @@ function getActiveItem(pathname: string): string {
 const sectionTitles: Record<string, string> = {
   rotina: "Dashboard",
   exercicios: "Exercícios",
+  biblioteca: "Biblioteca",
   progresso: "Progresso",
   explorar: "Explorar",
   personal: "Personal",
-  biblioteca: "Biblioteca",
   premium: "Premium",
 };
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const activeItem = getActiveItem(pathname);
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
-      {/* Desktop sidebar */}
       <div className="hidden md:flex">
         <Sidebar activeItem={activeItem} onItemChange={() => {}} user={mockUser} />
       </div>
 
-      {/* Main column */}
       <div className="flex flex-col flex-1 min-h-0 min-w-0">
-        {/* Mobile top bar */}
         <div className="md:hidden">
           <TopBar user={mockUser} activeTab={activeItem} onTabChange={() => {}} />
         </div>
 
-        {/* Desktop top header */}
         <div className="hidden md:block">
           <TopHeader
             sectionTitle={sectionTitles[activeItem] ?? activeItem}
@@ -51,12 +48,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           />
         </div>
 
-        {/* Scrollable content */}
         <main className="flex-1 overflow-y-auto pb-24 md:pb-0">
           {children}
         </main>
 
-        {/* Mobile bottom nav */}
         <div className="md:hidden">
           <BottomNav activeTab={activeItem} onTabChange={() => {}} />
         </div>
