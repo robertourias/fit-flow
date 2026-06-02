@@ -1,0 +1,314 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum RelationshipStatus {
+  PENDING
+  ACTIVE
+  REVOKED
+}
+
+enum ExerciseCategory {
+  STRENGTH
+  CARDIO
+  FLEXIBILITY
+  BALANCE
+}
+
+enum WorkoutSessionStatus {
+  ACTIVE
+  FINISHED
+  ABANDONED
+}
+
+// ─── Identity ─────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String
+  avatarUrl     String?
+  isTrainer     Boolean   @default(false)
+  plan          Plan      @default(FREE)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // NextAuth
+  accounts  Account[]
+  sessions  Session[]
+
+  // Catálogo — exercícios customizados (onDelete: Cascade — removidos com a conta)
+  customExercises Exercise[] @relation("CustomExercises")
+
+  // Training
+  strategies      Strategy[]
+  workouts        Workout[]
+  workoutSessions WorkoutSession[]
+
+  // Vínculos preparador-aluno
+  studentsAsTrainer TrainerStudentRelationship[] @relation("TrainerLinks")
+  trainersAsStudent TrainerStudentRelationship[] @relation("StudentLinks")
+
+  @@map("users")
+}
+
+// NextAuth — Account
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// NextAuth — Session de autenticação (distinta de WorkoutSession no domínio Training)
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("auth_sessions")
+}
+
+// NextAuth — VerificationToken
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model TrainerStudentRelationship {
+  id        String             @id @default(cuid())
+  trainerId String
+  studentId String
+  status    RelationshipStatus @default(PENDING)
+  startedAt DateTime           @default(now())
+  endedAt   DateTime?
+
+  trainer User @relation("TrainerLinks", fields: [trainerId], references: [id])
+  student User @relation("StudentLinks", fields: [studentId], references: [id])
+
+  @@unique([trainerId, studentId])
+  @@index([trainerId])
+  @@index([studentId])
+  @@map("trainer_student_relationships")
+}
+
+// ─── Catálogo ─────────────────────────────────────────────────────────────────
+
+model MuscleGroup {
+  id        String @id @default(cuid())
+  name      String
+  slug      String @unique
+
+  exercises ExerciseMuscleGroup[]
+
+  @@map("muscle_groups")
+}
+
+model Equipment {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+
+  exercises ExerciseEquipment[]
+
+  @@map("equipment")
+}
+
+model Exercise {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  videoUrl    String?
+  category    ExerciseCategory @default(STRENGTH)
+  isArchived  Boolean          @default(false)
+
+  // NULL = global (admin); non-null = customizado pelo usuário
+  tenantId String?
+  tenant   User?   @relation("CustomExercises", fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  muscleGroups     ExerciseMuscleGroup[]
+  equipment        ExerciseEquipment[]
+  workoutExercises WorkoutExercise[]
+  sessionExercises SessionExercise[]
+
+  @@index([tenantId])
+  @@map("exercises")
+}
+
+model ExerciseMuscleGroup {
+  exerciseId    String
+  muscleGroupId String
+  isPrimary     Boolean @default(false)
+
+  exercise    Exercise    @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  muscleGroup MuscleGroup @relation(fields: [muscleGroupId], references: [id])
+
+  @@id([exerciseId, muscleGroupId])
+  @@map("exercise_muscle_groups")
+}
+
+model ExerciseEquipment {
+  exerciseId  String
+  equipmentId String
+
+  exercise  Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  equipment Equipment @relation(fields: [equipmentId], references: [id])
+
+  @@id([exerciseId, equipmentId])
+  @@map("exercise_equipment")
+}
+
+// ─── Training ─────────────────────────────────────────────────────────────────
+
+model Strategy {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  type        String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant   User      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workouts Workout[]
+
+  @@index([tenantId])
+  @@map("strategies")
+}
+
+// Regra de negócio: plano FREE limita 6 Workouts por tenantId (enforçado na application layer)
+model Workout {
+  id          String   @id @default(cuid())
+  strategyId  String
+  tenantId    String
+  name        String
+  description String?
+  order       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  strategy         Strategy          @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  tenant           User              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  workoutExercises WorkoutExercise[]
+  sessions         WorkoutSession[]
+
+  @@index([tenantId])
+  @@index([strategyId])
+  @@map("workouts")
+}
+
+model WorkoutExercise {
+  id          String  @id @default(cuid())
+  workoutId   String
+  exerciseId  String
+  order       Int
+  restSeconds Int     @default(90)
+  notes       String?
+
+  workout     Workout      @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exercise    Exercise     @relation(fields: [exerciseId], references: [id])
+  plannedSets PlannedSet[]
+
+  @@index([workoutId])
+  @@map("workout_exercises")
+}
+
+model PlannedSet {
+  id                String  @id @default(cuid())
+  workoutExerciseId String
+  setNumber         Int
+  targetReps        String
+  targetKg          String?
+
+  workoutExercise WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+
+  @@index([workoutExerciseId])
+  @@map("planned_sets")
+}
+
+model WorkoutSession {
+  id         String               @id @default(cuid())
+  workoutId  String
+  tenantId   String
+  startedAt  DateTime
+  endedAt    DateTime?
+  comment    String?
+  difficulty Int?
+  status     WorkoutSessionStatus @default(ACTIVE)
+  createdAt  DateTime             @default(now())
+
+  workout          Workout           @relation(fields: [workoutId], references: [id])
+  tenant           User              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sessionExercises SessionExercise[]
+
+  @@index([tenantId])
+  @@index([workoutId])
+  @@map("workout_sessions")
+}
+
+model SessionExercise {
+  id         String  @id @default(cuid())
+  sessionId  String
+  exerciseId String
+  order      Int
+  notes      String?
+
+  session      WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exercise     Exercise       @relation(fields: [exerciseId], references: [id])
+  executedSets ExecutedSet[]
+
+  @@index([sessionId])
+  @@map("session_exercises")
+}
+
+model ExecutedSet {
+  id                String    @id @default(cuid())
+  sessionExerciseId String
+  setNumber         Int
+  kg                Decimal?  @db.Decimal(6, 2)
+  reps              Int?
+  completedAt       DateTime?
+
+  sessionExercise SessionExercise @relation(fields: [sessionExerciseId], references: [id], onDelete: Cascade)
+
+  @@index([sessionExerciseId])
+  @@map("executed_sets")
+}

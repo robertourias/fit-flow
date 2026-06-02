@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
   // standalone com o caminho apps/web/server.js relativo à raiz do monorepo,
   // compatível com o CMD do Dockerfile ("node apps/web/server.js").
   outputFileTracingRoot: path.join(__dirname, "../../"),
-  transpilePackages: ["@fitflow/ui", "@fitflow/utils", "@fitflow/types"],
+  transpilePackages: ["@fitflow/ui", "@fitflow/utils", "@fitflow/types", "@fitflow/db"],
 };
 
 export default withBundleAnalyzer(nextConfig);

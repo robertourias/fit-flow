@@ -32,7 +32,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fitflow}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-fitflow}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -50,16 +50,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 5s
 
-# ─── Aplicação (profile: app) ─────────────────────────────────────────────────
+  # ─── Aplicação (profile: app) ─────────────────────────────────────────────────
 
   api:
-    profiles: [app]
+    profiles: [ app ]
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -86,14 +86,14 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1"]
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
 
   web:
-    profiles: [app]
+    profiles: [ app ]
     build:
       context: .
       dockerfile: apps/web/Dockerfile
@@ -116,15 +116,15 @@ services:
       api:
         condition: service_healthy
 
-# ─── Ferramentas de desenvolvimento (profile: tools) ──────────────────────────
+  # ─── Ferramentas de desenvolvimento (profile: tools) ──────────────────────────
 
   maildev:
-    profiles: [tools]
+    profiles: [ tools ]
     image: maildev/maildev:2
     restart: unless-stopped
     ports:
-      - "1080:1080"   # interface web: http://localhost:1080
-      - "1025:1025"   # SMTP interno
+      - "1080:1080" # interface web: http://localhost:1080
+      - "1025:1025" # SMTP interno
     networks:
       - backend
 
