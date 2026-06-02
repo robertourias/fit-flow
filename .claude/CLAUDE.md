@@ -7,10 +7,9 @@ Leia apenas os arquivos relevantes ao seu papel antes de qualquer tarefa.
 
 ## Papel: PLANNER
 ```
+docs/skills/planner.md
 docs/context/product.md
 docs/architecture/overview.md
-docs/skills/architecture.md
-docs/agents/planner.agent.md
 docs/workflows/feature-delivery.md
 ```
 
@@ -20,15 +19,14 @@ docs/skills/frontend.md
 docs/context/conventions.md
 docs/context/ui-guidelines.md
 docs/context/decisions.md
-docs/agents/frontend.agent.md
 ```
 
 ## Papel: BACKEND
 ```
 docs/skills/backend.md
+docs/skills/supabase.md
 docs/context/conventions.md
 docs/context/decisions.md
-docs/agents/backend.agent.md
 ```
 
 ## Papel: REVIEWER
@@ -36,7 +34,6 @@ docs/agents/backend.agent.md
 docs/skills/quality.md
 docs/context/conventions.md
 docs/context/decisions.md
-docs/agents/reviewer.agent.md
 ```
 
 ## Carregue sob demanda (não por padrão)
@@ -64,7 +61,7 @@ packages/
 ```
 /init-project [descrição]   ← preenche todos os arquivos de contexto
 /retomar                    ← reconstrói contexto da sessão anterior
-/checkpoint                 ← salva estado atual antes de encerrar
+/checkpoint                 ← atualiza docs e salva estado atual
 /spec   [requisito]         ← gera spec com gate humano (Modo Spec)
 /plan   [caminho-do-spec]   ← cria plano técnico de spec aprovado
 /back   [tarefa]            ← agente backend
