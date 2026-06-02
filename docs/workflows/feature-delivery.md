@@ -37,15 +37,15 @@ O solicitante deve:
 **Input:** Spec aprovado em `docs/specs/YYYY-MM-DD-<topic>.md` (campo `Status: approved` obrigatório)
 **Output:** Tarefas técnicas ordenadas com contrato de API definido
 
-1. Ler `docs/architecture/overview.md` e `docs/context/product.md`
-2. Identificar módulos afetados (backend e frontend)
-3. Definir novos modelos de dados ou mudanças de schema
-4. Rascunhar o contrato de API (endpoints, request/response)
-5. Criar tarefas discretas seguindo o formato em `docs/agents/planner.agent.md`
-6. Identificar dependências e ordenar tarefas
-7. Sinalizar riscos e perguntas abertas antes de prosseguir
+1. Read `docs/architecture/overview.md` and `docs/context/product.md`
+2. Identify affected modules (backend and frontend)
+3. Define any new data models or schema changes
+4. Draft the API contract (endpoints, request/response)
+5. Create discrete tasks following the task format in `docs/agents/planner.agent.md`
+6. Identify dependencies and order tasks
+7. Flag risks and open questions before proceeding
 
-**Gate**: Todas as ambiguidades resolvidas antes de iniciar implementação.
+**Gate**: All ambiguities must be resolved before moving to implementation.
 
 ---
 
@@ -54,88 +54,89 @@ O solicitante deve:
 **Prerequisite**: API contract defined and agreed upon
 
 ### Step 2a: Domain & Database
-- [ ] Definir ou atualizar entidades de domínio (`domain/entities/`)
-- [ ] Criar ou atualizar value objects se necessário
-- [ ] Escrever migration(s) para mudanças de schema
-- [ ] Rodar migration localmente: `npm run migration:run`
+- [ ] Define or update domain entities (`domain/entities/`)
+- [ ] Create or update value objects if needed
+- [ ] Write migration(s) for schema changes
+- [ ] Run migration locally: `npm run migration:run`
 
 ### Step 2b: Application Layer
-- [ ] Implementar use case(s) em `application/use-cases/`
-- [ ] Definir interface de repository na camada de domínio se nova
-- [ ] Escrever testes unitários para use cases (mockar todas as dependências)
+- [ ] Implement use case(s) in `application/use-cases/`
+- [ ] Define repository interface in domain layer if new
+- [ ] Write unit tests for use cases (mock all dependencies)
 
 ### Step 2c: Infrastructure
-- [ ] Implementar repository em `infrastructure/repositories/`
-- [ ] Registrar módulo: providers, imports, exports
+- [ ] Implement repository in `infrastructure/repositories/`
+- [ ] Wire module: providers, imports, exports
 
 ### Step 2d: Presentation
-- [ ] Criar ou atualizar controller com DTOs e decorators Swagger
-- [ ] Adicionar validação (`class-validator` em todos os DTOs)
-- [ ] Escrever testes de integração contra a camada HTTP real
+- [ ] Create or update controller with DTOs and Swagger decorators
+- [ ] Add validation (`class-validator` on all DTOs)
+- [ ] Write integration tests against the real HTTP layer
 
-**Gate**: Todos os testes unitários + integração passando. `npm run test` está verde.
+**Gate**: All unit + integration tests pass. `npm run test` is green.
 
 ---
 
 ## Phase 3: Frontend Implementation (Frontend Agent)
 
-**Prerequisite**: Backend API endpoints disponíveis (ou mockados via MSW)
+**Prerequisite**: Backend API endpoints available (or mocked via MSW)
 
 ### Step 3a: Data Layer
-- [ ] Definir tipos TypeScript para shapes de resposta da API
-- [ ] Criar função de serviço/fetch para as novas chamadas de API
-- [ ] Configurar handler MSW para mocking no desenvolvimento local
+- [ ] Define TypeScript types for API response shapes
+- [ ] Create service/fetch function for the new API calls
+- [ ] Set up MSW handler for local development mocking
 
 ### Step 3b: Components
-- [ ] Construir novos componentes seguindo `docs/agents/frontend.agent.md`
-- [ ] Aplicar design tokens de `docs/context/ui-guidelines.md`
-- [ ] Tratar todos os estados: loading, empty, error, data
-- [ ] Escrever testes de componentes
+- [ ] Build new components following `docs/agents/frontend.agent.md`
+- [ ] Apply design tokens from `docs/context/ui-guidelines.md`
+- [ ] Handle all states: loading, empty, error, data
+- [ ] Write component tests
 
 ### Step 3c: Page / Route
-- [ ] Criar ou atualizar página Next.js seguindo `docs/agents/frontend.agent.md` e `docs/context/decisions.md`
-- [ ] Configurar metadata adequado
-- [ ] Adicionar `loading.tsx` e `error.tsx` se rota faz data-fetching
+- [ ] Create or update Next.js page following `docs/agents/frontend.agent.md` and `docs/context/decisions.md`
+- [ ] Set up proper metadata
+- [ ] Add `loading.tsx` and `error.tsx` if data-fetching route
 
-**Gate**: Todos os testes de componentes passando. Feature funciona contra mocks MSW.
+**Gate**: All component tests pass. Feature works against MSW mocks.
 
 ---
 
 ## Phase 4: Integration
 
-- [ ] Apontar frontend para o backend real (remover mock MSW ou ajustar flag)
-- [ ] Testar happy path end-to-end
-- [ ] Testar casos de erro end-to-end
-- [ ] Verificar estados de loading e empty
-- [ ] Checar responsividade mobile (ao menos 375px e 768px)
-- [ ] Checar acessibilidade (navegação por teclado, screen reader)
+- [ ] Point frontend to real backend (remove MSW mock or set flag)
+- [ ] Test happy path end-to-end
+- [ ] Test error cases end-to-end
+- [ ] Verify loading and empty states
+- [ ] Check mobile responsiveness (at least 375px and 768px)
+- [ ] Check accessibility (keyboard nav, screen reader)
 
 ---
 
 ## Phase 5: Review (Reviewer Agent)
 
-- [ ] Auto-revisão usando checklist em `docs/agents/reviewer.agent.md`
-- [ ] Abrir PR com descrição: o que mudou, por quê, como testar
-- [ ] Resolver todos os itens BLOCKER e WARNING
-- [ ] Obter aprovação de ao menos um outro agente ou membro do time
+- [ ] Self-review using `docs/agents/reviewer.agent.md` checklist
+- [ ] Open PR with description: what changed, why, how to test
+- [ ] Address all BLOCKER and WARNING items
+- [ ] Get approval from at least one other agent or team member
 
-**Gate**: Sem BLOCKERs não resolvidos. CI passa.
+**Gate**: No unresolved BLOCKERs. CI passes.
 
 ---
 
 ## Phase 6: Deploy
 
-Seguir `docs/workflows/release-process.md`.
+Follow `docs/workflows/release-process.md`.
 
 ---
 
 ## Phase 7: Documentation (pós-merge para `main`)
 
+Execute `/checkpoint` para consolidar o changelog e o estado atual do projeto, em seguida realize o commit manual das alterações de documentação.
+
 Checklist mínimo após cada merge:
-- [ ] `docs/changelog/YYYY-MM-DD.md` atualizado
-- [ ] `docs/context/current-state.md` atualizado
+- [ ] `docs/features/<feature>.md` criado ou atualizado
+- [ ] `docs/changelog/YYYY-MM-DD.md` — entrada atualizada com o que foi mergeado
 - [ ] `.env.example` atualizado se novas variáveis foram adicionadas
-- [ ] `docs/architecture/overview.md` atualizado se houve decisão arquitetural nova
 
 ---
 

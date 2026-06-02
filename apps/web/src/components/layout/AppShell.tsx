@@ -11,6 +11,7 @@ function getActiveItem(pathname: string): string {
   if (pathname.startsWith("/exercises")) return "exercicios";
   if (pathname.startsWith("/library")) return "biblioteca";
   if (pathname.startsWith("/program")) return "biblioteca";
+  if (pathname.startsWith("/workout")) return "biblioteca";
   if (pathname.startsWith("/progress")) return "progresso";
   if (pathname.startsWith("/explore")) return "explorar";
   if (pathname.startsWith("/personal")) return "personal";

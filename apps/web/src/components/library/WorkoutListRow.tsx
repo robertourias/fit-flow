@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Ellipsis } from "lucide-react";
 import type { Workout } from "@/lib/mock/library";
@@ -8,7 +9,10 @@ interface WorkoutListRowProps {
 
 export function WorkoutListRow({ workout }: WorkoutListRowProps) {
   return (
-    <div className="flex items-center gap-3.5 md:gap-4 px-5 md:px-6 py-3.5 border-b border-border bg-card hover:bg-accent/30 transition-colors cursor-pointer">
+    <div className="relative flex items-center gap-3.5 md:gap-4 px-5 md:px-6 py-3.5 border-b border-border bg-card hover:bg-accent/30 transition-colors">
+      {/* Stretched link covers the row except the button */}
+      <Link href={`/workout/${workout.id}`} className="absolute inset-0" aria-label={workout.name} />
+
       {/* Thumbnail */}
       <div className="relative h-[52px] w-[52px] rounded-m overflow-hidden shrink-0">
         <Image
@@ -30,10 +34,11 @@ export function WorkoutListRow({ workout }: WorkoutListRowProps) {
         </span>
       </div>
 
-      {/* More */}
+      {/* More — sits above the link overlay */}
       <button
-        className="text-muted-foreground hover:text-foreground transition-colors"
+        className="relative z-10 text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Mais opções"
+        onClick={(e) => e.preventDefault()}
       >
         <Ellipsis className="h-[18px] w-[18px]" />
       </button>

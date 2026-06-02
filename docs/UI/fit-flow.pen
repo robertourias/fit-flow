@@ -22290,7 +22290,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181078355.png",
+                    "url": "images/generated-1780181078355.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22324,7 +22324,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181077535.png",
+                    "url": "images/generated-1780181077535.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22337,7 +22337,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Peito",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22357,7 +22358,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181076176.png",
+                    "url": "images/generated-1780181076176.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22370,7 +22371,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Costas",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22390,7 +22392,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181082579.png",
+                    "url": "images/generated-1780181082579.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22403,7 +22405,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Ombros",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22423,7 +22426,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181073008.png",
+                    "url": "images/generated-1780181073008.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22436,7 +22439,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Bíceps",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22456,7 +22460,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181069739.png",
+                    "url": "images/generated-1780181069739.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22469,7 +22473,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Tríceps",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22489,7 +22494,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181077083.png",
+                    "url": "images/generated-1780181077083.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22502,7 +22507,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Pernas",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22522,7 +22528,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181076029.png",
+                    "url": "images/generated-1780181076029.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22535,7 +22541,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Abdômen",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -22555,7 +22562,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181088174.png",
+                    "url": "images/generated-1780181088174.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -22568,7 +22575,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Glúteos",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -24428,7 +24436,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181087063.png",
+                    "url": "images/generated-1780181087063.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24462,7 +24470,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181093391.png",
+                    "url": "images/generated-1780181093391.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24475,7 +24483,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Peito",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24495,7 +24504,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181093233.png",
+                    "url": "images/generated-1780181093233.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24508,7 +24517,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Costas",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24528,7 +24538,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181094068.png",
+                    "url": "images/generated-1780181094068.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24541,7 +24551,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Ombros",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24561,7 +24572,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181089130.png",
+                    "url": "images/generated-1780181089130.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24574,7 +24585,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Bíceps",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24594,7 +24606,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181087648.png",
+                    "url": "images/generated-1780181087648.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24607,7 +24619,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Tríceps",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24627,7 +24640,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181100289.png",
+                    "url": "images/generated-1780181100289.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24640,7 +24653,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Pernas",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24660,7 +24674,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181087098.png",
+                    "url": "images/generated-1780181087098.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24673,7 +24687,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Abdômen",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -24693,7 +24708,7 @@
                   "fill": {
                     "type": "image",
                     "enabled": true,
-                    "url": "./images/generated-1780181087741.png",
+                    "url": "images/generated-1780181087741.png",
                     "mode": "fill"
                   },
                   "width": 44,
@@ -24706,7 +24721,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Glúteos",
                   "fontFamily": "Inter",
-                  "fontSize": 9
+                  "fontSize": 9,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -30473,7 +30489,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181109546.png",
+                                        "url": "images/generated-1780181109546.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30522,7 +30538,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181117788.png",
+                                        "url": "images/generated-1780181117788.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30571,7 +30587,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181110450.png",
+                                        "url": "images/generated-1780181110450.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30629,7 +30645,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181115930.png",
+                                        "url": "images/generated-1780181115930.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30678,7 +30694,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181111781.png",
+                                        "url": "images/generated-1780181111781.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30727,7 +30743,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181110389.png",
+                                        "url": "images/generated-1780181110389.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30785,7 +30801,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181110164.png",
+                                        "url": "images/generated-1780181110164.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30834,7 +30850,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181108877.png",
+                                        "url": "images/generated-1780181108877.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30883,7 +30899,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181110106.png",
+                                        "url": "images/generated-1780181110106.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30941,7 +30957,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181117000.png",
+                                        "url": "images/generated-1780181117000.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -30990,7 +31006,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181108257.png",
+                                        "url": "images/generated-1780181108257.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -31039,7 +31055,7 @@
                                       "fill": {
                                         "type": "image",
                                         "enabled": true,
-                                        "url": "./images/generated-1780181115145.png",
+                                        "url": "images/generated-1780181115145.png",
                                         "mode": "fill"
                                       },
                                       "width": "fill_container",
@@ -32909,7 +32925,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Dashboard",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -32980,7 +32997,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Exercícios",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -33015,7 +33033,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Progresso",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -33050,7 +33069,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Perfil",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -35305,7 +35325,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Início",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -35372,7 +35393,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Exercícios",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -35405,7 +35427,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Progresso",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -35438,7 +35461,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Perfil",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             }
@@ -35553,7 +35577,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Dashboard",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -35624,7 +35649,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Exercícios",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -35659,7 +35685,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Progresso",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 },
@@ -35694,7 +35721,8 @@
                       "fill": "$--muted-foreground",
                       "content": "Perfil",
                       "fontFamily": "Inter",
-                      "fontSize": 14
+                      "fontSize": 14,
+                      "fontWeight": "normal"
                     }
                   ]
                 }
@@ -39065,7 +39093,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Início",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -39132,7 +39161,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Exercícios",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -39165,7 +39195,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Progresso",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             },
@@ -39198,7 +39229,8 @@
                   "fill": "$--muted-foreground",
                   "content": "Perfil",
                   "fontFamily": "Inter",
-                  "fontSize": 10
+                  "fontSize": 10,
+                  "fontWeight": "normal"
                 }
               ]
             }

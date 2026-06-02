@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import type { Workout } from "@/lib/mock/library";
 
@@ -7,7 +8,10 @@ interface WorkoutCardProps {
 
 export function WorkoutCard({ workout }: WorkoutCardProps) {
   return (
-    <div className="bg-card rounded-l border border-border overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow group">
+    <Link
+      href={`/workout/${workout.id}`}
+      className="bg-card rounded-l border border-border overflow-hidden flex flex-col hover:shadow-md transition-shadow group"
+    >
       {/* Thumbnail */}
       <div className="relative h-[120px] w-full overflow-hidden">
         <Image
@@ -28,6 +32,6 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           {workout.exercises} exercícios
         </span>
       </div>
-    </div>
+    </Link>
   );
 }
