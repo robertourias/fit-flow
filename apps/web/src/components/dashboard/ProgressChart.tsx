@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTheme } from "next-themes";
 import {
   BarChart,
@@ -25,15 +25,18 @@ function useChartColors() {
   useEffect(() => setMounted(true), []);
 
   const isDark = mounted && resolvedTheme === "dark";
-  return {
-    primary: "#10B981",
-    primaryMuted: isDark ? "#10B98133" : "#10B98122",
-    grid: isDark ? "#1C3550" : "#E2E8F0",
-    axis: isDark ? "#7BA4C0" : "#4F6278",
-    card: isDark ? "#0D1D2E" : "#FFFFFF",
-    border: isDark ? "#1C3550" : "#E2E8F0",
-    foreground: isDark ? "#D9EAF7" : "#0F172A",
-  };
+  return useMemo(
+    () => ({
+      primary: "#10B981",
+      primaryMuted: isDark ? "#10B98133" : "#10B98122",
+      grid: isDark ? "#1C3550" : "#E2E8F0",
+      axis: isDark ? "#7BA4C0" : "#4F6278",
+      card: isDark ? "#0D1D2E" : "#FFFFFF",
+      border: isDark ? "#1C3550" : "#E2E8F0",
+      foreground: isDark ? "#D9EAF7" : "#0F172A",
+    }),
+    [isDark]
+  );
 }
 
 const TICK_VALUES = [0, 2000, 4000, 6000, 8000];

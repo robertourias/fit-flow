@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bookmark } from "lucide-react";
@@ -7,7 +8,7 @@ interface ExerciseCardProps {
   exercise: Exercise;
 }
 
-export function ExerciseCard({ exercise }: ExerciseCardProps) {
+export const ExerciseCard = memo(function ExerciseCard({ exercise }: ExerciseCardProps) {
   return (
     <Link href={`/exercises/${exercise.id}`} className="block group">
       <div className="relative bg-card rounded-l border border-border overflow-hidden flex flex-col transition-shadow group-hover:shadow-md">
@@ -47,4 +48,4 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
       </div>
     </Link>
   );
-}
+});

@@ -1,6 +1,6 @@
 import { MetricsStrip } from "@/components/dashboard/MetricsStrip";
 import { TreinoCard } from "@/components/dashboard/TreinoCard";
-import { ProgressChart } from "@/components/dashboard/ProgressChart";
+import { ProgressChartClient as ProgressChart } from "@/components/dashboard/ProgressChartClient";
 import { CalendarSection } from "@/components/dashboard/CalendarSection";
 import { UpcomingCard } from "@/components/dashboard/UpcomingCard";
 import { MuscleCard } from "@/components/dashboard/MuscleCard";

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Workout } from "@/lib/mock/library";
@@ -6,7 +7,7 @@ interface WorkoutCardProps {
   workout: Workout;
 }
 
-export function WorkoutCard({ workout }: WorkoutCardProps) {
+export const WorkoutCard = memo(function WorkoutCard({ workout }: WorkoutCardProps) {
   return (
     <Link
       href={`/workout/${workout.id}`}
@@ -34,4 +35,4 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
       </div>
     </Link>
   );
-}
+});

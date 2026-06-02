@@ -1,5 +1,10 @@
 import path from "path";
 import type { NextConfig } from "next";
+import createBundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundleAnalyzer = createBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -16,4 +21,4 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@fitflow/ui", "@fitflow/utils", "@fitflow/types"],
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Ellipsis } from "lucide-react";
@@ -7,7 +8,7 @@ interface WorkoutListRowProps {
   workout: Workout;
 }
 
-export function WorkoutListRow({ workout }: WorkoutListRowProps) {
+export const WorkoutListRow = memo(function WorkoutListRow({ workout }: WorkoutListRowProps) {
   return (
     <div className="relative flex items-center gap-3.5 md:gap-4 px-5 md:px-6 py-3.5 border-b border-border bg-card hover:bg-accent/30 transition-colors">
       {/* Stretched link covers the row except the button */}
@@ -44,4 +45,4 @@ export function WorkoutListRow({ workout }: WorkoutListRowProps) {
       </button>
     </div>
   );
-}
+});
