@@ -11,6 +11,7 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json              ./apps/web/
 COPY packages/config/package.json       ./packages/config/
+COPY packages/db/package.json           ./packages/db/
 COPY packages/types/package.json        ./packages/types/
 COPY packages/ui/package.json           ./packages/ui/
 COPY packages/utils/package.json        ./packages/utils/
@@ -21,10 +22,13 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
 FROM base AS builder
 COPY --from=deps /app/node_modules              ./node_modules
 COPY --from=deps /app/apps/web/node_modules     ./apps/web/node_modules
+COPY --from=deps /app/packages/db/node_modules  ./packages/db/node_modules
 COPY package.json pnpm-workspace.yaml           ./
 COPY packages/                                  ./packages/
 COPY apps/web/                                  ./apps/web/
 ENV NEXT_TELEMETRY_DISABLED=1
+# Prisma client precisa existir antes do next build resolver '@fitflow/db' (re-exporta @prisma/client)
+RUN pnpm --filter @fitflow/db exec prisma generate
 RUN cd apps/web && pnpm run build
 
 # runner: minimal production image (~200 MB vs ~1 GB)

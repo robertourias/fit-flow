@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings } from "lucide-react";
+import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -135,6 +136,13 @@ export function NavContent({
         </div>
         <button className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Configurações">
           <Settings className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Sair"
+        >
+          <LogOut className="h-4 w-4" />
         </button>
       </div>
     </div>

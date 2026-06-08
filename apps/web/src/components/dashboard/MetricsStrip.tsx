@@ -14,9 +14,7 @@ interface MetricTile {
   deltaPositive?: boolean;
 }
 
-interface TileCardProps extends MetricTile {}
-
-function TileCard({ label, icon: Icon, value, unit, delta, deltaPositive }: TileCardProps) {
+function TileCard({ label, icon: Icon, value, unit, delta, deltaPositive }: MetricTile) {
   return (
     <div className="bg-card rounded-l border border-border p-[18px] h-full flex flex-col
       /* Mobile/tablet: center-aligned, icon on top */

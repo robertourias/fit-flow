@@ -33,9 +33,11 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 FROM deps AS builder
 WORKDIR /repo
 COPY --from=pruner /repo/out/full/ .
+# Prisma client precisa existir antes do tsc resolver os tipos de @fitflow/db
+# (prisma é devDep de @fitflow/db, não de @fitflow/api — filtro deve apontar pro pacote certo)
+RUN pnpm --filter @fitflow/db exec prisma generate
 # turbo respeita dependsOn: ["^build"], portanto @fitflow/types é compilado antes
 RUN pnpm exec turbo build --filter=@fitflow/api
-RUN pnpm --filter @fitflow/api exec prisma generate
 # pnpm deploy cria /deploy com node_modules flat de prod (sem devDeps)
 RUN pnpm --filter @fitflow/api deploy --prod /deploy
 
