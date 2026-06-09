@@ -4,21 +4,7 @@ import { prisma } from "@fitflow/db";
 import { createOtp } from "@/lib/otp";
 import { sendOtpEmail } from "@/lib/email";
 
-export async function requestLoginOtp(
-  email: string
-): Promise<{ success: boolean; error?: string }> {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) {
-    return { success: false, error: "Email não encontrado. Crie uma conta primeiro." };
-  }
-
-  const otp = await createOtp(email);
-  await sendOtpEmail(email, user.name, otp);
-
-  return { success: true };
-}
-
-export async function requestSignupOtp(
+export async function requestSignup(
   name: string,
   email: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -31,8 +17,24 @@ export async function requestSignupOtp(
     data: { name, email, hasOnboarded: false },
   });
 
+  return { success: true };
+}
+
+export async function requestLoginOtp(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    return { success: false, error: "Email não encontrado. Crie uma conta primeiro." };
+  }
+
   const otp = await createOtp(email);
-  await sendOtpEmail(email, name, otp);
+
+  try {
+    await sendOtpEmail(email, user.name, otp);
+  } catch {
+    return { success: false, error: "Erro ao enviar email. Verifique as configurações de SMTP." };
+  }
 
   return { success: true };
 }
@@ -46,7 +48,12 @@ export async function resendOtp(
   }
 
   const otp = await createOtp(email);
-  await sendOtpEmail(email, user.name, otp);
+
+  try {
+    await sendOtpEmail(email, user.name, otp);
+  } catch {
+    return { success: false, error: "Erro ao enviar email. Tente novamente." };
+  }
 
   return { success: true };
 }

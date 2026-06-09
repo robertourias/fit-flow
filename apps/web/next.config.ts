@@ -14,10 +14,11 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },
-  // Necessário em monorepos: faz o file tracing incluir packages/ e gera o
-  // standalone com o caminho apps/web/server.js relativo à raiz do monorepo,
-  // compatível com o CMD do Dockerfile ("node apps/web/server.js").
   outputFileTracingRoot: path.join(__dirname, "../../"),
+  // Prisma engine binary (.so.node) is not auto-detected by file tracing — include explicitly
+  outputFileTracingIncludes: {
+    "**": ["../../node_modules/.pnpm/**/.prisma/client/libquery_engine-*.node"],
+  },
   transpilePackages: ["@fitflow/ui", "@fitflow/utils", "@fitflow/types", "@fitflow/db"],
 };
 

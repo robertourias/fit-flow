@@ -45,22 +45,29 @@ const nextAuth = NextAuth({
       },
     }),
   ],
-  session: { strategy: "database" },
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
   callbacks: {
-    async session({ session, user }) {
+    async jwt({ token, user }) {
       if (user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (token as any).id = user.id;
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { hasOnboarded: true, id: true },
+          select: { hasOnboarded: true },
         });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).hasOnboarded = dbUser?.hasOnboarded ?? false;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (session.user as any).id = user.id;
+        (token as any).hasOnboarded = dbUser?.hasOnboarded ?? false;
       }
+      return token;
+    },
+    async session({ session, token }) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (session.user as any).id = (token as any).id;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (session.user as any).hasOnboarded = (token as any).hasOnboarded ?? false;
       return session;
     },
     async signIn({ account, profile }) {

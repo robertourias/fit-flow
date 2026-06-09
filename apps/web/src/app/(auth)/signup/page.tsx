@@ -6,7 +6,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { requestSignupOtp } from "@/app/(auth)/actions";
+import { requestSignup } from "@/app/(auth)/actions";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function SignupPage() {
     setError(null);
     setLoading(true);
 
-    const result = await requestSignupOtp(name.trim(), email);
+    const result = await requestSignup(name.trim(), email);
 
     if (!result.success) {
       setError(result.error ?? "Erro ao criar conta.");
@@ -29,7 +29,7 @@ export default function SignupPage() {
       return;
     }
 
-    router.push(`/verify?email=${encodeURIComponent(email)}&signup=true`);
+    router.push(`/login?registered=1`);
   }
 
   async function handleGoogle() {

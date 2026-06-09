@@ -114,13 +114,20 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       # Gmail SMTP — envio de OTP
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
       GMAIL_USER: ${GMAIL_USER:-}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD:-}
+      # DB direto — necessário para Prisma no auth (OTP, PrismaAdapter, JWT callback)
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-fitflow}
     ports:
       - "3000:3000"
     networks:
       - frontend
+      - backend
     depends_on:
+      db:
+        condition: service_healthy
       api:
         condition: service_healthy
 

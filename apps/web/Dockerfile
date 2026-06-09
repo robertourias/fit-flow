@@ -29,7 +29,7 @@ COPY apps/web/                                  ./apps/web/
 ENV NEXT_TELEMETRY_DISABLED=1
 # Prisma client precisa existir antes do next build resolver '@fitflow/db' (re-exporta @prisma/client)
 RUN pnpm --filter @fitflow/db exec prisma generate
-RUN cd apps/web && pnpm run build
+RUN cd apps/web && NODE_OPTIONS="--max_old_space_size=4096" pnpm run build
 
 # runner: minimal production image (~200 MB vs ~1 GB)
 FROM node:20-alpine AS runner
