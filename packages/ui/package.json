@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./button": "./src/button.tsx"
+    ".": "./src/index.ts",
+    "./button": "./src/button.tsx",
+    "./password-strength-bar": "./src/PasswordStrengthBar.tsx"
   },
   "scripts": {
     "build": "tsc --noEmit",

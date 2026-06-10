@@ -23,6 +23,7 @@ FROM base AS builder
 COPY --from=deps /app/node_modules              ./node_modules
 COPY --from=deps /app/apps/web/node_modules     ./apps/web/node_modules
 COPY --from=deps /app/packages/db/node_modules  ./packages/db/node_modules
+COPY --from=deps /app/packages/ui/node_modules  ./packages/ui/node_modules
 COPY package.json pnpm-workspace.yaml           ./
 COPY packages/                                  ./packages/
 COPY apps/web/                                  ./apps/web/

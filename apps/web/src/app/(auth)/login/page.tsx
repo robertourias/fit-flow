@@ -1,56 +1,67 @@
-"use client";
+'use client'
 
-import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { requestLoginOtp } from "@/app/(auth)/actions";
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { signIn } from 'next-auth/react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { TurnstileWidget } from '@/components/auth/TurnstileWidget'
+import { requestLoginOtp } from '@/app/(auth)/actions'
+
+const INPUT_CLASS =
+  'h-10 w-full rounded-m border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50'
+
+const GOOGLE_SVG = (
+  <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+  </svg>
+)
 
 function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const registered = searchParams.get("registered") === "1";
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const registered = searchParams.get('registered') === '1'
 
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
 
-    const result = await requestLoginOtp(email);
+    const result = await requestLoginOtp(email.trim(), password, turnstileToken)
 
     if (!result.success) {
-      setError(result.error ?? "Erro ao enviar código.");
-      setLoading(false);
-      return;
+      setError(result.error ?? 'Erro ao verificar credenciais.')
+      setLoading(false)
+      return
     }
 
-    router.push(`/verify?email=${encodeURIComponent(email)}`);
-  }
-
-  async function handleGoogle() {
-    setGoogleLoading(true);
-    await signIn("google", { callbackUrl: "/dashboard" });
+    router.push(`/verify?email=${encodeURIComponent(email.trim())}`)
   }
 
   return (
     <div className="flex flex-col gap-6">
       {registered && (
-        <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
-          Conta criada com sucesso! Digite seu email para entrar.
+        <div className="rounded-md border border-[var(--color-success)] bg-[var(--color-success-bg)] px-4 py-3 text-sm text-[var(--color-success-text)]">
+          Conta criada com sucesso! Entre com suas credenciais.
         </div>
       )}
 
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-2xl font-bold">Entrar</h1>
         <p className="text-sm text-muted-foreground">
-          Digite seu email para receber um código de acesso.
+          Digite seu email e senha para acessar sua conta.
         </p>
       </div>
 
@@ -65,21 +76,48 @@ function LoginForm() {
             required
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={() => setError(null)}
+            onChange={(e) => { setEmail(e.target.value); setError(null) }}
             placeholder="seu@email.com"
-            className="h-10 w-full rounded-m border border-input bg-background px-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50"
+            className={INPUT_CLASS}
           />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-sm font-medium">
+              Senha <span aria-hidden="true" className="text-destructive">*</span>
+            </label>
+          </div>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(null) }}
+              placeholder="Sua senha"
+              className={`${INPUT_CLASS} pr-10`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           {error && (
-            <p role="alert" className="text-sm text-[var(--color-error-text)]">
-              {error}
-            </p>
+            <p role="alert" className="text-sm text-[var(--color-error-text)]">{error}</p>
           )}
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <TurnstileWidget onVerify={setTurnstileToken} onError={() => setTurnstileToken('')} />
+
+        <Button type="submit" className="w-full" disabled={loading || !turnstileToken}>
           {loading && <Loader2 className="animate-spin" />}
-          Enviar código
+          Continuar
         </Button>
       </form>
 
@@ -92,42 +130,21 @@ function LoginForm() {
       <Button
         variant="outline"
         className="w-full"
-        onClick={handleGoogle}
+        onClick={() => { setGoogleLoading(true); signIn('google', { callbackUrl: '/dashboard' }) }}
         disabled={googleLoading}
       >
-        {googleLoading ? (
-          <Loader2 className="animate-spin" />
-        ) : (
-          <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
-            <path
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              fill="#EA4335"
-            />
-          </svg>
-        )}
+        {googleLoading ? <Loader2 className="animate-spin" /> : GOOGLE_SVG}
         Continuar com Google
       </Button>
 
       <p className="text-center text-sm text-muted-foreground">
-        Não tem conta?{" "}
+        Não tem conta?{' '}
         <Link href="/signup" className="text-primary underline underline-offset-4 hover:opacity-80">
           Criar conta
         </Link>
       </p>
     </div>
-  );
+  )
 }
 
 export default function LoginPage() {
@@ -135,5 +152,5 @@ export default function LoginPage() {
     <Suspense>
       <LoginForm />
     </Suspense>
-  );
+  )
 }

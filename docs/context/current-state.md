@@ -3,128 +3,68 @@
 > Memória de trabalho persistente. Atualizado pelo `/checkpoint`, lido pelo `/retomar`.
 > Não edite manualmente durante uma sessão ativa — use `/checkpoint` antes de fechar.
 
-**Última atualização:** 2026-06-02
-**Resumo da última sessão:** Spec de modelagem de dados aprovado e plano técnico executado completo (T-1 a T-11): `packages/db` com schema Prisma, migration inicial, entidades de domínio, interfaces de repositório, módulos NestJS com Prisma repos e NextAuth v5 configurado.
+**Última atualização:** 2026-06-08
+**Resumo da última sessão:** Depuração e correção completa do fluxo de autenticação em Docker: Prisma engine, DATABASE_URL, JWT strategy, PrismaAdapter image field, SMTP config e UX de cadastro.
 
 ---
 
-## Features implementadas
+## Feature em andamento
 
-### Frontend — Dashboard, Exercícios, Biblioteca, Treino (apps/web)
-
-#### Dashboard (`/dashboard`) — concluído
-- Shell de navegação: Sidebar, TopBar, TopHeader, BottomNav
-- Métricas, TreinoCard, ProgressChart (Recharts — lazy via next/dynamic), CalendarSection, UpcomingCard, MuscleCard
-- Layouts responsivos: mobile / tablet / desktop
-
-#### Exercícios (`/exercises`, `/exercises/[id]`) — concluído
-- Lista: FilterBar horizontal com useDeferredValue + react-window (virtualização ≥30 itens)
-- Grid 2-col mobile / 3-col desktop com ExerciseCard (React.memo)
-- Detalhe: imagem + action bar + silhueta + detalhes + CTA
-
-#### Biblioteca (`/library`) — concluído
-- WorkoutCard e WorkoutListRow com React.memo + Link para `/workout/[id]`
-- ViewToggle grade ↔ lista, LibraryPanel desktop
-
-#### Treino — Detalhe e Execução — concluído
-- `/workout/[id]` — WorkoutDetailPage: drag-and-drop @dnd-kit, tabela de séries
-- `/workout/[id]/start` — WorkoutStartPreview: stats, última execução
-- `/workout/[id]/session` — WorkoutActiveSession: timer, rest countdown, tabela Série/Anterior/Kg/Reps/✓
-- `/workout/[id]/finish` — WorkoutFinishForm: textarea, dificuldade, toggles, CTA
-- Store: `workout-session.store.ts` (Zustand + localStorage persist)
-
-#### Performance (apps/web) — concluído
-- recharts lazy-loaded via `ProgressChartClient` (next/dynamic, ssr: false)
-- `ExerciseCard`, `WorkoutCard`, `WorkoutListRow` → React.memo
-- `useDeferredValue` em ExercisesClientPage (search + filtered)
-- react-window em lista de exercícios (FixedSizeList, threshold 30 itens)
-- Bundle analyzer: `ANALYZE=true pnpm build`
-
----
-
-### Backend — Data Model (packages/db + apps/api)
-
-#### packages/db — concluído
-- `prisma/schema.prisma` — 16 models, 4 enums, todos os @@index e @@map
-- Migration inicial aplicada (`20260602204914_init`) no banco Docker (porta 5433)
-- PrismaClient singleton exportado via `packages/db/src/index.ts`
-- `packages/db/.env` — DATABASE_URL na porta 5433
-
-#### apps/api — entidades e repositórios — concluído
-**Identity** (`src/identity/domain/`):
-- `User`, `TrainerStudentRelationship` entities + `Plan`, `RelationshipStatus` enums
-- `IUsersRepository`, `ITrainerStudentRelationshipRepository` interfaces
-- `PrismaUsersRepository`, `PrismaTrainerStudentRelationshipRepository`
-- `IdentityModule` com tokens `USERS_REPOSITORY`, `TRAINER_STUDENT_RELATIONSHIP_REPOSITORY`
-
-**Catalog** (`src/catalog/domain/`):
-- `Exercise`, `MuscleGroup`, `Equipment` entities + `ExerciseCategory` enum
-- `IExercisesRepository` interface
-- `PrismaExercisesRepository` (findMany com OR tenantId NULL/tenant)
-- `CatalogModule` com token `EXERCISES_REPOSITORY`
-
-**Training** (`src/training/domain/`):
-- `Strategy`, `Workout`, `WorkoutExercise`, `WorkoutSession`, `SessionExercise` entities
-- `PlannedSet`, `ExecutedSet` value objects + `WorkoutSessionStatus` enum
-- `IStrategiesRepository`, `IWorkoutsRepository`, `IWorkoutSessionsRepository`
-- `PrismaStrategiesRepository` (setActive via $transaction), `PrismaWorkoutsRepository` (limit FREE plan), `PrismaWorkoutSessionsRepository`
-- `TrainingModule` com tokens `STRATEGIES_REPOSITORY`, `WORKOUTS_REPOSITORY`, `WORKOUT_SESSIONS_REPOSITORY`
-
-#### apps/web — auth — concluído
-- `src/lib/auth.ts` — NextAuth v5 + PrismaAdapter + `@fitflow/db`
-- `src/app/api/auth/[...nextauth]/route.ts` — route handler App Router
-- Schema Prisma: `AuthSession` renomeado para `Session` (tabela `auth_sessions` inalterada)
+**Spec ativo:** docs/specs/2026-06-05-auth.md
+**Plano ativo:** docs/plans/2026-06-05-auth.md
 
 ---
 
 ## Tasks
 
-### ✅ Concluídas (sessões 2026-06-01 e 2026-06-02)
+### ✅ Concluídas (sessões anteriores)
 
 **Frontend (web):**
-- T-1 a T-9 do plano workout-detail (fluxo completo de execução de treino)
-- Performance: React.memo, useDeferredValue, react-window, next/dynamic para recharts
-- Fix webpack build: ProgressChartClient wrapper para ssr:false em Server Component
+- Dashboard, Exercícios, Biblioteca, Treino — fluxo completo de execução com mock data
 
 **Backend (data model):**
-- T-1: packages/db (schema Prisma + migration + PrismaClient singleton)
-- T-2: Identity domain entities
-- T-3: Catalog domain entities
-- T-4: Training domain entities
-- T-5: Identity repository interfaces
-- T-6: Catalog repository interface
-- T-7: Training repository interfaces
-- T-8: Identity NestJS module + Prisma repos
-- T-9: Catalog NestJS module + Prisma repo
-- T-10: Training NestJS module + Prisma repos
-- T-11: NextAuth v5 + PrismaAdapter em apps/web
+- packages/db: schema Prisma, migration, PrismaClient singleton
+- apps/api: Identity, Catalog, Training — entidades, repositórios, módulos NestJS
+
+### ✅ Concluídas (sessão 2026-06-08 — auth)
+
+- Corrigir `api/auth/error?error=Configuration` — `AUTH_SECRET` ausente em `apps/web/.env.local`
+- Corrigir incompatibilidade NextAuth v5: `Credentials` + `session: database` → migrar para `jwt` strategy com callbacks `jwt`/`session`
+- Corrigir Prisma engine binary ausente no standalone Docker (`outputFileTracingIncludes` em `next.config.ts`)
+- Adicionar `DATABASE_URL` + rede `backend` + `depends_on: db` ao serviço web no docker-compose
+- Adicionar campo `image String?` no User model (requerido pelo PrismaAdapter para Google OAuth) + migration `20260608000000_add_user_image`
+- Refatorar fluxo de cadastro: `requestSignup` apenas cria usuário (sem OTP), redireciona para `/login?registered=1` com banner de sucesso
+- Adicionar try/catch em `requestLoginOtp` e `resendOtp` — Gmail 535 retorna erro tratável em vez de 500
+- Atualizar `email.ts`: `service:"gmail"` → config explícita STARTTLS (host/port via `SMTP_HOST`/`SMTP_PORT`)
+- Atualizar App Password Gmail e vars SMTP no `.env` e docker-compose
+- Corrigir OOM no build Docker: `NODE_OPTIONS=--max_old_space_size=4096`
 
 ### 🔄 Em progresso
-- (nenhuma — plano 2026-06-02-data-model.md concluído na íntegra)
+- (nenhuma — fixes de auth implantados em produção Docker)
 
 ### ⏭ Próximos passos
-1. Spec + plano de autenticação — configurar providers NextAuth (Google, Credentials)
-2. Spec + plano de API REST — endpoints para Identity, Catalog e Training (NestJS controllers, use cases, DTOs)
-3. Conectar frontend ao backend — substituir mock data por chamadas API reais
-4. Implementar páginas: Progresso (`/progress`), Explorar (`/explore`), Personal (`/personal`)
-5. Criar rota `/program/[programId]` — `WorkoutFinishForm` redireciona para ela mas não existe
+1. **Manual obrigatório**: adicionar `http://localhost:3000/api/auth/callback/google` em Authorized redirect URIs no Google Cloud Console (OAuth client `124527683396-...`)
+2. Testar fluxo completo: cadastro → login OTP → Google OAuth → redirect pós-login
+3. Implementar onboarding (`/onboarding`) — atualmente a rota existe mas não há conteúdo funcional
+4. Spec + plano de API REST — endpoints para Identity, Catalog e Training (NestJS controllers, use cases, DTOs)
+5. Conectar frontend ao backend — substituir mock data por chamadas API reais
+6. Criar rota `/program/[programId]` — `WorkoutFinishForm` redireciona para ela mas não existe
 
 ---
 
 ## Decisões desta sessão
 
-- **`packages/db`** centraliza schema Prisma e cliente — compartilhado entre `apps/api` e `apps/web`
-- **PostgreSQL porta 5433** — PostgreSQL nativo do Windows ocupava 5432; root `.env` define `POSTGRES_PORT=5433`
-- **pg_hba.conf md5** — Docker container precisou ter `scram-sha-256` trocado para `md5` para Prisma conectar via TCP do host Windows
-- **DI tokens como `USERS_REPOSITORY` (não `IUsersRepository`)** — evita colisão de nome entre interface TypeScript e constante Symbol no mesmo arquivo
-- **`Session` no schema** (não `AuthSession`) — `@auth/prisma-adapter` usa `prisma.session` hardcoded; tabela DB permanece `auth_sessions` via `@@map`
-- **TS2742 em next-auth v5 beta** — `auth` e `signIn` anotados como `any` em `auth.ts`; workaround para pnpm monorepo onde TypeScript não nomeia paths internos do pacote
+- **JWT strategy em vez de database** — Credentials provider é incompatível com database sessions no NextAuth v5 beta; PrismaAdapter continua ativo para persistir User/Account do Google OAuth
+- **Signup sem OTP** — criação de conta apenas registra o usuário; verificação de email ocorre no primeiro login via OTP; simplifica o fluxo e elimina dependência do Gmail no cadastro
+- **`image` field no User** — campo exigido pelo PrismaAdapter; mantido ao lado de `avatarUrl` (app usa `avatarUrl`, adapter usa `image`)
+- **SMTP explícito** — `nodemailer` com `host`/`port`/`secure: false` em vez de `service: "gmail"` para suportar qualquer provider via env vars
+- **Web service na rede `backend`** — necessário para server actions e auth callbacks que acessam Prisma diretamente
 
 ---
 
 ## Bloqueadores / Perguntas abertas
 
-- `WorkoutFinishForm` redireciona para `/program/[programId]` mas essa rota não existe ainda
-- next-auth v5 ainda em beta — TS2742 workaround com `any` no `auth.ts`; remover quando beta estabilizar
-- Backend (`apps/api`) não tem `AppModule` nem `main.ts` — necessário para iniciar a API
-- Providers NextAuth não configurados — sem login funcional ainda
+- **Google OAuth**: redirect URI `http://localhost:3000/api/auth/callback/google` precisa ser adicionado manualmente no Google Cloud Console antes de funcionar
+- `WorkoutFinishForm` redireciona para `/program/[programId]` mas rota não existe
+- next-auth v5 ainda em beta — TS2742 workaround com `any` em `auth.ts`; remover quando estabilizar
+- Migration system do API Docker sem migrations aplicadas automaticamente — `apps/api/prisma/` não contém pasta `migrations/`; schema é mantido via push manual

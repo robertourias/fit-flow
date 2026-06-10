@@ -15,6 +15,7 @@ function getActiveItem(pathname: string): string {
   if (pathname.startsWith("/progress")) return "progresso";
   if (pathname.startsWith("/explore")) return "explorar";
   if (pathname.startsWith("/personal")) return "personal";
+  if (pathname.startsWith("/settings")) return "configuracoes";
   return "rotina";
 }
 
@@ -26,6 +27,7 @@ const sectionTitles: Record<string, string> = {
   explorar: "Explorar",
   personal: "Personal",
   premium: "Premium",
+  configuracoes: "Configurações",
 };
 
 export function AppShell({ children }: { children: React.ReactNode }) {

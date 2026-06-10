@@ -22,7 +22,11 @@
     "@fitflow/config": "workspace:*",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
+    "@swc/core": "^1.15.41",
+    "@swc/jest": "^0.2.39",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
+    "jest": "^30.4.2",
     "ts-loader": "^9.5.0",
     "typescript": "^5.7.0",
     "webpack": "^5.0.0"
