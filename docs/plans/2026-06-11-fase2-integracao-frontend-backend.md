@@ -655,6 +655,8 @@ Critérios de Aceite:
 - [x] `pnpm --filter @fitflow/types build` (ou type-check) passa com os novos tipos.
 - [x] Testes unitários de `apiFetch`.
 
+✅ **TASK05 CONCLUÍDO** — Infraestrutura TanStack Query + proxy BFF + apiFetch verificada em 2026-06-11. 6 testes unitários passam, tipos compilam, layout integrado.
+
 Notas: pré-requisito de Tarefas 6, 7, 8, 9.
 
 ---
