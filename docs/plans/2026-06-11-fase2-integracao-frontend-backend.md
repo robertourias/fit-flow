@@ -723,11 +723,13 @@ Substitui todos os mocks de `/dashboard` por dados reais (FR-006/007/008). Depen
 - `apps/web/src/components/dashboard/TreinoCard.tsx` — adicionar estado vazio (sem Strategy ativa): mensagem + link para `/onboarding` (FR-008).
 
 Critérios de Aceite:
-- [ ] `/dashboard` não importa `apps/web/src/lib/mock/dashboard.ts`.
-- [ ] `MetricsStrip`, `ProgressChartClient`, `CalendarSection`, `MuscleCard`, `UpcomingCard` renderizam dados de `GET /workout-sessions/summary`.
-- [ ] `TreinoCard` renderiza `GET /strategies/active-workout`; se `data === null`, exibe estado vazio com CTA `/onboarding`.
-- [ ] `planUsed`/`planLimit` = `workoutsCount`/`6`.
-- [ ] Página renderiza sem erro para usuário recém-onboardado (Strategy com Workouts `exercises: []`).
+- [x] `/dashboard` não importa `apps/web/src/lib/mock/dashboard.ts`.
+- [x] `MetricsStrip`, `ProgressChartClient`, `CalendarSection`, `MuscleCard`, `UpcomingCard` renderizam dados de `GET /workout-sessions/summary`.
+- [x] `TreinoCard` renderiza `GET /strategies/active-workout`; se `data === null`, exibe estado vazio com CTA `/onboarding`.
+- [x] `planUsed`/`planLimit` = `workoutsCount`/`6`.
+- [x] Página renderiza sem erro para usuário recém-onboardado (Strategy com Workouts `exercises: []`).
+
+✅ **TASK07 CONCLUÍDO** — Dashboard async Server Component com parallel fetches em 2026-06-11. Fallback para empty state.
 
 Notas: implementação **sem** `useQuery` — leitura única por request via `apiFetch` direto (Server Component, cookie). TanStack Query (Tarefa 5) fica reservado para a interatividade client-side das Tarefas 8/9. Pode rodar em paralelo com Tarefas 6, 8, 9.
 
