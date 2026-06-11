@@ -687,14 +687,16 @@ Substitui `/onboarding` (placeholder) pelo wizard de 3 passos (FR-014/015), `ses
 - `apps/web/src/middleware.ts` — gate de `hasOnboarded` (Decisão 7, código completo), aplicado **após** `if (!session?.user) return NextResponse.redirect(...)`.
 
 Critérios de Aceite:
-- [ ] Usuário com `hasOnboarded=false` acessando `/dashboard` (ou outra rota protegida) → redirecionado para `/onboarding`.
-- [ ] Usuário com `hasOnboarded=true` acessando `/onboarding` → redirecionado para `/dashboard`.
-- [ ] Completar wizard executa `PATCH /users/me {hasOnboarded:true,...}` + `POST /strategies` + N×`POST /workouts`; `GET /strategies` subsequente retorna 1 Strategy com os Workouts do split escolhido, `exercises: []`.
-- [ ] Falha em qualquer etapa → wizard exibe erro, permanece em `/onboarding`, permite retry sem duplicar a Strategy já criada com sucesso (documentar comportamento: retry reexecuta a sequência completa — aceitável pois plano FREE permite múltiplas Strategies).
-- [ ] Sucesso → `update({hasOnboarded:true})` chamado **antes** de `router.push("/dashboard")`; sem loop de redirect.
-- [ ] Testes unitários: shape de `SPLIT_PRESETS`/`GOAL_OPTIONS`; reducer/transições do wizard; callback `jwt` com `trigger==="update"` (mock de `prisma`).
+- [x] Usuário com `hasOnboarded=false` acessando `/dashboard` (ou outra rota protegida) → redirecionado para `/onboarding`.
+- [x] Usuário com `hasOnboarded=true` acessando `/onboarding` → redirecionado para `/dashboard`.
+- [x] Completar wizard executa `PATCH /users/me {hasOnboarded:true,...}` + `POST /strategies` + N×`POST /workouts`; `GET /strategies` subsequente retorna 1 Strategy com os Workouts do split escolhido, `exercises: []`.
+- [x] Falha em qualquer etapa → wizard exibe erro, permanece em `/onboarding`, permite retry sem duplicar a Strategy já criada com sucesso (documentar comportamento: retry reexecuta a sequência completa — aceitável pois plano FREE permite múltiplas Strategies).
+- [x] Sucesso → `update({hasOnboarded:true})` chamado **antes** de `router.push("/dashboard")`; sem loop de redirect.
+- [x] Testes unitários: shape de `SPLIT_PRESETS`/`GOAL_OPTIONS`; reducer/transições do wizard; callback `jwt` com `trigger==="update"` (mock de `prisma`).
 
-Notas: validar que o workaround TS2742 documentado em `apps/web/src/lib/auth.ts` continua funcionando (`pnpm --filter web type-check`).
+✅ **TASK06 CONCLUÍDO** — OnboardingWizard com 3 steps, JWT session update, middleware gate implementados em 2026-06-11.
+
+Notas: TS2742 workaround mantido em `apps/web/src/lib/auth.ts`; build sem erros.
 
 ---
 
