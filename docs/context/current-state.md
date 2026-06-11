@@ -3,25 +3,47 @@
 > Memória de trabalho persistente. Atualizado pelo `/checkpoint`, lido pelo `/retomar`.
 
 **Última atualização:** 2026-06-11
-**Fase Atual:** Fase 2 — Integração & Fluxo
+**Resumo de progresso global:** Fase 2 — Integração & Fluxo: T1-T7 completos (backend + frontend infra + onboarding + dashboard). T8+T9 hooks criados, UI components implementados, integration points claros.
+
+**Resumo da última sessão:** T1-T4 backend (hasOnboarded, empty exercises, dashboard summary, active workout) + T5-T7 frontend (TanStack Query, onboarding wizard, dashboard real data). T8+T9 hooks layer + UI components (DropdownMenu, AlertDialog, ProgramOptionsMenu). 162 tests passing.
 
 ---
 
-## Status de Alto Nível
+## Spec Ativo
 
-O backend core (API, Data Model, Auth) e as UIs estáticas estão concluídos (Fase 0 e Fase 1). O foco principal agora é a Fase 2: conectar o Frontend (web) às novas APIs reais, substituindo os dados mockados.
+`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — TASK04-07
 
 ---
 
 ## 🔄 Em Progresso
 
-- Integração Frontend ↔ Backend (API reais via TanStack Query)
+**T8+T9** — Frontend integration (Exercises + Library/Program)
+- Hooks: useExercises, useStrategy, mutations ✅
+- UI components: DropdownMenu, AlertDialog, ProgramOptionsMenu ✅
+- Remaining: integrate hooks into pages, create /program/[id], update /library
+- % estimado: 40%
+- Próximo passo: Implementar /exercises page com useExercises + useMuscleGroups/useEquipment
 
 ---
 
 ## ⏭ Próximos Passos Imediatos
 
-1. Adicionar `http://localhost:3000/api/auth/callback/google` em Authorized redirect URIs no Google Cloud Console.
-2. Implementar fluxo de onboarding (`/onboarding`).
-3. Conectar telas do frontend (Dashboard, Exercícios, Biblioteca, Treino) aos endpoints da API.
-4. Criar rota `/program/[programId]` (destino do `WorkoutFinishForm`).
+1. Integrar `useExercises` em `/exercises/page.tsx` com pagination
+2. Integrar `useStrategies` em `/library/page.tsx`
+3. Criar `/program/[id]/page.tsx` com `useStrategy(id)`
+4. Atualizar ProgramHeader.tsx com ProgramOptionsMenu + programColor
+
+---
+
+## Decisões desta Sessão
+
+- Onboarding wizard via 3-step form com JWT session.update() + middleware gate
+- Dashboard como Server Component com parallel apiFetch calls (não useQuery)
+- T8+T9 hooks use TanStack Query com cache invalidation
+- DropdownMenu/AlertDialog criados baseados em shadcn/Radix pattern
+
+---
+
+## Bloqueadores / Perguntas Abertas
+
+- (nenhum) — próxima sessão pode prosseguir com T8+T9 UI integration
