@@ -10,6 +10,7 @@ export interface IUserProps {
   goals: string[]
   isTrainer: boolean
   plan: Plan
+  hasOnboarded: boolean
   deletedAt?: Date | null
   createdAt: Date
   updatedAt: Date
@@ -27,6 +28,7 @@ export class User {
   get goals() { return this.props.goals }
   get isTrainer() { return this.props.isTrainer }
   get plan() { return this.props.plan }
+  get hasOnboarded() { return this.props.hasOnboarded }
   get deletedAt() { return this.props.deletedAt }
   get createdAt() { return this.props.createdAt }
   get updatedAt() { return this.props.updatedAt }

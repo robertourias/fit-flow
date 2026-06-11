@@ -8,6 +8,7 @@ const base = {
   goals: [],
   isTrainer: false,
   plan: Plan.FREE,
+  hasOnboarded: false,
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 }

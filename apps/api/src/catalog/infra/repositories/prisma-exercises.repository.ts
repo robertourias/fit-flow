@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { prisma, Prisma } from "@fitflow/db";
 import {
   IExercisesRepository,
+  IExerciseWriteData,
   IFindExercisesOptions,
 } from "../../domain/repositories/exercises.repository.interface";
 import { Exercise } from "../../domain/exercise.entity";
@@ -23,26 +24,39 @@ const EXERCISE_INCLUDE = {
 
 @Injectable()
 export class PrismaExercisesRepository implements IExercisesRepository {
-  async findMany(options: IFindExercisesOptions): Promise<Exercise[]> {
+  private _buildWhere(options: IFindExercisesOptions): Prisma.ExerciseWhereInput {
+    return {
+      // FR-030: global (tenantId IS NULL) OR owned by this tenant
+      OR: [{ tenantId: null }, { tenantId: options.tenantId }],
+      isArchived: options.includeArchived ? undefined : false,
+      ...(options.search
+        ? { name: { contains: options.search, mode: "insensitive" } }
+        : {}),
+      ...(options.muscleGroupSlug
+        ? { muscleGroups: { some: { muscleGroup: { slug: options.muscleGroupSlug } } } }
+        : {}),
+      ...(options.equipmentSlug
+        ? { equipment: { some: { equipment: { slug: options.equipmentSlug } } } }
+        : {}),
+      ...(options.category ? { category: options.category as ExerciseCategory } : {}),
+    };
+  }
+
+  async findMany(
+    options: IFindExercisesOptions & { take: number; cursor?: string; skip?: number },
+  ): Promise<Exercise[]> {
     const rows = await prisma.exercise.findMany({
-      where: {
-        // FR-005: global (tenantId IS NULL) OR owned by this tenant
-        OR: [{ tenantId: null }, { tenantId: options.tenantId }],
-        isArchived: options.includeArchived ? undefined : false,
-        ...(options.search
-          ? { name: { contains: options.search, mode: "insensitive" } }
-          : {}),
-        ...(options.muscleGroupSlug
-          ? { muscleGroups: { some: { muscleGroup: { slug: options.muscleGroupSlug } } } }
-          : {}),
-        ...(options.equipmentSlug
-          ? { equipment: { some: { equipment: { slug: options.equipmentSlug } } } }
-          : {}),
-        ...(options.category ? { category: options.category as ExerciseCategory } : {}),
-      },
+      where: this._buildWhere(options),
       include: EXERCISE_INCLUDE,
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: options.take,
+      ...(options.cursor ? { cursor: { id: options.cursor }, skip: options.skip ?? 1 } : {}),
     });
     return rows.map((r) => this.toDomain(r));
+  }
+
+  async count(options: IFindExercisesOptions): Promise<number> {
+    return prisma.exercise.count({ where: this._buildWhere(options) });
   }
 
   async findById(id: string): Promise<Exercise | null> {
@@ -53,7 +67,7 @@ export class PrismaExercisesRepository implements IExercisesRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async create(data: Parameters<IExercisesRepository["create"]>[0]): Promise<Exercise> {
+  async create(data: IExerciseWriteData & { tenantId?: string }): Promise<Exercise> {
     const row = await prisma.exercise.create({
       data: {
         name: data.name,
@@ -77,8 +91,52 @@ export class PrismaExercisesRepository implements IExercisesRepository {
     return this.toDomain(row);
   }
 
-  async archive(id: string): Promise<void> {
+  async update(
+    id: string,
+    tenantId: string,
+    data: Partial<IExerciseWriteData>,
+  ): Promise<Exercise | null> {
+    const existing = await prisma.exercise.findUnique({ where: { id }, select: { tenantId: true } });
+    // global (tenantId null) ou de outro tenant => 404
+    if (!existing || existing.tenantId !== tenantId) return null;
+
+    const row = await prisma.$transaction(async (tx) => {
+      await tx.exercise.update({
+        where: { id },
+        data: {
+          ...(data.name !== undefined && { name: data.name }),
+          ...(data.description !== undefined && { description: data.description }),
+          ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+          ...(data.videoUrl !== undefined && { videoUrl: data.videoUrl }),
+          ...(data.category !== undefined && { category: data.category as ExerciseCategory }),
+        },
+      });
+      if (data.muscleGroupIds !== undefined) {
+        await tx.exerciseMuscleGroup.deleteMany({ where: { exerciseId: id } });
+        await tx.exerciseMuscleGroup.createMany({
+          data: data.muscleGroupIds.map((m) => ({
+            exerciseId: id,
+            muscleGroupId: m.id,
+            isPrimary: m.isPrimary,
+          })),
+        });
+      }
+      if (data.equipmentIds !== undefined) {
+        await tx.exerciseEquipment.deleteMany({ where: { exerciseId: id } });
+        await tx.exerciseEquipment.createMany({
+          data: data.equipmentIds.map((equipmentId) => ({ exerciseId: id, equipmentId })),
+        });
+      }
+      return tx.exercise.findUniqueOrThrow({ where: { id }, include: EXERCISE_INCLUDE });
+    });
+    return this.toDomain(row);
+  }
+
+  async archive(id: string, tenantId: string): Promise<boolean> {
+    const existing = await prisma.exercise.findUnique({ where: { id }, select: { tenantId: true } });
+    if (!existing || existing.tenantId !== tenantId) return false;
     await prisma.exercise.update({ where: { id }, data: { isArchived: true } });
+    return true;
   }
 
   private toDomain(row: ExerciseRow): Exercise {

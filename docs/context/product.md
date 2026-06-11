@@ -120,4 +120,70 @@ FitFlow é um webapp voltado para praticantes de musculação que desejam organi
 
 ## Roadmap (High Level)
 
-<!-- a definir -->
+> Fases ordenadas por dependência. Cada fase vira um ou mais specs em `docs/specs/`. Specs dentro de uma fase podem ser paralelizados entre frontend/backend quando o contrato de API estiver definido.
+
+### Fase 0 — Concluída
+- Monorepo, Auth (signup/login/OTP, Google OAuth, device alerts, profile settings)
+- UI estática com mock data: Dashboard, Exercícios, Biblioteca, Treino (execução)
+- Data model Prisma + entidades/repositórios NestJS: Identity, Catalog, Training
+
+### Fase 1 — API REST Core (Backend)
+**Bounded contexts**: Identity, Catalog, Training
+- Controllers + DTOs + Swagger para entidades já modeladas (Identity, Catalog, Training)
+- Validação `class-validator`, paginação cursor-based, filtro por `tenantId`
+- Testes de integração (Supertest)
+- **Bloqueia** Fase 2
+
+### Fase 2 — Integração Frontend ↔ Backend
+- Substituir mock data por chamadas reais (TanStack Query) nas páginas existentes (Dashboard, Exercícios, Biblioteca, Treino)
+- Implementar onboarding (`/onboarding`) — rota existe, sem conteúdo
+- Criar rota `/program/[programId]` (destino do `WorkoutFinishForm`)
+- E2E happy path: cadastro → onboarding → login → dashboard
+
+### Fase 3 — Rotina de Treino (CRUD completo)
+**Bounded context**: Training
+- Cadastro de Estratégia (split: ABC, Upper/Lower, PPL, Full Body)
+- Cadastro de Rotina (semanal) e Treinos (seleção de exercícios, séries, reps, carga, técnicas: drop set, bi-set, rest-pause, pirâmide)
+- Enforce limites do plano gratuito: máx. 2 programas ativos, máx. 4 treinos/programa
+- Depende de Fase 2 (API + integração)
+
+### Fase 4 — Execução de Treino e Histórico
+**Bounded context**: Training
+- Registrar sessão (séries/cargas/reps executados), timer de intervalo, conclusão de treino
+- Histórico de sessões (retenção 60 dias no plano gratuito)
+- Notificações in-app durante treino (lembretes, intervalo) — pode reusar `useWakeLock`
+- Depende de Fase 3
+
+### Fase 5 — Progresso
+**Bounded context**: Training (read models)
+- Dashboards: volume, duração, dias de treino no mês, músculos trabalhados na semana, heatmap
+- Medidas corporais (peso, bioimpedância) — cadastro + histórico (60 dias plano gratuito)
+- Depende de Fase 4 (dados de sessão existentes)
+
+### Fase 6 — Explorar
+**Bounded context**: Catalog
+- Área de estratégias/rotinas pré-criadas (templates) para importar
+- Depende de Fase 3 (modelo de Estratégia/Rotina já validado)
+
+### Fase 7 — Compartilhamento
+- Gerador de informativo (imagem/card) com resumo do treino/progresso para redes sociais
+- Depende de Fase 5 (dados de progresso)
+
+### Fase 8 — Área do Preparador: Alunos
+**Novo bounded context**: Coaching
+- Vínculo aluno ↔ preparador (multi-tenant: isolamento garantido por `tenantId`)
+- Preparador cria/atribui rotinas a alunos, acompanha evolução
+- Depende de Fase 3 e 5 (rotinas e progresso já existentes para reaproveitar)
+
+### Fase 9 — Personal (Comunicação)
+**Bounded context**: Coaching
+- Área de comunicação preparador → aluno (orientações)
+- Moderação de conteúdo (linguagem imprópria)
+- Notificações assíncronas via BullMQ
+- Depende de Fase 8
+
+### Fase 10 — Hardening & Release
+- Observabilidade: Pino, Sentry, Prometheus
+- Cobertura de testes nas metas definidas em `docs/context/decisions.md`
+- CI/CD completo (GitHub Actions), deploy produção (Vercel + Railway)
+- Resolver débitos técnicos abertos em `docs/context/current-state.md` (next-auth v5 beta workaround, migrations automáticas no Docker)

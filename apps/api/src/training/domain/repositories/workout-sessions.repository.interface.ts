@@ -1,23 +1,55 @@
 import { WorkoutSession } from "../workout-session.entity";
 import { WorkoutSessionStatus } from "../workout-session-status.enum";
 
+export interface IExecutedSetInput {
+  setNumber: number;
+  kg?: number | null;
+  reps?: number | null;
+  completedAt?: Date | null;
+}
+
+export interface ISessionExerciseInput {
+  exerciseId: string;
+  order: number;
+  notes?: string | null;
+  executedSets: IExecutedSetInput[];
+}
+
 export interface IWorkoutSessionsRepository {
   findById(id: string, tenantId: string): Promise<WorkoutSession | null>;
-  findByWorkout(workoutId: string, tenantId: string): Promise<WorkoutSession[]>;
-  findLastByWorkout(workoutId: string, tenantId: string): Promise<WorkoutSession | null>;
+  /** Página do tenant, ordenada por startedAt desc, id desc. startedAfter filtra retenção (plano FREE). */
+  findManyByTenant(opts: {
+    tenantId: string;
+    take: number;
+    cursor?: string;
+    skip?: number;
+    startedAfter?: Date;
+  }): Promise<WorkoutSession[]>;
+  count(opts: { tenantId: string; startedAfter?: Date }): Promise<number>;
   create(data: {
     workoutId: string;
     tenantId: string;
     startedAt: Date;
+    endedAt?: Date | null;
+    status: WorkoutSessionStatus;
+    comment?: string | null;
+    difficulty?: number | null;
+    exercises: ISessionExerciseInput[];
   }): Promise<WorkoutSession>;
-  finish(
+  /**
+   * Atualiza a sessão do tenant. Se `exercises` for fornecido, substitui integralmente
+   * os filhos (delete + recreate). Retorna null se não pertencer ao tenant.
+   */
+  update(
     id: string,
     tenantId: string,
-    data: { endedAt: Date; comment?: string; difficulty?: number },
-  ): Promise<WorkoutSession>;
-  updateStatus(
-    id: string,
-    tenantId: string,
-    status: WorkoutSessionStatus,
-  ): Promise<WorkoutSession>;
+    data: Partial<{
+      endedAt: Date | null;
+      status: WorkoutSessionStatus;
+      comment: string | null;
+      difficulty: number | null;
+      exercises: ISessionExerciseInput[];
+    }>,
+  ): Promise<WorkoutSession | null>;
+  delete(id: string, tenantId: string): Promise<void>;
 }

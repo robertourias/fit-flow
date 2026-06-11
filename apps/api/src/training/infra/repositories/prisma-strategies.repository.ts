@@ -63,12 +63,24 @@ export class PrismaStrategiesRepository implements IStrategiesRepository {
     return this.toDomain(row);
   }
 
-  async setActive(id: string, tenantId: string): Promise<Strategy> {
+  async update(
+    id: string,
+    tenantId: string,
+    data: Parameters<IStrategiesRepository["update"]>[2],
+  ): Promise<Strategy | null> {
+    const existing = await prisma.strategy.findFirst({ where: { id, tenantId }, select: { id: true } });
+    if (!existing) return null;
+
     const row = await prisma.$transaction(async (tx) => {
-      await tx.strategy.updateMany({ where: { tenantId }, data: { isActive: false } });
+      if (data.isActive === true) {
+        await tx.strategy.updateMany({
+          where: { tenantId, NOT: { id } },
+          data: { isActive: false },
+        });
+      }
       return tx.strategy.update({
         where: { id },
-        data: { isActive: true },
+        data: data as Prisma.StrategyUpdateInput,
         include: STRATEGY_INCLUDE,
       });
     });

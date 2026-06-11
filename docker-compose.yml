@@ -75,6 +75,9 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@fitflow.local}
       # Migrations: defina SKIP_MIGRATIONS=1 para réplicas somente-leitura
       SKIP_MIGRATIONS: ${SKIP_MIGRATIONS:-0}
+      # Auth: mesmo segredo do NextAuth (web) — guard da API decodifica o JWE da sessão
+      AUTH_SECRET: ${AUTH_SECRET}
+      AUTH_COOKIE_NAME: ${AUTH_COOKIE_NAME:-authjs.session-token}
     ports:
       - "3001:3001"
     networks:
@@ -113,11 +116,14 @@ services:
       AUTH_URL: ${AUTH_URL:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      # Gmail SMTP — envio de OTP
-      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      GMAIL_USER: ${GMAIL_USER:-}
-      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD:-}
+      # Resend — envio de OTP e alertas de novo dispositivo
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-FitFlow <noreply@fitflow.app>}
+      # Cloudflare Turnstile — verificação anti-bot em signup/login
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+      # URL pública usada em links de email (alerta de novo dispositivo)
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       # DB direto — necessário para Prisma no auth (OTP, PrismaAdapter, JWT callback)
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-fitflow}
     ports:

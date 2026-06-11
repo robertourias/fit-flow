@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { prisma, Prisma } from "@fitflow/db";
-import { IWorkoutsRepository } from "../../domain/repositories/workouts.repository.interface";
+import {
+  IWorkoutExerciseInput,
+  IWorkoutsRepository,
+} from "../../domain/repositories/workouts.repository.interface";
 import { Workout } from "../../domain/workout.entity";
 import { WorkoutExercise } from "../../domain/workout-exercise.entity";
 import { PlannedSet } from "../../domain/planned-set.value-object";
-
-const FREE_PLAN_WORKOUT_LIMIT = 6;
 
 const WORKOUT_INCLUDE = {
   workoutExercises: {
@@ -17,6 +18,24 @@ const WORKOUT_INCLUDE = {
 type WorkoutRow = Prisma.WorkoutGetPayload<{
   include: { workoutExercises: { include: { plannedSets: true } } };
 }>;
+
+function nestedExerciseCreate(
+  exercises: IWorkoutExerciseInput[],
+): Prisma.WorkoutExerciseUncheckedCreateWithoutWorkoutInput[] {
+  return exercises.map((ex) => ({
+    exerciseId: ex.exerciseId,
+    order: ex.order,
+    ...(ex.restSeconds !== undefined && { restSeconds: ex.restSeconds }),
+    notes: ex.notes ?? null,
+    plannedSets: {
+      create: ex.plannedSets.map((set) => ({
+        setNumber: set.setNumber,
+        targetReps: set.targetReps,
+        targetKg: set.targetKg ?? null,
+      })),
+    },
+  }));
+}
 
 @Injectable()
 export class PrismaWorkoutsRepository implements IWorkoutsRepository {
@@ -42,11 +61,6 @@ export class PrismaWorkoutsRepository implements IWorkoutsRepository {
   }
 
   async create(data: Parameters<IWorkoutsRepository["create"]>[0]): Promise<Workout> {
-    // Secondary defense — primary validation belongs in the use case
-    const count = await this.countByTenant(data.tenantId);
-    if (count >= FREE_PLAN_WORKOUT_LIMIT) {
-      throw new Error("PLAN_LIMIT_EXCEEDED");
-    }
     const row = await prisma.workout.create({
       data: {
         strategyId: data.strategyId,
@@ -54,6 +68,7 @@ export class PrismaWorkoutsRepository implements IWorkoutsRepository {
         name: data.name,
         description: data.description,
         order: data.order,
+        workoutExercises: { create: nestedExerciseCreate(data.exercises) },
       },
       include: WORKOUT_INCLUDE,
     });
@@ -64,13 +79,28 @@ export class PrismaWorkoutsRepository implements IWorkoutsRepository {
     id: string,
     tenantId: string,
     data: Parameters<IWorkoutsRepository["update"]>[2],
-  ): Promise<Workout> {
-    const row = await prisma.workout.update({
-      where: { id },
-      data,
-      include: WORKOUT_INCLUDE,
+  ): Promise<Workout | null> {
+    const existing = await prisma.workout.findFirst({ where: { id, tenantId }, select: { id: true } });
+    if (!existing) return null;
+
+    const row = await prisma.$transaction(async (tx) => {
+      await tx.workout.update({
+        where: { id },
+        data: {
+          ...(data.name !== undefined && { name: data.name }),
+          ...(data.description !== undefined && { description: data.description }),
+          ...(data.order !== undefined && { order: data.order }),
+        },
+      });
+      if (data.exercises !== undefined) {
+        // substituição total: cascata remove plannedSets dos workoutExercises deletados
+        await tx.workoutExercise.deleteMany({ where: { workoutId: id } });
+        for (const ex of nestedExerciseCreate(data.exercises)) {
+          await tx.workoutExercise.create({ data: { ...ex, workoutId: id } });
+        }
+      }
+      return tx.workout.findUniqueOrThrow({ where: { id }, include: WORKOUT_INCLUDE });
     });
-    if (row.tenantId !== tenantId) throw new Error("FORBIDDEN");
     return this.toDomain(row);
   }
 

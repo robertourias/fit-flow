@@ -57,6 +57,11 @@ RUN npm install -g prisma@6 --ignore-scripts
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nestjs
 
+# nestjs (não-root) precisa escrever em node_modules/prisma/node_modules/@prisma/engines
+# ao rodar `prisma migrate deploy` — sem isso falha com EACCES e o CMD abaixo
+# (que ignora erro do migrate via ";") nunca aplica migrations automaticamente.
+RUN chown -R nestjs:nodejs /usr/local/lib/node_modules/prisma
+
 # node_modules de produção (flat, sem symlinks pnpm)
 COPY --from=builder --chown=nestjs:nodejs /deploy/node_modules ./node_modules
 # dist compilado — pnpm deploy exclui se estiver no .gitignore

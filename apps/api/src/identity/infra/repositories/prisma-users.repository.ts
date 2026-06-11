@@ -61,6 +61,7 @@ export class PrismaUsersRepository implements IUsersRepository {
       goals: (row as unknown as { goals?: string[] }).goals ?? [],
       isTrainer: row.isTrainer,
       plan: row.plan as Plan,
+      hasOnboarded: (row as unknown as { hasOnboarded?: boolean }).hasOnboarded ?? false,
       deletedAt: (row as unknown as { deletedAt?: Date | null }).deletedAt ?? null,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,

@@ -371,9 +371,8 @@ export default function SignupPage() {
         {([1, 2, 3] as const).map((s) => (
           <div
             key={s}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              s <= step ? 'bg-primary' : 'bg-muted'
-            }`}
+            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${s <= step ? 'bg-primary' : 'bg-muted'
+              }`}
             aria-hidden="true"
           />
         ))}
@@ -404,13 +403,6 @@ export default function SignupPage() {
             </svg>
             Continuar com Google
           </Button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Já tem conta?{' '}
-            <Link href="/login" className="text-primary underline underline-offset-4 hover:opacity-80">
-              Entrar
-            </Link>
-          </p>
         </>
       )}
     </div>

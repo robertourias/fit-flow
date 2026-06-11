@@ -12,7 +12,7 @@ const config = {
       },
     ],
   },
-  testMatch: ['**/__tests__/**/*.test.ts', '**/*.spec.ts'],
+  testMatch: ['**/__tests__/**/*.test.ts', '**/*.spec.ts', '**/test/**/*.e2e-spec.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },

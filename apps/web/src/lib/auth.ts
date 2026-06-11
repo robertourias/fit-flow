@@ -11,6 +11,9 @@ const nextAuth = NextAuth({
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      // Google só retorna tokens OAuth para emails verificados, então é seguro
+      // linkar automaticamente a uma conta existente (senha) com o mesmo email.
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       credentials: {
