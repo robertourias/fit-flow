@@ -1,14 +1,39 @@
-import { Play } from "lucide-react";
+import Link from "next/link";
+import { Play, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { TreinoHoje } from "@/lib/mock/dashboard";
 
 interface TreinoCardProps {
-  treino: TreinoHoje;
+  treino: TreinoHoje | null;
   className?: string;
 }
 
 export function TreinoCard({ treino, className }: TreinoCardProps) {
+  if (!treino) {
+    return (
+      <div className={cn(
+        "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border items-center justify-center",
+        className
+      )}>
+        <div className="text-center space-y-3">
+          <h3 className="font-bold text-lg text-foreground">
+            Nenhum programa ativo
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Comece criando seu primeiro programa de treino
+          </p>
+          <Button asChild className="gap-2">
+            <Link href="/onboarding">
+              <Plus className="h-4 w-4" />
+              Criar Programa
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border",
