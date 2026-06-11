@@ -21,6 +21,17 @@ export default async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hasOnboarded = (session.user as any).hasOnboarded ?? false;
+
+  if (!hasOnboarded && pathname !== "/onboarding") {
+    return NextResponse.redirect(new URL("/onboarding", req.url));
+  }
+
+  if (hasOnboarded && pathname === "/onboarding") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   return NextResponse.next();
 }
 

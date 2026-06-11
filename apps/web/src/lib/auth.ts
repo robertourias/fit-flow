@@ -83,7 +83,7 @@ const nextAuth = NextAuth({
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(token as any).id = user.id
@@ -93,6 +93,10 @@ const nextAuth = NextAuth({
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(token as any).hasOnboarded = dbUser?.hasOnboarded ?? false
+      }
+      if (trigger === 'update' && session?.hasOnboarded !== undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(token as any).hasOnboarded = session.hasOnboarded
       }
       return token
     },
