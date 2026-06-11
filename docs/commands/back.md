@@ -30,6 +30,34 @@ As decisões de escopo específico **sobrepõem** os padrões globais onde houve
 - Escopo específico → salve specs/plans em `$SCOPE/docs/`
 - Escopo global → salve em `docs/`
 
-## Tarefa
+## Tarefa (Batching Suportado)
 
 $ARGUMENTS
+
+*Se o $ARGUMENTS contiver múltiplas tarefas (batching), execute todas elas sequencialmente em uma única resposta para maximizar a economia de tokens, sem pedir permissão entre cada uma.*
+
+## Finalização obrigatória ao concluir a(s) tarefa(s)
+
+Ao terminar a implementação, execute **sempre** estas etapas na ordem:
+
+### 1. Atualizar o plano técnico
+
+Identifique o arquivo de plano associado à tarefa (em `docs/plans/` ou `$SCOPE/docs/plans/`).
+
+Para cada critério de aceite implementado, marque o checkbox como concluído:
+- `- [ ]` → `- [x]`
+
+### 2. Verificar se é a última tarefa do plano
+
+Verifique se **todos** os checkboxes do plano estão marcados como `[x]`.
+
+Se sim → prossiga para o passo 3. Caso contrário → encerre aqui.
+
+### 3. Atualizar o status no product-backlog
+
+Abra `docs/context/product-backlog.md` e localize a linha da TASK correspondente ao plano concluído.
+
+Altere o valor da coluna `Status`:
+- `in-progress` → `done`
+
+Salve o arquivo.

@@ -38,16 +38,11 @@ FitFlow é um webapp voltado para praticantes de musculação que desejam organi
 ## Business Rules
 
 > Critical business logic that AI agents must never violate. These are non-negotiable constraints.
+> The detailed rules have been split into specific domain files:
 
-- **Isolamento de dados**: Preparador só acessa dados dos próprios alunos — nunca de alunos vinculados a outros preparadores
-- **Limite do plano gratuito**:
-  - Máximo de **2 programas** ativos simultaneamente
-  - Máximo de **4 treinos por programa**
-  - **Histórico de sessões**: 60 dias
-  - **Medidas corporais** (peso, medida corporal, avaliação de bioimpedância): histórico de 60 dias
-  - Não permitir criação além desses limites sem upgrade
-- **Moderação de conteúdo**: Não permitir linguagem imprópria na comunicação entre preparador e aluno
-- **Autenticação obrigatória**: Acesso a todas as telas somente em ambiente autenticado — nenhuma tela de conteúdo é acessível sem login
+- [Autenticação e Acesso](./domains/auth.md)
+- [Monetização e Limites](./domains/plans.md)
+- [Comunicação e Comunidade](./domains/community.md)
 
 ## Domain Glossary
 
