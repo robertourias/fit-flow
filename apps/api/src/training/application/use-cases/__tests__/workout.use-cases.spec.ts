@@ -175,6 +175,25 @@ describe("CreateWorkoutUseCase", () => {
       expect.objectContaining({ strategyId: "strategy-1", tenantId: "tenant-1" }),
     );
   });
+
+  it("creates a workout with an empty exercises list (onboarding)", async () => {
+    const strategies = strategiesRepo();
+    const workouts = workoutsRepo();
+    const exercises = exercisesRepo();
+    strategies.findById.mockResolvedValue(makeStrategy());
+    workouts.countByTenant.mockResolvedValue(0);
+    workouts.create.mockResolvedValue(makeWorkout());
+
+    await new CreateWorkoutUseCase(strategies, workouts, exercises).execute("tenant-1", {
+      ...validDto,
+      exercises: [],
+    });
+
+    expect(exercises.findById).not.toHaveBeenCalled();
+    expect(workouts.create).toHaveBeenCalledWith(
+      expect.objectContaining({ strategyId: "strategy-1", tenantId: "tenant-1", exercises: [] }),
+    );
+  });
 });
 
 describe("GetWorkoutUseCase", () => {

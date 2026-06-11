@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import {
   IsArray,
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -40,4 +41,9 @@ export class UpdateUserMeDto {
   @IsArray()
   @IsString({ each: true })
   goals?: string[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  hasOnboarded?: boolean;
 }

@@ -86,6 +86,27 @@ describe("UpdateMeUseCase", () => {
     expect(repo.update).toHaveBeenCalledWith("user-1", { goals: ["a", "b"] });
   });
 
+  it("passes hasOnboarded through", async () => {
+    const repo = makeRepo();
+    repo.findById.mockResolvedValue(makeUser({ hasOnboarded: false }));
+    repo.update.mockResolvedValue(makeUser({ hasOnboarded: true }));
+
+    const result = await new UpdateMeUseCase(repo).execute("user-1", { hasOnboarded: true });
+
+    expect(repo.update).toHaveBeenCalledWith("user-1", { hasOnboarded: true });
+    expect(result.hasOnboarded).toBe(true);
+  });
+
+  it("does not touch hasOnboarded when not provided", async () => {
+    const repo = makeRepo();
+    repo.findById.mockResolvedValue(makeUser());
+    repo.update.mockResolvedValue(makeUser());
+
+    await new UpdateMeUseCase(repo).execute("user-1", { name: "Novo Nome" });
+
+    expect(repo.update).toHaveBeenCalledWith("user-1", { name: "Novo Nome" });
+  });
+
   it("throws NotFound for missing user", async () => {
     const repo = makeRepo();
     repo.findById.mockResolvedValue(null);

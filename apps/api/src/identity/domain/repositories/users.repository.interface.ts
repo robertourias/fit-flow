@@ -20,6 +20,7 @@ export interface IUsersRepository {
       goals: string[]
       isTrainer: boolean
       plan: string
+      hasOnboarded: boolean
     }>,
   ): Promise<User>
   softDelete(id: string): Promise<void>

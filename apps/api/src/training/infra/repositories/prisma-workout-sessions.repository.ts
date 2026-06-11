@@ -75,6 +75,21 @@ export class PrismaWorkoutSessionsRepository implements IWorkoutSessionsReposito
     });
   }
 
+  async countFinishedByStrategy(strategyId: string, tenantId: string): Promise<number> {
+    return prisma.workoutSession.count({
+      where: { tenantId, status: WorkoutSessionStatus.FINISHED, workout: { strategyId } },
+    });
+  }
+
+  async findFinishedSince(tenantId: string, since: Date): Promise<WorkoutSession[]> {
+    const rows = await prisma.workoutSession.findMany({
+      where: { tenantId, status: WorkoutSessionStatus.FINISHED, startedAt: { gte: since } },
+      include: SESSION_INCLUDE,
+      orderBy: [{ startedAt: "asc" }],
+    });
+    return rows.map((r) => this.toDomain(r));
+  }
+
   async create(
     data: Parameters<IWorkoutSessionsRepository["create"]>[0],
   ): Promise<WorkoutSession> {

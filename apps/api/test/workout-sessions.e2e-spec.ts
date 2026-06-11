@@ -112,6 +112,19 @@ class FakeSessionsRepository implements IWorkoutSessionsRepository {
     return this._filtered(opts).length;
   }
 
+  async countFinishedByStrategy(strategyId: string, tenantId: string): Promise<number> {
+    return [...this._sessions.values()].filter(
+      (s) => s.tenantId === tenantId && s.status === WorkoutSessionStatus.FINISHED,
+    ).length;
+  }
+
+  async findFinishedSince(tenantId: string, since: Date): Promise<WorkoutSession[]> {
+    const records = [...this._sessions.values()]
+      .filter((s) => s.tenantId === tenantId && s.status === WorkoutSessionStatus.FINISHED && s.startedAt >= since)
+      .sort((a, b) => a.startedAt.getTime() - b.startedAt.getTime());
+    return records.map(toEntity);
+  }
+
   async create(data: Parameters<IWorkoutSessionsRepository["create"]>[0]): Promise<WorkoutSession> {
     const rec: SessionRecord = {
       id: `session-new-${++this._seq}`,
@@ -520,5 +533,38 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
       .send({ ...validBody, difficulty: 11 })
       .expect(400);
     expect(res.body.error.code).toBe(ApiErrorCode.VALIDATION_ERROR);
+  });
+
+  it("GET /summary returns zeroed stats with no sessions", async () => {
+    await boot(new Map());
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workout-sessions/summary")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+    expect(res.body.data.diasEstaSemana).toBe(0);
+    expect(res.body.data.treinosNoMes).toBe(0);
+    expect(res.body.data.treinosNoMesDelta).toBe(0);
+    expect(res.body.data.diasSequencia).toBe(0);
+    expect(res.body.data.volumeSemanal).toBe(0);
+    expect(res.body.data.volumeData).toHaveLength(7);
+    expect(res.body.data.muscleGroups).toEqual([]);
+    expect(res.body.data.trainDates).toEqual([]);
+    expect(res.body.data.workoutsCount).toBe(0);
+  });
+
+  it("GET /summary without authentication returns 401", async () => {
+    await boot(new Map());
+    await request(app.getHttpServer())
+      .get("/api/v1/workout-sessions/summary")
+      .expect(401);
+  });
+
+  it("GET /summary is not captured by GET /:id", async () => {
+    await boot(new Map());
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workout-sessions/summary")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+    expect(res.body.data).toHaveProperty("diasEstaSemana");
   });
 });

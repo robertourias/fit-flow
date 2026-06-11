@@ -2,12 +2,17 @@ import request from "supertest";
 import type { INestApplication } from "@nestjs/common";
 import { ApiErrorCode } from "@fitflow/types";
 import { createTestApp, authHeader, fakeDecode } from "./e2e-utils";
-import { STRATEGIES_REPOSITORY } from "../src/training/training.tokens";
+import { STRATEGIES_REPOSITORY, WORKOUT_SESSIONS_REPOSITORY } from "../src/training/training.tokens";
+import { EXERCISES_REPOSITORY } from "../src/catalog/catalog.tokens";
 import { Strategy } from "../src/training/domain/strategy.entity";
 import { Workout } from "../src/training/domain/workout.entity";
 import { WorkoutExercise } from "../src/training/domain/workout-exercise.entity";
 import { PlannedSet } from "../src/training/domain/planned-set.value-object";
+import { Exercise } from "../src/catalog/domain/exercise.entity";
+import { ExerciseCategory } from "../src/catalog/domain/exercise-category.enum";
 import type { IStrategiesRepository } from "../src/training/domain/repositories/strategies.repository.interface";
+import type { IWorkoutSessionsRepository } from "../src/training/domain/repositories/workout-sessions.repository.interface";
+import type { IExercisesRepository } from "../src/catalog/domain/repositories/exercises.repository.interface";
 
 jest.mock("@auth/core/jwt", () => ({
   decode: jest.fn((args: { token: string }) => fakeDecode(args)),
@@ -260,5 +265,191 @@ describe("Strategies CRUD (e2e)", () => {
       .set(authHeader("tenant-a"))
       .expect(404);
     expect(repo.raw("strategy-b1")).toBeDefined();
+  });
+});
+
+describe("GET /strategies/active-workout (e2e)", () => {
+  function awWorkout(id: string, order: number, exerciseIds: string[]): Workout {
+    return new Workout({
+      id,
+      strategyId: "strategy-x1",
+      tenantId: "tenant-x",
+      name: `Treino ${id}`,
+      description: null,
+      order,
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+      exercises: exerciseIds.map(
+        (exId, i) =>
+          new WorkoutExercise({
+            id: `we-${id}-${i}`,
+            workoutId: id,
+            exerciseId: exId,
+            order: i,
+            restSeconds: 90,
+            notes: null,
+            plannedSets: [],
+          }),
+      ),
+    });
+  }
+
+  function awStrategyProps(id: string, isActive: boolean, workouts: Workout[]): StrategyProps {
+    return {
+      id,
+      tenantId: "tenant-x",
+      name: `Estratégia ${id}`,
+      type: "ABC",
+      description: null,
+      isActive,
+      workouts,
+      createdAt: new Date("2026-01-01"),
+      updatedAt: new Date("2026-01-01"),
+    };
+  }
+
+  class FakeWorkoutSessionsRepository implements IWorkoutSessionsRepository {
+    constructor(private readonly _countByStrategy: Record<string, number>) {}
+    async findById(): Promise<never> {
+      throw new Error("not used");
+    }
+    async findManyByTenant(): Promise<never> {
+      throw new Error("not used");
+    }
+    async count(): Promise<never> {
+      throw new Error("not used");
+    }
+    async countFinishedByStrategy(strategyId: string): Promise<number> {
+      return this._countByStrategy[strategyId] ?? 0;
+    }
+    async create(): Promise<never> {
+      throw new Error("not used");
+    }
+    async update(): Promise<never> {
+      throw new Error("not used");
+    }
+    async delete(): Promise<never> {
+      throw new Error("not used");
+    }
+  }
+
+  const exercisesRepoFake: IExercisesRepository = {
+    findMany: async () => [],
+    count: async () => 0,
+    findById: async (id: string) =>
+      id === "ex-1"
+        ? new Exercise({
+            id: "ex-1",
+            name: "Supino",
+            description: null,
+            imageUrl: null,
+            videoUrl: null,
+            category: ExerciseCategory.STRENGTH,
+            isArchived: false,
+            tenantId: null,
+            muscleGroups: [],
+            equipment: [],
+            createdAt: new Date("2026-01-01"),
+            updatedAt: new Date("2026-01-01"),
+          })
+        : null,
+    create: async () => {
+      throw new Error("not used");
+    },
+    update: async () => null,
+    archive: async () => false,
+  };
+
+  async function boot(
+    strategies: Map<string, StrategyProps>,
+    countByStrategy: Record<string, number> = {},
+  ): Promise<INestApplication> {
+    return createTestApp([
+      { token: STRATEGIES_REPOSITORY, value: new FakeStrategiesRepository(strategies) },
+      {
+        token: WORKOUT_SESSIONS_REPOSITORY,
+        value: new FakeWorkoutSessionsRepository(countByStrategy),
+      },
+      { token: EXERCISES_REPOSITORY, value: exercisesRepoFake },
+    ]);
+  }
+
+  it("returns null when there is no active strategy", async () => {
+    const app = await boot(
+      new Map([["strategy-x1", awStrategyProps("strategy-x1", false, [awWorkout("w0", 0, [])])]]),
+    );
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/strategies/active-workout")
+      .set(authHeader("tenant-x"))
+      .expect(200);
+    expect(res.body.data).toBeNull();
+    await app.close();
+  });
+
+  it("returns null when the active strategy has no workouts", async () => {
+    const app = await boot(new Map([["strategy-x1", awStrategyProps("strategy-x1", true, [])]]));
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/strategies/active-workout")
+      .set(authHeader("tenant-x"))
+      .expect(200);
+    expect(res.body.data).toBeNull();
+    await app.close();
+  });
+
+  it("returns workout 0 with exercise names when no sessions are finished", async () => {
+    const workouts = [awWorkout("w0", 0, ["ex-1"]), awWorkout("w1", 1, []), awWorkout("w2", 2, [])];
+    const app = await boot(
+      new Map([["strategy-x1", awStrategyProps("strategy-x1", true, workouts)]]),
+      { "strategy-x1": 0 },
+    );
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/strategies/active-workout")
+      .set(authHeader("tenant-x"))
+      .expect(200);
+    expect(res.body.data.estrategiaNome).toBe("Estratégia strategy-x1");
+    expect(res.body.data.workout).toEqual({
+      id: "w0",
+      nome: "Treino w0",
+      exercicios: ["Supino"],
+      order: 0,
+    });
+    expect(res.body.data.proximos.map((p: { id: string }) => p.id)).toEqual(["w1", "w2"]);
+    await app.close();
+  });
+
+  it("rotates to the next workout based on finished session count", async () => {
+    const workouts = [awWorkout("w0", 0, []), awWorkout("w1", 1, []), awWorkout("w2", 2, [])];
+    const app = await boot(
+      new Map([["strategy-x1", awStrategyProps("strategy-x1", true, workouts)]]),
+      { "strategy-x1": 1 },
+    );
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/strategies/active-workout")
+      .set(authHeader("tenant-x"))
+      .expect(200);
+    expect(res.body.data.workout.id).toBe("w1");
+    expect(res.body.data.proximos.map((p: { id: string }) => p.id)).toEqual(["w2", "w0"]);
+    await app.close();
+  });
+
+  it("returns empty proximos for a strategy with a single workout", async () => {
+    const app = await boot(
+      new Map([["strategy-x1", awStrategyProps("strategy-x1", true, [awWorkout("w0", 0, [])])]]),
+      { "strategy-x1": 0 },
+    );
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/strategies/active-workout")
+      .set(authHeader("tenant-x"))
+      .expect(200);
+    expect(res.body.data.proximos).toEqual([]);
+    await app.close();
+  });
+
+  it("requires authentication", async () => {
+    const app = await boot(
+      new Map([["strategy-x1", awStrategyProps("strategy-x1", true, [awWorkout("w0", 0, [])])]]),
+    );
+    await request(app.getHttpServer()).get("/api/v1/strategies/active-workout").expect(401);
+    await app.close();
   });
 });

@@ -32,6 +32,8 @@ import { ListWorkoutSessionsUseCase } from "../application/use-cases/list-workou
 import { GetWorkoutSessionUseCase } from "../application/use-cases/get-workout-session.use-case";
 import { UpdateWorkoutSessionUseCase } from "../application/use-cases/update-workout-session.use-case";
 import { DeleteWorkoutSessionUseCase } from "../application/use-cases/delete-workout-session.use-case";
+import { GetDashboardSummaryUseCase } from "../application/use-cases/get-dashboard-summary.use-case";
+import { DashboardSummaryDto } from "../application/dto/dashboard-summary.dto";
 
 @ApiTags("workout-sessions")
 @ApiBearerAuth()
@@ -43,6 +45,7 @@ export class WorkoutSessionsController {
     private readonly _getSession: GetWorkoutSessionUseCase,
     private readonly _updateSession: UpdateWorkoutSessionUseCase,
     private readonly _deleteSession: DeleteWorkoutSessionUseCase,
+    private readonly _getDashboardSummary: GetDashboardSummaryUseCase,
   ) {}
 
   @Post()
@@ -62,6 +65,12 @@ export class WorkoutSessionsController {
   ): Promise<PaginatedResponse<WorkoutSessionSummaryDto>> {
     const page = await this._listSessions.execute(user.id, query);
     return { ...page, items: page.items.map((item) => WorkoutSessionSummaryDto.fromEntity(item)) };
+  }
+
+  @Get("summary")
+  @ApiOkResponse({ type: DashboardSummaryDto })
+  async getSummary(@CurrentUser() user: AuthenticatedUser): Promise<DashboardSummaryDto> {
+    return this._getDashboardSummary.execute(user.id);
   }
 
   @Get(":id")

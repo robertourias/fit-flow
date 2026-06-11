@@ -21,6 +21,8 @@ import { ListWorkoutSessionsUseCase } from "./application/use-cases/list-workout
 import { GetWorkoutSessionUseCase } from "./application/use-cases/get-workout-session.use-case";
 import { UpdateWorkoutSessionUseCase } from "./application/use-cases/update-workout-session.use-case";
 import { DeleteWorkoutSessionUseCase } from "./application/use-cases/delete-workout-session.use-case";
+import { GetActiveWorkoutUseCase } from "./application/use-cases/get-active-workout.use-case";
+import { GetDashboardSummaryUseCase } from "./application/use-cases/get-dashboard-summary.use-case";
 import {
   STRATEGIES_REPOSITORY,
   WORKOUTS_REPOSITORY,
@@ -55,6 +57,8 @@ export {
     GetWorkoutSessionUseCase,
     UpdateWorkoutSessionUseCase,
     DeleteWorkoutSessionUseCase,
+    GetActiveWorkoutUseCase,
+    GetDashboardSummaryUseCase,
   ],
   exports: [STRATEGIES_REPOSITORY, WORKOUTS_REPOSITORY, WORKOUT_SESSIONS_REPOSITORY],
 })

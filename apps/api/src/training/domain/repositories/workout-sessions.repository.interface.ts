@@ -26,6 +26,10 @@ export interface IWorkoutSessionsRepository {
     startedAfter?: Date;
   }): Promise<WorkoutSession[]>;
   count(opts: { tenantId: string; startedAfter?: Date }): Promise<number>;
+  /** Total de sessões FINISHED cujo Workout pertence a strategyId, no tenant. */
+  countFinishedByStrategy(strategyId: string, tenantId: string): Promise<number>;
+  /** Sessões FINISHED do tenant com startedAt >= since, com exercises/executedSets, orderBy startedAt asc. */
+  findFinishedSince(tenantId: string, since: Date): Promise<WorkoutSession[]>;
   create(data: {
     workoutId: string;
     tenantId: string;

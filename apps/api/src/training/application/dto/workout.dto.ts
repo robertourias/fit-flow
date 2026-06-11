@@ -196,7 +196,6 @@ export class CreateWorkoutDto {
 
   @ApiProperty({ type: [CreateWorkoutExerciseDto] })
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreateWorkoutExerciseDto)
   exercises!: CreateWorkoutExerciseDto[];

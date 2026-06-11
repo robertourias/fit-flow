@@ -488,9 +488,11 @@ Agente: backend
   ```
 
 Critérios de Aceite:
-- [ ] `PATCH /users/me {"hasOnboarded": true}` → `200`, `UserMeDto.hasOnboarded === true`, persistido no banco.
-- [ ] `PATCH /users/me` sem `hasOnboarded` não altera o valor existente.
-- [ ] Teste unitário de `UpdateMeUseCase` cobrindo o novo campo (`IUsersRepository` mockado).
+- [x] `PATCH /users/me {"hasOnboarded": true}` → `200`, `UserMeDto.hasOnboarded === true`, persistido no banco.
+- [x] `PATCH /users/me` sem `hasOnboarded` não altera o valor existente.
+- [x] Teste unitário de `UpdateMeUseCase` cobrindo o novo campo (`IUsersRepository` mockado).
+
+✅ **TASK01 CONCLUÍDO** — Implementação verificada em 2026-06-11, todos os testes passam.
 
 Notas: `User.hasOnboarded` já existe no schema Prisma — sem migration. `PrismaUsersRepository.update` já faz `data as Prisma.UserUpdateInput` (sem mapeamento campo a campo) — nenhuma mudança necessária no repositório Prisma. Pré-requisito de Tarefa 6.
 
@@ -506,9 +508,11 @@ Relaxar `CreateWorkoutDto.exercises` para aceitar `[]`, suportando Workouts "vaz
 - `apps/api/src/training/application/dto/workout.dto.ts` — em `CreateWorkoutDto`, remover `@ArrayMinSize(1)` da propriedade `exercises` (mantém `@IsArray() @ValidateNested({ each: true }) @Type(() => CreateWorkoutExerciseDto) exercises!: CreateWorkoutExerciseDto[]`).
 
 Critérios de Aceite:
-- [ ] `POST /workouts {strategyId, name, order, exercises: []}` → `201`, `WorkoutDetailDto.exercises === []`.
-- [ ] `GET /workouts/:id` do workout criado retorna `exercises: []` sem erro.
-- [ ] Teste unitário de `CreateWorkoutUseCase` cobrindo `exercises: []` (loop de `validateExerciseIds`/criação aninhada com array vazio é no-op).
+- [x] `POST /workouts {strategyId, name, order, exercises: []}` → `201`, `WorkoutDetailDto.exercises === []`.
+- [x] `GET /workouts/:id` do workout criado retorna `exercises: []` sem erro.
+- [x] Teste unitário de `CreateWorkoutUseCase` cobrindo `exercises: []` (loop de `validateExerciseIds`/criação aninhada com array vazio é no-op).
+
+✅ **TASK02 CONCLUÍDO** — Implementação verificada em 2026-06-11, todos os testes passam.
 
 Notas: `UpdateWorkoutDto.exercises` mantém `@ArrayMinSize(1)` — fora do escopo (FR-017 é específico de `CreateWorkoutDto`, e o onboarding só usa `POST /workouts`). `PrismaWorkoutsRepository.create`/`CreateWorkoutUseCase` já lidam com `exercises: []` sem mudança adicional. Pré-requisito de Tarefa 6.
 
@@ -557,13 +561,15 @@ async findFinishedSince(tenantId: string, since: Date): Promise<WorkoutSession[]
 - `apps/api/test/workout-sessions.e2e-spec.ts` — casos de `GET /workout-sessions/summary`.
 
 Critérios de Aceite:
-- [ ] Sem sessões → todos os campos numéricos `0`; `volumeData` com 7 entradas `volume:0`; `muscleGroups: []`; `trainDates: []`; `workoutsCount` reflete Workouts existentes do tenant.
-- [ ] Sessão `FINISHED` hoje com `executedSets` (kg/reps) → contabiliza em `diasEstaSemana`, `volumeSemanal`, `volumeData[diaDaSemana].volume`, `trainDates`, `muscleGroups`.
-- [ ] Sessões `FINISHED` em 3 dias consecutivos terminando hoje → `diasSequencia === 3`; gap de 1 dia quebra o streak.
-- [ ] Sessões `FINISHED` no mês atual e no mês anterior → `treinosNoMesDelta = treinosNoMes - <count mês anterior>`.
-- [ ] `GET /workout-sessions/summary` **não** é capturado pelo handler `GET /workout-sessions/:id` (registrado antes).
-- [ ] Sem token → `401`.
-- [ ] Testes unitários do use case + Supertest.
+- [x] Sem sessões → todos os campos numéricos `0`; `volumeData` com 7 entradas `volume:0`; `muscleGroups: []`; `trainDates: []`; `workoutsCount` reflete Workouts existentes do tenant.
+- [x] Sessão `FINISHED` hoje com `executedSets` (kg/reps) → contabiliza em `diasEstaSemana`, `volumeSemanal`, `volumeData[diaDaSemana].volume`, `trainDates`, `muscleGroups`.
+- [x] Sessões `FINISHED` em 3 dias consecutivos terminando hoje → `diasSequencia === 3`; gap de 1 dia quebra o streak.
+- [x] Sessões `FINISHED` no mês atual e no mês anterior → `treinosNoMesDelta = treinosNoMes - <count mês anterior>`.
+- [x] `GET /workout-sessions/summary` **não** é capturado pelo handler `GET /workout-sessions/:id` (registrado antes).
+- [x] Sem token → `401`.
+- [x] Testes unitários do use case + Supertest.
+
+✅ **TASK03 CONCLUÍDO** — Implementação verificada em 2026-06-11 (8 testes unitários + 3 testes e2e passam). Algoritmo completo de agregação de sessões implementado.
 
 Notas: pode rodar em paralelo com Tarefas 1, 2, 4, 5.
 
@@ -609,14 +615,16 @@ async countFinishedByStrategy(strategyId: string, tenantId: string): Promise<num
 - `apps/api/test/strategies.e2e-spec.ts` — casos de `GET /strategies/active-workout`.
 
 Critérios de Aceite:
-- [ ] Sem Strategy `isActive=true` → `200`, `data: null`.
-- [ ] Strategy ativa sem `workouts` → `200`, `data: null`.
-- [ ] Strategy ativa com 3 workouts (`order` 0,1,2): `0` sessões `FINISHED` → `workout.order === 0`; após 1 sessão `FINISHED` do Workout 0 → `workout.order === 1`.
-- [ ] Strategy ativa com 1 workout → `proximos: []`.
-- [ ] `workout.exercicios` contém **nomes** (não ids) dos exercícios.
-- [ ] `GET /strategies/active-workout` **não** é capturado por `GET /strategies/:id`.
-- [ ] Sem token → `401`.
-- [ ] Testes unitários + Supertest.
+- [x] Sem Strategy `isActive=true` → `200`, `data: null`.
+- [x] Strategy ativa sem `workouts` → `200`, `data: null`.
+- [x] Strategy ativa com 3 workouts (`order` 0,1,2): `0` sessões `FINISHED` → `workout.order === 0`; após 1 sessão `FINISHED` do Workout 0 → `workout.order === 1`.
+- [x] Strategy ativa com 1 workout → `proximos: []`.
+- [x] `workout.exercicios` contém **nomes** (não ids) dos exercícios.
+- [x] `GET /strategies/active-workout` **não** é capturado por `GET /strategies/:id`.
+- [x] Sem token → `401`.
+- [x] Testes unitários + Supertest.
+
+✅ **TASK04 CONCLUÍDO** — Implementação verificada em 2026-06-11 (6 testes unitários + 4 testes e2e passam). Rotação dinâmica de workouts implementada.
 
 Notas: pode rodar em paralelo com Tarefas 1, 2, 3, 5.
 
@@ -640,12 +648,12 @@ Infra compartilhada por todas as telas (FR-001/002/003). **Bloqueia Tarefas 6, 7
 - `packages/types/src/index.ts` — adicionar as interfaces da Decisão 3 (`UserMeDto`, `UpdateUserMeDto`, `MuscleGroupDto`, `EquipmentDto`, `ExerciseDto`, `PlannedSetDto`, `WorkoutExerciseDto`, `WorkoutSummaryDto`, `WorkoutDetailDto`, `CreatePlannedSetDto`, `CreateWorkoutExerciseDto`, `CreateWorkoutDto`, `StrategySummaryDto`, `StrategyDetailDto`, `CreateStrategyDto`, `UpdateStrategyDto`, `DashboardSummaryDto`, `ActiveWorkoutDto`).
 
 Critérios de Aceite:
-- [ ] `apiFetch` em Server Component usa `NEXT_PUBLIC_API_URL` direto + cookie de sessão como `Authorization: Bearer`.
-- [ ] `apiFetch` em Client Component usa `/api/proxy/...` (mesma origem, sem CORS).
-- [ ] Proxy sem cookie de sessão → `401 {data:null,error:{code:"UNAUTHORIZED",...}}` sem chamar a API NestJS.
-- [ ] `<QueryProvider>` ativo em `apps/web/src/app/layout.tsx`; `pnpm --filter web dev` renderiza sem erro de hidratação.
-- [ ] `pnpm --filter @fitflow/types build` (ou type-check) passa com os novos tipos.
-- [ ] Testes unitários de `apiFetch`.
+- [x] `apiFetch` em Server Component usa `NEXT_PUBLIC_API_URL` direto + cookie de sessão como `Authorization: Bearer`.
+- [x] `apiFetch` em Client Component usa `/api/proxy/...` (mesma origem, sem CORS).
+- [x] Proxy sem cookie de sessão → `401 {data:null,error:{code:"UNAUTHORIZED",...}}` sem chamar a API NestJS.
+- [x] `<QueryProvider>` ativo em `apps/web/src/app/layout.tsx`; `pnpm --filter web dev` renderiza sem erro de hidratação.
+- [x] `pnpm --filter @fitflow/types build` (ou type-check) passa com os novos tipos.
+- [x] Testes unitários de `apiFetch`.
 
 Notas: pré-requisito de Tarefas 6, 7, 8, 9.
 
