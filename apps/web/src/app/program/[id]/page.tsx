@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api/client";
 import { programColor } from "@/lib/utils/program-color";
+import { ProgramHeader } from "@/components/library/ProgramHeader";
 import type { StrategyDetailDto } from "@fitflow/types";
 
 interface ProgramPageProps {
@@ -13,28 +14,13 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   try {
     const strategy = await apiFetch<StrategyDetailDto>(`/strategies/${id}`);
 
-    const color = programColor(strategy.id);
-    const tags = [
-      `${strategy.workouts.length} treino${strategy.workouts.length !== 1 ? "s" : ""}`,
-      strategy.type ?? "Personalizado",
-    ];
-
     return (
       <div className="flex flex-col">
-        <div className="h-32 relative" style={{ backgroundColor: color }} />
+        <div className="h-32 relative" style={{ backgroundColor: programColor(strategy.id) }} />
+
+        <ProgramHeader strategy={strategy} />
 
         <div className="flex flex-col gap-6 p-6">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold">{strategy.name}</h1>
-            <div className="flex gap-2 flex-wrap">
-              {tags.map((tag) => (
-                <span key={tag} className="inline-flex items-center rounded-pill px-3 py-1 text-sm bg-muted text-muted-foreground">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold">Treinos</h2>
             {strategy.workouts.length === 0 ? (
