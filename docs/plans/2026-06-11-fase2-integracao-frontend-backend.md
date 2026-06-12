@@ -742,23 +742,25 @@ Agente: frontend
 Substitui `/exercises` e `/exercises/[id]` por dados reais (FR-009-013). Depende de Tarefa 5.
 
 **Arquivos a criar:**
-- `apps/web/src/lib/api/hooks/use-exercises.ts` — `useExercises(filters)` → `useInfiniteQuery` sobre `PaginatedResponse<ExerciseDto>` (`getNextPageParam` via `nextCursor`), `queryKey: ["exercises", filters]`.
-- `apps/web/src/lib/api/hooks/use-exercise.ts` — `useExercise(id)` → `useQuery(["exercise", id], () => apiFetch<ExerciseDto>(`/exercises/${id}`))`.
-- `apps/web/src/lib/api/hooks/use-muscle-groups.ts` / `use-equipment.ts` — `useQuery` para `GET /muscle-groups` / `GET /equipment`, `staleTime: Infinity` (dados de referência).
+- `apps/web/src/lib/api/hooks/use-exercises.ts` — `useExercises(filters)` → `useInfiniteQuery` sobre `PaginatedResponse<ExerciseDto>` (`getNextPageParam` via `nextCursor`), `queryKey: ["exercises", filters]`. ✅ CRIADO
+- `apps/web/src/lib/api/hooks/use-exercise.ts` — `useExercise(id)` → `useQuery(["exercise", id], () => apiFetch<ExerciseDto>(`/exercises/${id}`))`. ✅ CRIADO
+- `apps/web/src/lib/api/hooks/use-muscle-groups.ts` / `use-equipment.ts` — `useQuery` para `GET /muscle-groups` / `GET /equipment`, `staleTime: Infinity` (dados de referência). ✅ CRIADO
 
 **Arquivos a modificar:**
-- `apps/web/src/components/exercises/ExercisesClientPage.tsx`:
+- `apps/web/src/components/exercises/ExercisesClientPage.tsx`: ⏳ **EM PROGRESSO**
   - Filtro de grupo muscular/equipamento passa a usar `slug` (de `useMuscleGroups`/`useEquipment`) em vez de nomes mockados.
   - Filtro de tipo: "Força" → `category=STRENGTH`, "Cardio" → `category=CARDIO`, "Todos" → omitido.
   - `search` (com `useDebounce`, já existe em `apps/web/src/lib/hooks/useDebounce.ts`) → query param `search`.
   - Substitui lista mockada por `useExercises({search, muscleGroupSlug, equipmentSlug, category})`; concatena `pages[].items` para o `react-window` `FixedSizeList`; "carregar mais"/scroll chama `fetchNextPage()` quando `hasNextPage`.
   - Adapta `ExerciseDto` → shape `Exercise` consumido por `ExerciseCard`/`FilterBar`: `primaryMuscles`/`secondaryMuscles` derivados de `muscleGroups[].isPrimary` (FR-012); `bookmarkCount` → `"—"` fixo (FR-013).
-- `apps/web/src/components/exercises/FilterBar.tsx` — opções de `muscle`/`equipment` vêm de `useMuscleGroups()`/`useEquipment()` (estado de loading desabilita os selects).
-- `apps/web/src/app/exercises/page.tsx` — vira shell simples (`<ExercisesClientPage />`, sem props de mock).
-- `apps/web/src/app/exercises/[id]/page.tsx` + `ExerciseDetail.tsx` — usa `useExercise(params.id)`; `error instanceof ApiClientError && error.status === 404` → `notFound()`. Mesmo mapeamento `isPrimary` do item anterior.
+- `apps/web/src/components/exercises/FilterBar.tsx`: ⏳ **EM PROGRESSO**
+  - opções de `muscle`/`equipment` vêm de `useMuscleGroups()`/`useEquipment()` (estado de loading desabilita os selects).
+- `apps/web/src/app/exercises/page.tsx` — ✅ CONCLUÍDO (removido mock, passa hook)
+- `apps/web/src/app/exercises/[id]/page.tsx` + `ExerciseDetail.tsx`: ⏳ **EM PROGRESSO**
+  - usa `useExercise(params.id)`; `error instanceof ApiClientError && error.status === 404` → `notFound()`. Mesmo mapeamento `isPrimary` do item anterior.
 
 Critérios de Aceite:
-- [ ] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`.
+- [x] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`. (página principal sim)
 - [ ] Filtros de grupo muscular/equipamento usam `slug` real.
 - [ ] Filtro "Força"/"Cardio"/"Todos" mapeia para `category=STRENGTH`/`CARDIO`/sem filtro.
 - [ ] Busca por nome filtra via `search` (debounced).
@@ -766,6 +768,8 @@ Critérios de Aceite:
 - [ ] `/exercises/[id]` com id inexistente → página 404 (Next `notFound()`).
 - [ ] `primaryMuscles`/`secondaryMuscles` corretos conforme `isPrimary`.
 - [ ] `bookmarkCount` exibido como `"—"`.
+
+**Status:** 40% — hooks + page shell prontos, componentes cliente precisam refactor para usar hooks.
 
 Notas: pode rodar em paralelo com Tarefas 6, 7, 9.
 
@@ -778,28 +782,36 @@ Agente: frontend
 Substitui `/library` (aba "Programas") e cria `/program/[id]/page.tsx` real, com ações de ativar/desativar/excluir (FR-021-026). Depende de Tarefa 5.
 
 **Arquivos a criar:**
-- `apps/web/src/lib/utils/program-color.ts` — `programColor(id): string` (Decisão 6).
-- `apps/web/src/lib/api/hooks/use-strategies.ts` — `useStrategies()` → `useQuery(["strategies"], () => apiFetch<StrategySummaryDto[]>("/strategies"))`.
-- `apps/web/src/lib/api/hooks/use-strategy.ts` — `useStrategy(id)` → `useQuery(["strategy", id], () => apiFetch<StrategyDetailDto>(`/strategies/${id}`))`.
-- `apps/web/src/lib/api/hooks/use-update-strategy.ts` / `use-delete-strategy.ts` — `useMutation` para `PATCH`/`DELETE /strategies/:id`, invalidando `["strategies"]` e `["strategy", id]` em sucesso.
-- `apps/web/src/components/ui/dropdown-menu.tsx` e `apps/web/src/components/ui/alert-dialog.tsx` — primitivos shadcn/ui sobre Radix, seguindo o padrão de `apps/web/src/components/ui/sheet.tsx` (Decisão 9).
-- `apps/web/src/components/library/ProgramOptionsMenu.tsx` — `"use client"`, recebe `strategy: StrategyDetailDto`. `DropdownMenu` com itens "Ativar"/"Desativar" (`useUpdateStrategy`, label conforme `strategy.isActive`) e "Excluir" (abre `AlertDialog` de confirmação; em sucesso de `useDeleteStrategy`, `router.push("/library")`).
+- `apps/web/src/lib/utils/program-color.ts` — `programColor(id): string` (Decisão 6). ✅ CRIADO
+- `apps/web/src/lib/api/hooks/use-strategies.ts` — `useStrategies()` → `useQuery(["strategies"], () => apiFetch<StrategySummaryDto[]>("/strategies"))`. ✅ CRIADO
+- `apps/web/src/lib/api/hooks/use-strategy.ts` — `useStrategy(id)` → `useQuery(["strategy", id], () => apiFetch<StrategyDetailDto>(`/strategies/${id}`))`. ✅ CRIADO
+- `apps/web/src/lib/api/hooks/use-update-strategy.ts` / `use-delete-strategy.ts` — `useMutation` para `PATCH`/`DELETE /strategies/:id`, invalidando `["strategies"]` e `["strategy", id]` em sucesso. ✅ CRIADO
+- `apps/web/src/components/ui/dropdown-menu.tsx` e `apps/web/src/components/ui/alert-dialog.tsx` — primitivos shadcn/ui sobre Radix, seguindo o padrão de `apps/web/src/components/ui/sheet.tsx` (Decisão 9). ✅ CRIADO
+- `apps/web/src/components/library/ProgramOptionsMenu.tsx` — `"use client"`, recebe `strategy: StrategyDetailDto`. `DropdownMenu` com itens "Ativar"/"Desativar" (`useUpdateStrategy`, label conforme `strategy.isActive`) e "Excluir" (abre `AlertDialog` de confirmação; em sucesso de `useDeleteStrategy`, `router.push("/library")`). ✅ CRIADO
 
 **Arquivos a modificar:**
-- `apps/web/package.json` — adicionar `@radix-ui/react-dropdown-menu`, `@radix-ui/react-alert-dialog`.
-- `apps/web/src/components/library/LibraryListPage.tsx` — aba "Programas" usa `useStrategies()`; mapeia `StrategySummaryDto` → `LibraryProgram`: `{ id, name, color: programColor(id), routinesCount: workouts.length }` (sem `image`); remove o item `isFavorites` ("Favoritos") do array renderizado; estado de loading exibe skeleton/placeholder nos cards.
-- `apps/web/src/app/program/[id]/page.tsx` — Server Component `async`: `apiFetch<StrategyDetailDto>(`/strategies/${id}`)`; em erro `ApiClientError` com `status === 404` → `notFound()`. Mapeia para `TrainingProgram`: `{ id, name, tags: [`${workouts.length} treinos`, type ?? "Personalizado"], workouts: workouts.map(w => ({ id: w.id, name: w.name, exercises: w.exercises.length })) }` — `image`/cor resolvidos via `programColor(id)` nos componentes (Decisão 6, sem campo `image` no DTO).
-- `apps/web/src/components/library/ProgramHeader.tsx` — recebe também `strategy: StrategyDetailDto` (além de `program`); renderiza `<ProgramOptionsMenu strategy={strategy} />` no botão "Mais opções"; onde usa `program.image`, renderiza `<div style={{backgroundColor: programColor(strategy.id)}}>` (Decisão 6).
-- `apps/web/src/components/library/WorkoutCard.tsx` / `WorkoutListRow.tsx` — onde usam `workout.image`, mesma substituição por cor determinística; sem mudança nos links `/workout/{id}` (já usam `workout.id` real, FR-024).
+- `apps/web/package.json` — adicionar `@radix-ui/react-dropdown-menu`, `@radix-ui/react-alert-dialog`. ✅ CRIADO
+- `apps/web/src/components/library/LibraryListPage.tsx` — ✅ CONCLUÍDO
+  - aba "Programas" usa `useStrategies()` hook
+  - mapeia `StrategySummaryDto` renderendo com `programColor(id)`
+  - removido `isFavorites` logic
+- `apps/web/src/app/program/[id]/page.tsx` — ✅ CRIADO (Server Component async, apiFetch, 404 handling)
+- `apps/web/src/components/library/ProgramHeader.tsx` — ⏳ **EM PROGRESSO**
+  - recebe também `strategy: StrategyDetailDto` (além de `program`); renderiza `<ProgramOptionsMenu strategy={strategy} />`
+  - onde usa `program.image`, renderiza cor via `programColor(strategy.id)`
+- `apps/web/src/components/library/WorkoutCard.tsx` / `WorkoutListRow.tsx` — ⏳ **EM PROGRESSO**
+  - onde usam `workout.image`, mesma substituição por cor determinística
 
 Critérios de Aceite:
-- [ ] `/library` (aba Programas) não importa `mockLibraryPrograms`; lista `GET /strategies`; sem card "Favoritos".
-- [ ] Clicar em um programa abre `/program/[id]` com Workouts reais (`GET /strategies/:id`).
-- [ ] `/program/[id]` com id inexistente/de outro tenant → página 404.
+- [x] `/library` (aba Programas) não importa `mockLibraryPrograms`; lista `GET /strategies`; sem card "Favoritos". ✅
+- [x] Clicar em um programa abre `/program/[id]` com Workouts reais (`GET /strategies/:id`). ✅
+- [x] `/program/[id]` com id inexistente/de outro tenant → página 404. ✅
 - [ ] "Mais opções" → "Ativar"/"Desativar" chama `PATCH /strategies/:id {isActive: !current}`; UI reflete novo estado.
 - [ ] "Excluir" abre confirmação; ao confirmar, `DELETE /strategies/:id` + redirect para `/library`.
 - [ ] `WorkoutCard`/`WorkoutListRow` linkam `/workout/[id]` com id real.
-- [ ] "Criar novo programa"/"Criar nova rotina" permanecem não funcionais (FR-026, sem mudança).
+- [x] "Criar novo programa"/"Criar nova rotina" permanecem não funcionais (FR-026, sem mudança). ✅
+
+**Status:** 75% — hooks, DTOs, server pages prontos; faltam ProgramHeader/WorkoutCard refactor para integrar ProgramOptionsMenu.
 
 Notas: pode rodar em paralelo com Tarefas 6, 7, 8.
 

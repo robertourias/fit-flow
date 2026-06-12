@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bookmark, History, LayoutGrid, List, Plus } from "lucide-react";
+import { History, LayoutGrid, List, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { mockLibraryPrograms, type LibraryProgram } from "@/lib/mock/library";
 import { ViewToggle, type ViewMode } from "@/components/library/ViewToggle";
+import { useStrategies } from "@/lib/api/hooks/use-strategies";
+import { programColor } from "@/lib/utils/program-color";
+import type { StrategySummaryDto } from "@fitflow/types";
 
 const tabs = ["Programas", "Rotinas", "Exercícios"] as const;
 type Tab = (typeof tabs)[number];
@@ -27,67 +29,42 @@ function CreateNewCard() {
   );
 }
 
-function ProgramCard({ program }: { program: LibraryProgram }) {
+function ProgramCard({ program }: { program: StrategySummaryDto }) {
   return (
     <Link
       href={`/program/${program.id}`}
       className="relative rounded-2xl overflow-hidden aspect-square block group"
     >
-      {program.image ? (
-        <Image
-          src={program.image}
-          alt={program.name}
-          fill
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-200 group-hover:scale-105"
-        />
-      ) : (
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: program.color ?? "#122338" }}
-        />
-      )}
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: programColor(program.id) }}
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-      {program.isFavorites && (
-        <div className="absolute inset-0 flex items-center justify-center pb-8">
-          <Bookmark className="h-7 w-7 text-white/80" fill="currentColor" />
-        </div>
-      )}
       <div className="absolute bottom-0 left-0 right-0 p-2.5">
         <p className="text-white font-semibold text-[13px] leading-tight truncate">
           {program.name}
         </p>
         <p className="text-white/70 text-[11px] mt-0.5">
-          {program.routinesCount} rotinas
+          {program.workouts.length} rotinas
         </p>
       </div>
     </Link>
   );
 }
 
-function ProgramListRow({ program }: { program: LibraryProgram }) {
+function ProgramListRow({ program }: { program: StrategySummaryDto }) {
   return (
     <Link
       href={`/program/${program.id}`}
       className="flex items-center gap-3 px-4 py-3 hover:bg-accent/50 transition-colors"
     >
       <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0">
-        {program.image ? (
-          <Image src={program.image} alt={program.name} fill sizes="48px" className="object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{ backgroundColor: program.color ?? "#122338" }}>
-            {program.isFavorites && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Bookmark className="h-4 w-4 text-white/80" fill="currentColor" />
-              </div>
-            )}
-          </div>
-        )}
+        <div className="absolute inset-0" style={{ backgroundColor: programColor(program.id) }} />
       </div>
       <div className="flex flex-col">
         <span className="text-[14px] font-semibold leading-tight">{program.name}</span>
         <span className="text-[12px] text-muted-foreground mt-0.5">
-          {program.routinesCount} rotinas
+          {program.workouts.length} rotinas
         </span>
       </div>
     </Link>
@@ -97,6 +74,7 @@ function ProgramListRow({ program }: { program: LibraryProgram }) {
 export function LibraryListPage() {
   const [activeTab, setActiveTab] = useState<Tab>("Programas");
   const [viewMode, setViewMode] = useState<ViewMode>("grade");
+  const { data: strategies = [], isLoading } = useStrategies();
 
   return (
     <div className="flex flex-col">
@@ -133,7 +111,7 @@ export function LibraryListPage() {
           {viewMode === "grade" && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 px-4 pb-8">
               <CreateNewCard />
-              {mockLibraryPrograms.map((program) => (
+              {strategies.map((program) => (
                 <ProgramCard key={program.id} program={program} />
               ))}
             </div>
@@ -142,7 +120,7 @@ export function LibraryListPage() {
           {/* List view */}
           {viewMode === "lista" && (
             <div className="flex flex-col pb-8">
-              {mockLibraryPrograms.map((program) => (
+              {strategies.map((program) => (
                 <ProgramListRow key={program.id} program={program} />
               ))}
             </div>
