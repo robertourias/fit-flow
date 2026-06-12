@@ -20,10 +20,11 @@
 **T8+T9** — Frontend integration (Exercises + Library/Program)
 - Hooks: useExercises, useStrategy, mutations ✅
 - UI components: DropdownMenu, AlertDialog, ProgramOptionsMenu ✅
-- Pages: /program/[id] Server Component, /exercises page shell, /library refactored com useStrategies ✅
-- Remaining: ExercisesClientPage refactor (hooks integration), ProgramHeader (ProgramOptionsMenu integration)
-- % estimado: 70%
-- Próximo passo: Refatorar ExercisesClientPage para usar useExercises com filtros; integrar ProgramOptionsMenu em ProgramHeader
+- Pages: /program/[id] Server Component, /exercises page shell, /library refactored ✅
+- ProgramHeader integration with ProgramOptionsMenu ✅
+- Remaining: ExercisesClientPage refactor (useExercises hook + pagination), FilterBar (useMuscleGroups/useEquipment)
+- % estimado: 80%
+- Próximo passo: Refatorar ExercisesClientPage para usar useExercises com InfiniteQuery; atualizar FilterBar
 
 ---
 

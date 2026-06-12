@@ -70,10 +70,13 @@ const ExerciseRow = memo(function ExerciseRow({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface ExercisesClientPageProps {
-  exercises: Exercise[];
+  exercises?: Exercise[];
 }
 
-export function ExercisesClientPage({ exercises }: ExercisesClientPageProps) {
+export function ExercisesClientPage({ exercises: mockExercises }: ExercisesClientPageProps) {
+  // TODO: Replace with useExercises hook for real data
+  // For now, fall back to mock data or empty array if not provided
+  const exercises = mockExercises ?? [];
   const [search, setSearch] = useState("");
   const [muscle, setMuscle] = useState("todos");
   const [equipment, setEquipment] = useState("Todos");
