@@ -1,51 +1,50 @@
 # Status do Projeto
 
 > Memória de trabalho persistente. Atualizado pelo `/checkpoint`, lido pelo `/retomar`.
+> Não edite manualmente durante uma sessão ativa — use `/checkpoint` antes de fechar.
 
-**Última atualização:** 2026-06-11
-**Resumo de progresso global:** Fase 2 — Integração & Fluxo: T1-T7 completos (backend + frontend infra + onboarding + dashboard). T8+T9 hooks criados, UI components implementados, integration points claros.
-
-**Resumo da última sessão:** T1-T4 backend (hasOnboarded, empty exercises, dashboard summary, active workout) + T5-T7 frontend (TanStack Query, onboarding wizard, dashboard real data). T8+T9 hooks layer + UI components (DropdownMenu, AlertDialog, ProgramOptionsMenu). 162 tests passing.
+**Última atualização:** 2026-06-12
+**Resumo de progresso global:** Fase 2 completa a 80% — Backend T1-T4 + Frontend T5-T7 finalizados; T8+T9 em progresso (80% done). Infraestrutura TanStack Query + hooks + UI components prontos. Library/program pages usando dados reais via API.
+**Resumo da última sessão:** Integração T8+T9 — /library refatorada com useStrategies, /program/[id] criado como Server Component com ProgramHeader integrado, ProgramHeader refatorado para aceitar StrategyDetailDto e renderizar ProgramOptionsMenu. ExercisesClientPage preparado com prop opcional (TODO hook integration). 3 commits incrementais.
 
 ---
 
 ## Spec Ativo
 
-`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — TASK04-07
+`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — T8+T9 UI Integration
 
 ---
 
 ## 🔄 Em Progresso
 
-**T8+T9** — Frontend integration (Exercises + Library/Program)
-- Hooks: useExercises, useStrategy, mutations ✅
-- UI components: DropdownMenu, AlertDialog, ProgramOptionsMenu ✅
-- Pages: /program/[id] Server Component, /exercises page shell, /library refactored ✅
-- ProgramHeader integration with ProgramOptionsMenu ✅
-- Remaining: ExercisesClientPage refactor (useExercises hook + pagination), FilterBar (useMuscleGroups/useEquipment)
-- % estimado: 80%
-- Próximo passo: Refatorar ExercisesClientPage para usar useExercises com InfiniteQuery; atualizar FilterBar
+**T8+T9** — Frontend UI integration (Exercises + Library/Program)
+- Hooks layer: 100% ✅ (useExercises, useStrategy, useStrategies, mutations)
+- UI components: 100% ✅ (DropdownMenu, AlertDialog, ProgramOptionsMenu)
+- Server pages: 100% ✅ (/program/[id], /library refactored, /exercises shell)
+- Client component integration: 80% (ExercisesClientPage needs useExercises + InfiniteQuery, FilterBar needs hook options)
+- Estimated: 80% overall completion
+- Próximo passo: Refatorar ExercisesClientPage para useExercises({search, muscleGroupSlug, equipmentSlug, category}) com InfiniteQuery
 
 ---
 
 ## ⏭ Próximos Passos Imediatos
 
-1. Integrar `useExercises` em `/exercises/page.tsx` com pagination
-2. Integrar `useStrategies` em `/library/page.tsx`
-3. Criar `/program/[id]/page.tsx` com `useStrategy(id)`
-4. Atualizar ProgramHeader.tsx com ProgramOptionsMenu + programColor
+1. Refatorar ExercisesClientPage: substituir filtro local por useExercises hook com params
+2. Integrar useMuscleGroups/useEquipment em FilterBar para preencher opções dinâmicas
+3. Mapear ExerciseDto → Exercise shape (primaryMuscles via isPrimary, bookmarkCount fixo)
+4. Testar /exercises e /exercises/[id] com dados reais da API
 
 ---
 
 ## Decisões desta Sessão
 
-- Onboarding wizard via 3-step form com JWT session.update() + middleware gate
-- Dashboard como Server Component com parallel apiFetch calls (não useQuery)
-- T8+T9 hooks use TanStack Query com cache invalidation
-- DropdownMenu/AlertDialog criados baseados em shadcn/Radix pattern
+- /program/[id] como Server Component (parallel apiFetch, não useQuery)
+- ProgramHeader como client component com inline ProgramOptionsMenu (não modal)
+- ExercisesClientPage prop opcional com fallback (facilita refactor incremental)
+- Status em docs/plans/ atualizado para 80% (T8), 75% (T9)
 
 ---
 
 ## Bloqueadores / Perguntas Abertas
 
-- (nenhum) — próxima sessão pode prosseguir com T8+T9 UI integration
+- (nenhum) — ExercisesClientPage refactor é trabalho direto, sem dependências externas
