@@ -129,7 +129,7 @@ Este spec cobre as 4 tarefas da Fase 2 do backlog: **TASK04** (Dashboard), **TAS
 ## Critérios de Sucesso
 
 - [ ] `/dashboard` não importa nenhum arquivo de `apps/web/src/lib/mock/dashboard.ts`; todos os widgets renderizam dados de `GET /workout-sessions/summary` e `GET /strategies/active-workout`.
-- [ ] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`; filtros de grupo muscular/equipamento/tipo funcionam contra a API.
+- [x] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`; filtros de grupo muscular/equipamento/tipo funcionam contra a API.
 - [ ] Fluxo completo `/signup` → OTP → `/onboarding` (3 passos) → `/dashboard` funciona sem reload manual nem loop de redirect.
 - [ ] Após onboarding, `GET /strategies` retorna 1 Strategy com os Workouts do split escolhido (sem exercícios).
 - [ ] `/library` (aba Programas) lista as Strategies reais do usuário; clicar em um card abre `/program/[id]` com os Workouts reais.

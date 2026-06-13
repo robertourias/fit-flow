@@ -1,11 +1,11 @@
 import { memo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Ellipsis } from "lucide-react";
-import type { Workout } from "@/lib/mock/library";
+import { programColor } from "@/lib/utils/program-color";
+import type { WorkoutDetailDto } from "@fitflow/types";
 
 interface WorkoutListRowProps {
-  workout: Workout;
+  workout: WorkoutDetailDto;
 }
 
 export const WorkoutListRow = memo(function WorkoutListRow({ workout }: WorkoutListRowProps) {
@@ -16,13 +16,7 @@ export const WorkoutListRow = memo(function WorkoutListRow({ workout }: WorkoutL
 
       {/* Thumbnail */}
       <div className="relative h-[52px] w-[52px] rounded-m overflow-hidden shrink-0">
-        <Image
-          src={workout.image}
-          alt={workout.name}
-          fill
-          className="object-cover"
-          sizes="52px"
-        />
+        <div className="absolute inset-0" style={{ backgroundColor: programColor(workout.id) }} />
       </div>
 
       {/* Info */}
@@ -31,7 +25,7 @@ export const WorkoutListRow = memo(function WorkoutListRow({ workout }: WorkoutL
           {workout.name}
         </span>
         <span className="text-[13px] text-muted-foreground">
-          {workout.exercises} exercícios
+          {workout.exercises.length} exercícios
         </span>
       </div>
 

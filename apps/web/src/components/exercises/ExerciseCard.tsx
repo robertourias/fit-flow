@@ -1,25 +1,27 @@
 import { memo } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Bookmark } from "lucide-react";
-import type { Exercise } from "@/lib/mock/exercises";
+import { ExerciseImage } from "@/components/exercises/ExerciseImage";
+import type { ExerciseDto } from "@fitflow/types";
 
 interface ExerciseCardProps {
-  exercise: Exercise;
+  exercise: ExerciseDto;
 }
 
 export const ExerciseCard = memo(function ExerciseCard({ exercise }: ExerciseCardProps) {
+  const primaryMuscle = exercise.muscleGroups.find((m) => m.isPrimary) ?? exercise.muscleGroups[0];
+  const primaryEquipment = exercise.equipment[0];
+
   return (
     <Link href={`/exercises/${exercise.id}`} className="block group">
       <div className="relative bg-card rounded-l border border-border overflow-hidden flex flex-col transition-shadow group-hover:shadow-md">
         {/* Thumbnail */}
         <div className="relative h-[120px] w-full overflow-hidden">
-          <Image
-            src={exercise.image}
+          <ExerciseImage
+            src={exercise.imageUrl}
             alt={exercise.name}
-            fill
-            className="object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="transition-transform group-hover:scale-105"
           />
           {/* Bookmark overlay */}
           <button
@@ -37,12 +39,16 @@ export const ExerciseCard = memo(function ExerciseCard({ exercise }: ExerciseCar
             {exercise.name}
           </span>
           <div className="flex gap-1.5 flex-wrap">
-            <span className="inline-flex items-center rounded-pill px-1.5 py-0.5 text-[10px] bg-muted text-muted-foreground">
-              {exercise.muscleGroup}
-            </span>
-            <span className="inline-flex items-center rounded-pill px-1.5 py-0.5 text-[10px] bg-muted text-muted-foreground">
-              {exercise.equipment}
-            </span>
+            {primaryMuscle && (
+              <span className="inline-flex items-center rounded-pill px-1.5 py-0.5 text-[10px] bg-muted text-muted-foreground">
+                {primaryMuscle.name}
+              </span>
+            )}
+            {primaryEquipment && (
+              <span className="inline-flex items-center rounded-pill px-1.5 py-0.5 text-[10px] bg-muted text-muted-foreground">
+                {primaryEquipment.name}
+              </span>
+            )}
           </div>
         </div>
       </div>

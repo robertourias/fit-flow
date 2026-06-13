@@ -1,6 +1,6 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, keepPreviousData } from "@tanstack/react-query";
 import { apiFetch } from "../client";
 import type { ExerciseDto, PaginatedResponse } from "@fitflow/types";
 
@@ -14,7 +14,7 @@ interface UseExercisesFilters {
 export function useExercises(filters: UseExercisesFilters = {}) {
   return useInfiniteQuery({
     queryKey: ["exercises", filters],
-    queryFn: async ({ pageParam = null }) => {
+    queryFn: async ({ pageParam }) => {
       const params = new URLSearchParams();
       if (filters.search) params.append("search", filters.search);
       if (filters.muscleGroupSlug) params.append("muscleGroupSlug", filters.muscleGroupSlug);
@@ -25,7 +25,8 @@ export function useExercises(filters: UseExercisesFilters = {}) {
       const path = `/exercises?${params.toString()}`;
       return apiFetch<PaginatedResponse<ExerciseDto>>(path);
     },
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
-    initialPageParam: null,
+    getNextPageParam: (lastPage): string | null => lastPage.nextCursor,
+    initialPageParam: null as string | null,
+    placeholderData: keepPreviousData,
   });
 }

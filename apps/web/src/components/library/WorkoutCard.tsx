@@ -1,10 +1,10 @@
 import { memo } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import type { Workout } from "@/lib/mock/library";
+import { programColor } from "@/lib/utils/program-color";
+import type { WorkoutDetailDto } from "@fitflow/types";
 
 interface WorkoutCardProps {
-  workout: Workout;
+  workout: WorkoutDetailDto;
 }
 
 export const WorkoutCard = memo(function WorkoutCard({ workout }: WorkoutCardProps) {
@@ -15,12 +15,9 @@ export const WorkoutCard = memo(function WorkoutCard({ workout }: WorkoutCardPro
     >
       {/* Thumbnail */}
       <div className="relative h-[120px] w-full overflow-hidden">
-        <Image
-          src={workout.image}
-          alt={workout.name}
-          fill
-          className="object-cover transition-transform group-hover:scale-105"
-          sizes="(max-width: 768px) 50vw, 33vw"
+        <div
+          className="absolute inset-0 transition-transform group-hover:scale-105"
+          style={{ backgroundColor: programColor(workout.id) }}
         />
       </div>
 
@@ -30,7 +27,7 @@ export const WorkoutCard = memo(function WorkoutCard({ workout }: WorkoutCardPro
           {workout.name}
         </span>
         <span className="inline-flex items-center rounded-pill bg-muted text-muted-foreground px-1.5 py-0.5 text-[10px] self-start">
-          {workout.exercises} exercícios
+          {workout.exercises.length} exercícios
         </span>
       </div>
     </Link>

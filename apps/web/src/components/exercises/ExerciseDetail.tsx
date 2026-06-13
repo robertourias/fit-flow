@@ -1,14 +1,20 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowLeft, Bookmark, Share2, Plus, EllipsisVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Exercise } from "@/lib/mock/exercises";
+import { ExerciseImage } from "@/components/exercises/ExerciseImage";
+import type { ExerciseDto } from "@fitflow/types";
 
 interface ExerciseDetailProps {
-  exercise: Exercise;
+  exercise: ExerciseDto;
 }
 
 export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
+  const primaryMuscles = exercise.muscleGroups.filter((m) => m.isPrimary).map((m) => m.name);
+  const secondaryMuscles = exercise.muscleGroups.filter((m) => !m.isPrimary).map((m) => m.name);
+  const allMuscleGroups = exercise.muscleGroups.map((m) => m.name);
+  const equipmentNames = exercise.equipment.map((e) => e.name);
+  const headerMuscleGroup = primaryMuscles[0] ?? allMuscleGroups[0] ?? "—";
+
   return (
     <div className="flex flex-col relative min-h-full">
       {/* Header */}
@@ -33,14 +39,7 @@ export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
 
       {/* Image area */}
       <div className="relative h-[220px] w-full overflow-hidden">
-        <Image
-          src={exercise.image}
-          alt={exercise.name}
-          fill
-          className="object-cover"
-          sizes="100vw"
-          priority
-        />
+        <ExerciseImage src={exercise.imageUrl} alt={exercise.name} sizes="100vw" priority />
         {/* Gradient overlay */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
@@ -48,11 +47,11 @@ export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
       {/* Action bar */}
       <div className="flex items-center gap-4 px-5 py-3 bg-card border-b border-border">
         <span className="flex-1 text-[13px] text-muted-foreground">
-          Exercícios de {exercise.muscleGroup}
+          Exercícios de {headerMuscleGroup}
         </span>
         <button className="flex items-center gap-1.5 text-[12px] text-foreground">
           <Bookmark className="h-4 w-4 text-muted-foreground" />
-          {exercise.bookmarkCount}
+          —
         </button>
         <button className="flex items-center gap-1.5 text-[12px] text-foreground">
           <Share2 className="h-4 w-4 text-muted-foreground" />
@@ -69,7 +68,7 @@ export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
             <div className="bg-muted rounded-l w-[70px] h-[120px] flex flex-col items-center justify-center gap-1 p-2">
               <span className="text-[9px] font-semibold text-muted-foreground">FRENTE</span>
               <div className="text-center">
-                {exercise.primaryMuscles.slice(0, 2).map((m) => (
+                {primaryMuscles.slice(0, 2).map((m) => (
                   <p key={m} className="text-[8px] text-primary font-medium leading-snug">{m}</p>
                 ))}
               </div>
@@ -78,7 +77,7 @@ export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
             <div className="bg-muted rounded-l w-[70px] h-[120px] flex flex-col items-center justify-center gap-1 p-2">
               <span className="text-[9px] font-semibold text-muted-foreground">COSTAS</span>
               <div className="text-center">
-                {exercise.secondaryMuscles.slice(0, 2).map((m) => (
+                {secondaryMuscles.slice(0, 2).map((m) => (
                   <p key={m} className="text-[8px] text-muted-foreground leading-snug">{m}</p>
                 ))}
               </div>
@@ -95,10 +94,10 @@ export function ExerciseDetail({ exercise }: ExerciseDetailProps) {
           </div>
 
           {[
-            { label: "GRUPO MUSCULAR", value: exercise.muscleGroup },
-            { label: "EQUIPAMENTO", value: exercise.equipment },
-            { label: "MÚSC. PRIMÁRIOS", value: exercise.primaryMuscles.join(", ") },
-            { label: "MÚSC. SECUNDÁRIOS", value: exercise.secondaryMuscles.join(", ") || "—" },
+            { label: "GRUPO MUSCULAR", value: allMuscleGroups.join(", ") || "—" },
+            { label: "EQUIPAMENTO", value: equipmentNames.join(", ") || "—" },
+            { label: "MÚSC. PRIMÁRIOS", value: primaryMuscles.join(", ") || "—" },
+            { label: "MÚSC. SECUNDÁRIOS", value: secondaryMuscles.join(", ") || "—" },
           ].map(({ label, value }) => (
             <div key={label} className="px-3 py-2 border-t border-border flex flex-col gap-0.5">
               <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">

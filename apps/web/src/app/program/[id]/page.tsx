@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { apiFetch, ApiClientError } from "@/lib/api/client";
 import { programColor } from "@/lib/utils/program-color";
 import { ProgramHeader } from "@/components/library/ProgramHeader";
+import { WorkoutListRow } from "@/components/library/WorkoutListRow";
 import type { StrategyDetailDto } from "@fitflow/types";
 
 interface ProgramPageProps {
@@ -26,16 +27,9 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
             {strategy.workouts.length === 0 ? (
               <p className="text-muted-foreground">Nenhum treino adicionado ainda.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="rounded-l border border-border overflow-hidden">
                 {strategy.workouts.map((workout) => (
-                  <div key={workout.id} className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent transition-colors">
-                    <div className="flex flex-col gap-1">
-                      <p className="font-medium">{workout.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {workout.exercises.length} exercício{workout.exercises.length !== 1 ? "s" : ""}
-                      </p>
-                    </div>
-                  </div>
+                  <WorkoutListRow key={workout.id} workout={workout} />
                 ))}
               </div>
             )}

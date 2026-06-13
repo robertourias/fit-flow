@@ -3,48 +3,40 @@
 > Memória de trabalho persistente. Atualizado pelo `/checkpoint`, lido pelo `/retomar`.
 > Não edite manualmente durante uma sessão ativa — use `/checkpoint` antes de fechar.
 
-**Última atualização:** 2026-06-12
-**Resumo de progresso global:** Fase 2 completa a 80% — Backend T1-T4 + Frontend T5-T7 finalizados; T8+T9 em progresso (80% done). Infraestrutura TanStack Query + hooks + UI components prontos. Library/program pages usando dados reais via API.
-**Resumo da última sessão:** Integração T8+T9 — /library refatorada com useStrategies, /program/[id] criado como Server Component com ProgramHeader integrado, ProgramHeader refatorado para aceitar StrategyDetailDto e renderizar ProgramOptionsMenu. ExercisesClientPage preparado com prop opcional (TODO hook integration). 3 commits incrementais.
+**Última atualização:** 2026-06-13
+**Resumo de progresso global:** Fase 2 (T1-T9) concluída — Backend T1-T4 + Frontend T5-T9 finalizados. Catálogo de exercícios e Library/Program rodando 100% sobre API real.
+**Resumo da última sessão:** Fix bug `/api/proxy/users/me` 500 (ECONNREFUSED) via novo `API_INTERNAL_URL` server-side. TASK08 (Exercícios) e TASK09 (Library/Program) concluídas: ExercisesClientPage+FilterBar com hooks reais (slug/category/search/paginação), WorkoutCard/WorkoutListRow refatorados para `WorkoutDetailDto`+`programColor`, integrados em `/program/[id]`.
 
 ---
 
 ## Spec Ativo
 
-`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — T8+T9 UI Integration
+`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — T1-T9 concluídos.
 
 ---
 
 ## 🔄 Em Progresso
 
-**T8+T9** — Frontend UI integration (Exercises + Library/Program)
-- Hooks layer: 100% ✅ (useExercises, useStrategy, useStrategies, mutations)
-- UI components: 100% ✅ (DropdownMenu, AlertDialog, ProgramOptionsMenu)
-- Server pages: 100% ✅ (/program/[id], /library refactored, /exercises shell)
-- Client component integration: 80% (ExercisesClientPage needs useExercises + InfiniteQuery, FilterBar needs hook options)
-- Estimated: 80% overall completion
-- Próximo passo: Refatorar ExercisesClientPage para useExercises({search, muscleGroupSlug, equipmentSlug, category}) com InfiniteQuery
+(nenhum) — Fase 2 concluída.
 
 ---
 
 ## ⏭ Próximos Passos Imediatos
 
-1. Refatorar ExercisesClientPage: substituir filtro local por useExercises hook com params
-2. Integrar useMuscleGroups/useEquipment em FilterBar para preencher opções dinâmicas
-3. Mapear ExerciseDto → Exercise shape (primaryMuscles via isPrimary, bookmarkCount fixo)
-4. Testar /exercises e /exercises/[id] com dados reais da API
+1. Commitar mudanças pendentes (T8+T9 + fix API_INTERNAL_URL).
+2. Avaliar próxima fase do produto (ver `docs/context/product.md`/backlog).
+3. Seed script para `exercises`/`muscle_groups`/`equipment` (catálogo vazio em dev — ver README "Solução de problemas").
 
 ---
 
 ## Decisões desta Sessão
 
-- /program/[id] como Server Component (parallel apiFetch, não useQuery)
-- ProgramHeader como client component com inline ProgramOptionsMenu (não modal)
-- ExercisesClientPage prop opcional com fallback (facilita refactor incremental)
-- Status em docs/plans/ atualizado para 80% (T8), 75% (T9)
+- `API_INTERNAL_URL` (novo env, default `http://api:3001`): usado por código server-side (`apiFetch` server branch + proxy BFF) dentro do container `web`, com fallback para `NEXT_PUBLIC_API_URL`.
+- `WorkoutCard`/`WorkoutListRow` usam `programColor(workout.id)` no lugar de imagem mockada.
+- `bookmarkCount` (FR-013) considerado N/A — campo não exibido no card/detail real (fora do design atual).
 
 ---
 
 ## Bloqueadores / Perguntas Abertas
 
-- (nenhum) — ExercisesClientPage refactor é trabalho direto, sem dependências externas
+- (nenhum)

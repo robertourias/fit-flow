@@ -40,6 +40,11 @@ RUN pnpm --filter @fitflow/db exec prisma generate
 RUN pnpm exec turbo build --filter=@fitflow/api
 # pnpm deploy cria /deploy com node_modules flat de prod (sem devDeps)
 RUN pnpm --filter @fitflow/api deploy --prod /deploy
+# pnpm deploy reinstala @prisma/client do zero em /deploy sem rodar `prisma generate`
+# (prisma é devDep de @fitflow/db, fora do --prod) — fica com stub "did not initialize yet".
+# Sobrescreve com o client real já gerado em /repo (mesmo hash .pnpm, mesmo lockfile).
+RUN cp -r node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/* \
+       /deploy/node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/
 
 # ────────────────────────────────────────────────────────────────────────────
 # runner — imagem mínima de produção
@@ -66,8 +71,10 @@ RUN chown -R nestjs:nodejs /usr/local/lib/node_modules/prisma
 COPY --from=builder --chown=nestjs:nodejs /deploy/node_modules ./node_modules
 # dist compilado — pnpm deploy exclui se estiver no .gitignore
 COPY --from=builder --chown=nestjs:nodejs /repo/apps/api/dist ./dist
-# schema e migrations para `prisma migrate deploy` em runtime
-COPY --from=builder --chown=nestjs:nodejs /repo/apps/api/prisma ./prisma
+# schema e migrations reais para `prisma migrate deploy` em runtime
+# (apps/api/prisma é um scaffold vazio sem migrations — o schema canônico
+# com models e migrations/ vive em packages/db/prisma)
+COPY --from=builder --chown=nestjs:nodejs /repo/packages/db/prisma ./prisma
 COPY --from=builder --chown=nestjs:nodejs /deploy/package.json ./package.json
 
 USER nestjs

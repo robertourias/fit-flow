@@ -24,12 +24,18 @@ COPY --from=deps /app/node_modules              ./node_modules
 COPY --from=deps /app/apps/web/node_modules     ./apps/web/node_modules
 COPY --from=deps /app/packages/db/node_modules  ./packages/db/node_modules
 COPY --from=deps /app/packages/ui/node_modules  ./packages/ui/node_modules
+COPY --from=deps /app/packages/types/node_modules ./packages/types/node_modules
+COPY --from=deps /app/packages/utils/node_modules ./packages/utils/node_modules
 COPY package.json pnpm-workspace.yaml           ./
 COPY packages/                                  ./packages/
 COPY apps/web/                                  ./apps/web/
 ENV NEXT_TELEMETRY_DISABLED=1
 # Prisma client precisa existir antes do next build resolver '@fitflow/db' (re-exporta @prisma/client)
 RUN pnpm --filter @fitflow/db exec prisma generate
+# dist/ é excluído pelo .dockerignore; estes pacotes resolvem via main "./dist/index.js"
+# (transpilePackages no next.config), então precisam ser compilados (tsc) antes do next build.
+# @fitflow/ui não entra: seu exports aponta pro src direto.
+RUN pnpm --filter @fitflow/types --filter @fitflow/utils --filter @fitflow/db run build
 RUN cd apps/web && NODE_OPTIONS="--max_old_space_size=4096" pnpm run build
 
 # runner: minimal production image (~200 MB vs ~1 GB)

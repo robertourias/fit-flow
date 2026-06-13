@@ -22,7 +22,10 @@ async function handler(req: NextRequest, { params }: { params: Promise<{ path: s
   }
 
   const { path } = await params;
-  const url = new URL(`/api/v1/${path.join("/")}${req.nextUrl.search}`, process.env.NEXT_PUBLIC_API_URL);
+  const url = new URL(
+    `/api/v1/${path.join("/")}${req.nextUrl.search}`,
+    process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL,
+  );
   const hasBody = !["GET", "HEAD", "DELETE"].includes(req.method);
 
   const res = await fetch(url, {

@@ -91,6 +91,16 @@ describe("apiFetch", () => {
     expect((init.headers as Headers).get("Authorization")).toBe("Bearer session-jwt");
   });
 
+  it("on the server, prefers API_INTERNAL_URL over NEXT_PUBLIC_API_URL (Docker-internal hostname)", async () => {
+    process.env.API_INTERNAL_URL = "http://api:3001";
+    mockFetch.mockResolvedValueOnce(jsonResponse({ data: { id: "1" }, error: null }));
+
+    await apiFetch("/users/me");
+
+    const [url] = mockFetch.mock.calls[0];
+    expect(url).toBe("http://api:3001/api/v1/users/me");
+  });
+
   it("on the client, calls /api/proxy/...", async () => {
     (global as { window?: unknown }).window = {};
     mockFetch.mockResolvedValueOnce(jsonResponse({ data: { id: "1" }, error: null }));

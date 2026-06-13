@@ -86,7 +86,7 @@ export function ProgramOptionsMenu({ strategy }: ProgramOptionsMenuProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir programa?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta ação não pode ser desfeita. O programa "{strategy.name}" e
+              Esta ação não pode ser desfeita. O programa &quot;{strategy.name}&quot; e
               todos os seus treinos serão permanentemente deletados.
             </AlertDialogDescription>
           </AlertDialogHeader>

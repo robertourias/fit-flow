@@ -22,7 +22,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     const store = await cookies();
     const token = COOKIE_NAMES.map((n) => store.get(n)?.value).find(Boolean);
     if (token) headers.set("Authorization", `Bearer ${token}`);
-    url = new URL(`/api/v1${path}`, process.env.NEXT_PUBLIC_API_URL).toString();
+    url = new URL(`/api/v1${path}`, process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL).toString();
   } else {
     url = `/api/proxy${path}`;
   }

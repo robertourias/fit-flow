@@ -1,22 +1,26 @@
 "use client";
 
 import { Search, SlidersHorizontal, Grid2x2 } from "lucide-react";
-import { MuscleChip } from "@/components/exercises/MuscleChip";
 import { cn } from "@/lib/utils";
-import { muscleGroups, equipmentOptions, typeOptions } from "@/lib/mock/exercises";
-import type { ExerciseType } from "@/lib/mock/exercises";
+import type { MuscleGroupDto, EquipmentDto } from "@fitflow/types";
+
+export type ExerciseTypeFilter = "Todos" | "Força" | "Cardio";
+
+const typeOptions: ExerciseTypeFilter[] = ["Todos", "Força", "Cardio"];
 
 interface FilterBarProps {
   search: string;
   onSearch: (v: string) => void;
-  muscle: string;
-  onMuscle: (v: string) => void;
-  equipment: string;
-  onEquipment: (v: string) => void;
-  type: "Todos" | ExerciseType;
-  onType: (v: "Todos" | ExerciseType) => void;
+  muscleGroups: MuscleGroupDto[];
+  muscleGroupSlug?: string;
+  onMuscleGroupSlug: (slug?: string) => void;
+  equipment: EquipmentDto[];
+  equipmentSlug?: string;
+  onEquipmentSlug: (slug?: string) => void;
+  type: ExerciseTypeFilter;
+  onType: (v: ExerciseTypeFilter) => void;
   totalCount: number;
-  totalAll: number;
+  isLoading: boolean;
 }
 
 function PillChip({
@@ -47,14 +51,16 @@ function PillChip({
 export function FilterBar({
   search,
   onSearch,
-  muscle,
-  onMuscle,
+  muscleGroups,
+  muscleGroupSlug,
+  onMuscleGroupSlug,
   equipment,
-  onEquipment,
+  equipmentSlug,
+  onEquipmentSlug,
   type,
   onType,
   totalCount,
-  totalAll,
+  isLoading,
 }: FilterBarProps) {
   return (
     <div className="flex flex-col border-b border-border bg-card md:bg-background">
@@ -78,31 +84,45 @@ export function FilterBar({
         </button>
       </div>
 
-      {/* Muscle chips — horizontal scroll */}
-      <div className="flex items-center gap-3 px-4 py-2 overflow-x-auto scrollbar-none border-b border-border">
-        {muscleGroups.map((g) => (
-          <MuscleChip
-            key={g.id}
-            label={g.label}
-            image={g.image}
-            active={muscle === g.id}
-            onClick={() => onMuscle(g.id)}
+      {/* Muscle group filter */}
+      <div className="flex items-center gap-2 px-4 py-2 border-b border-border overflow-x-auto scrollbar-none">
+        <span className="text-[11px] font-semibold text-muted-foreground w-[56px] shrink-0">
+          Músculo
+        </span>
+        <div className="flex gap-1.5 flex-wrap">
+          <PillChip
+            label="Todos"
+            active={!muscleGroupSlug}
+            onClick={() => onMuscleGroupSlug(undefined)}
           />
-        ))}
+          {muscleGroups.map((mg) => (
+            <PillChip
+              key={mg.id}
+              label={mg.name}
+              active={muscleGroupSlug === mg.slug}
+              onClick={() => onMuscleGroupSlug(mg.slug)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Equipment filter */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border overflow-x-auto scrollbar-none">
-        <span className="text-[11px] font-semibold text-muted-foreground w-[52px] shrink-0">
+        <span className="text-[11px] font-semibold text-muted-foreground w-[56px] shrink-0">
           Equip.
         </span>
         <div className="flex gap-1.5 flex-wrap">
-          {equipmentOptions.map((opt) => (
+          <PillChip
+            label="Todos"
+            active={!equipmentSlug}
+            onClick={() => onEquipmentSlug(undefined)}
+          />
+          {equipment.map((eq) => (
             <PillChip
-              key={opt}
-              label={opt}
-              active={equipment === opt}
-              onClick={() => onEquipment(opt)}
+              key={eq.id}
+              label={eq.name}
+              active={equipmentSlug === eq.slug}
+              onClick={() => onEquipmentSlug(eq.slug)}
             />
           ))}
         </div>
@@ -110,7 +130,7 @@ export function FilterBar({
 
       {/* Type filter */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-border overflow-x-auto scrollbar-none">
-        <span className="text-[11px] font-semibold text-muted-foreground w-[52px] shrink-0">
+        <span className="text-[11px] font-semibold text-muted-foreground w-[56px] shrink-0">
           Tipo
         </span>
         <div className="flex gap-1.5">
@@ -128,7 +148,7 @@ export function FilterBar({
       {/* Count row */}
       <div className="flex items-center justify-between px-4 py-2">
         <span className="text-[13px] text-muted-foreground">
-          {totalCount === totalAll ? `${totalAll} exercícios` : `${totalCount} de ${totalAll} exercícios`}
+          {isLoading ? "Carregando..." : `${totalCount} exercício${totalCount === 1 ? "" : "s"}`}
         </span>
         <button
           className="h-7 w-7 rounded-s bg-primary flex items-center justify-center"

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { mockExercises } from "@/lib/mock/exercises";
+import { apiFetch, ApiClientError } from "@/lib/api/client";
 import { ExerciseDetail } from "@/components/exercises/ExerciseDetail";
+import type { ExerciseDto } from "@fitflow/types";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -9,17 +10,24 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const exercise = mockExercises.find((e) => e.id === id);
-  return { title: exercise ? `${exercise.name} — FitFlow` : "Exercício — FitFlow" };
-}
-
-export function generateStaticParams() {
-  return mockExercises.map((e) => ({ id: e.id }));
+  try {
+    const exercise = await apiFetch<ExerciseDto>(`/exercises/${id}`);
+    return { title: `${exercise.name} — FitFlow` };
+  } catch {
+    return { title: "Exercício — FitFlow" };
+  }
 }
 
 export default async function ExerciseDetailPage({ params }: Props) {
   const { id } = await params;
-  const exercise = mockExercises.find((e) => e.id === id);
-  if (!exercise) notFound();
-  return <ExerciseDetail exercise={exercise} />;
+
+  try {
+    const exercise = await apiFetch<ExerciseDto>(`/exercises/${id}`);
+    return <ExerciseDetail exercise={exercise} />;
+  } catch (error) {
+    if (error instanceof ApiClientError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 }

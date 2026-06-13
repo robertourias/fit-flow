@@ -166,6 +166,32 @@ psql postgresql://postgres:postgres@localhost:5432/fitflow -c "SELECT 1"
 
 ---
 
+## Solução de problemas
+
+### `AdapterError` / `The table "public.accounts" does not exist` no login
+
+Ocorre quando o container `db` é recriado (volume novo/vazio) mas o container
+`api` continua o mesmo de antes — as migrations só rodam no boot da `api`,
+contra o banco que existia naquele momento.
+
+Fix: reinicie a `api` para reaplicar `prisma migrate deploy` no banco atual.
+
+```sh
+docker compose --profile app restart api
+```
+
+### `/exercises`, `/library` sem dados (catálogo vazio)
+
+As migrations criam o schema mas não populam `exercises` / `muscle_groups` /
+`equipment` — ainda não há script de seed. Para inspecionar ou inserir dados
+manualmente em dev:
+
+```sh
+pnpm --filter @fitflow/db db:studio
+```
+
+---
+
 ## Documentação técnica
 
 - [Visão geral da arquitetura](docs/architecture/overview.md)

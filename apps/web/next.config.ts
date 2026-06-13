@@ -15,9 +15,8 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingRoot: path.join(__dirname, "../../"),
-  // Prisma engine binary (.so.node) is not auto-detected by file tracing — include explicitly
   outputFileTracingIncludes: {
-    "**": ["../../node_modules/.pnpm/**/.prisma/client/libquery_engine-*.node"],
+    "**": ["../../node_modules/.pnpm/@prisma+client*/**/.prisma/client/*query_engine-*.node"],
   },
   transpilePackages: ["@fitflow/ui", "@fitflow/utils", "@fitflow/types", "@fitflow/db"],
 };

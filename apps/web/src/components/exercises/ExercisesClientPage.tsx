@@ -9,21 +9,35 @@ import {
   useState,
   type CSSProperties,
 } from "react";
-import { FixedSizeList, type ListChildComponentProps } from "react-window";
-import { FilterBar } from "@/components/exercises/FilterBar";
+import {
+  FixedSizeList,
+  type ListChildComponentProps,
+  type ListOnItemsRenderedProps,
+} from "react-window";
+import { RefreshCw } from "lucide-react";
+import { FilterBar, type ExerciseTypeFilter } from "@/components/exercises/FilterBar";
 import { ExerciseCard } from "@/components/exercises/ExerciseCard";
-import type { Exercise, ExerciseType } from "@/lib/mock/exercises";
+import { Button } from "@/components/ui/button";
+import { useExercises } from "@/lib/api/hooks/use-exercises";
+import { useMuscleGroups } from "@/lib/api/hooks/use-muscle-groups";
+import { useEquipment } from "@/lib/api/hooks/use-equipment";
+import type { ExerciseDto } from "@fitflow/types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const LG_BREAKPOINT = 1024;
 const COLS_DEFAULT = 2;
 const COLS_LG = 3;
-const ROW_HEIGHT = 210;   // card ~190px + gap 12px + buffer 8px
-const ROW_PADDING = 16;   // p-4
-const GAP = 12;           // gap-3
+const ROW_HEIGHT = 210;  // card ~190px + gap 12px + buffer 8px
+const ROW_PADDING = 16;  // p-4
+const GAP = 12;          // gap-3
 // Activate virtualization only when list is large enough to justify the overhead
 const VIRTUALIZE_THRESHOLD = 30;
+
+const CATEGORY_BY_TYPE: Record<"Força" | "Cardio", "STRENGTH" | "CARDIO"> = {
+  "Força": "STRENGTH",
+  Cardio: "CARDIO",
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -36,7 +50,7 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 // ─── Virtualized row renderer (defined outside to keep stable reference) ─────
 
 interface RowData {
-  rows: Exercise[][];
+  rows: ExerciseDto[][];
   cols: number;
 }
 
@@ -69,39 +83,37 @@ const ExerciseRow = memo(function ExerciseRow({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-interface ExercisesClientPageProps {
-  exercises?: Exercise[];
-}
-
-export function ExercisesClientPage({ exercises: mockExercises }: ExercisesClientPageProps) {
-  // TODO: Replace with useExercises hook for real data
-  // For now, fall back to mock data or empty array if not provided
-  const exercises = mockExercises ?? [];
+export function ExercisesClientPage() {
   const [search, setSearch] = useState("");
-  const [muscle, setMuscle] = useState("todos");
-  const [equipment, setEquipment] = useState("Todos");
-  const [type, setType] = useState<"Todos" | ExerciseType>("Todos");
+  const [muscleGroupSlug, setMuscleGroupSlug] = useState<string | undefined>(undefined);
+  const [equipmentSlug, setEquipmentSlug] = useState<string | undefined>(undefined);
+  const [type, setType] = useState<ExerciseTypeFilter>("Todos");
 
-  // Defer search so each keystroke doesn't synchronously re-filter the list
+  // Defer search so each keystroke doesn't synchronously trigger a refetch
   const deferredSearch = useDeferredValue(search);
 
-  const filtered = useMemo(
-    () =>
-      exercises.filter((e) => {
-        const matchSearch =
-          !deferredSearch ||
-          e.name.toLowerCase().includes(deferredSearch.toLowerCase());
-        const matchMuscle = muscle === "todos" || e.muscleGroup === muscle;
-        const matchEquip = equipment === "Todos" || e.equipment === equipment;
-        const matchType = type === "Todos" || e.type === type;
-        return matchSearch && matchMuscle && matchEquip && matchType;
-      }),
-    [exercises, deferredSearch, muscle, equipment, type]
-  );
+  const { data: muscleGroups = [] } = useMuscleGroups();
+  const { data: equipment = [] } = useEquipment();
 
-  // Defers grid re-render while new filter result is being prepared
-  const deferredFiltered = useDeferredValue(filtered);
-  const isStale = deferredFiltered !== filtered;
+  const {
+    data,
+    isLoading,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useExercises({
+    search: deferredSearch || undefined,
+    muscleGroupSlug,
+    equipmentSlug,
+    category: type === "Todos" ? undefined : CATEGORY_BY_TYPE[type],
+  });
+
+  const exercises = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data]);
+  const totalCount = data?.pages[0]?.total ?? 0;
+  const isStale = isFetching && !isFetchingNextPage;
 
   // ── react-window: measure container height ───────────────────────────────
   const containerRef = useRef<HTMLDivElement>(null);
@@ -129,30 +141,51 @@ export function ExercisesClientPage({ exercises: mockExercises }: ExercisesClien
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const rows = useMemo(
-    () => chunkArray(deferredFiltered, cols),
-    [deferredFiltered, cols]
-  );
+  const rows = useMemo(() => chunkArray(exercises, cols), [exercises, cols]);
   const itemData = useMemo<RowData>(() => ({ rows, cols }), [rows, cols]);
 
-  const shouldVirtualize = deferredFiltered.length >= VIRTUALIZE_THRESHOLD;
+  const shouldVirtualize = exercises.length >= VIRTUALIZE_THRESHOLD;
+
+  // Virtualized list: fetch the next page once the last row scrolls into view
+  const handleItemsRendered = ({ visibleStopIndex }: ListOnItemsRenderedProps) => {
+    if (visibleStopIndex >= rows.length - 1 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
       <FilterBar
         search={search}
         onSearch={setSearch}
-        muscle={muscle}
-        onMuscle={setMuscle}
+        muscleGroups={muscleGroups}
+        muscleGroupSlug={muscleGroupSlug}
+        onMuscleGroupSlug={setMuscleGroupSlug}
         equipment={equipment}
-        onEquipment={setEquipment}
+        equipmentSlug={equipmentSlug}
+        onEquipmentSlug={setEquipmentSlug}
         type={type}
         onType={setType}
-        totalCount={deferredFiltered.length}
-        totalAll={exercises.length}
+        totalCount={totalCount}
+        isLoading={isLoading}
       />
 
-      {deferredFiltered.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-4 md:p-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-[190px] rounded-l bg-muted animate-pulse" />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center flex-1 gap-3 py-16 text-center px-6">
+          <p className="font-semibold text-foreground">Erro ao carregar exercícios</p>
+          <p className="text-sm text-muted-foreground">Tente novamente em alguns instantes.</p>
+          <Button variant="secondary" onClick={() => refetch()}>
+            <RefreshCw className="h-4 w-4" />
+            Tentar novamente
+          </Button>
+        </div>
+      ) : exercises.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-2 py-16 text-center px-6">
           <span className="text-4xl">🔍</span>
           <p className="font-semibold text-foreground">Nenhum exercício encontrado</p>
@@ -174,14 +207,28 @@ export function ExercisesClientPage({ exercises: mockExercises }: ExercisesClien
               itemSize={ROW_HEIGHT}
               itemData={itemData}
               overscanCount={3}
+              onItemsRendered={handleItemsRendered}
             >
               {ExerciseRow}
             </FixedSizeList>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-4 md:p-5">
-              {deferredFiltered.map((ex) => (
-                <ExerciseCard key={ex.id} exercise={ex} />
-              ))}
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 p-4 md:p-5">
+                {exercises.map((ex) => (
+                  <ExerciseCard key={ex.id} exercise={ex} />
+                ))}
+              </div>
+              {hasNextPage && (
+                <div className="flex justify-center pb-6">
+                  <Button
+                    variant="secondary"
+                    onClick={() => fetchNextPage()}
+                    isLoading={isFetchingNextPage}
+                  >
+                    Carregar mais
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

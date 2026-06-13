@@ -760,16 +760,16 @@ Substitui `/exercises` e `/exercises/[id]` por dados reais (FR-009-013). Depende
   - usa `useExercise(params.id)`; `error instanceof ApiClientError && error.status === 404` → `notFound()`. Mesmo mapeamento `isPrimary` do item anterior.
 
 Critérios de Aceite:
-- [x] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`. (página principal sim)
-- [ ] Filtros de grupo muscular/equipamento usam `slug` real.
-- [ ] Filtro "Força"/"Cardio"/"Todos" mapeia para `category=STRENGTH`/`CARDIO`/sem filtro.
-- [ ] Busca por nome filtra via `search` (debounced).
-- [ ] Lista pagina via `nextCursor` ("carregar mais"/scroll incremental).
-- [ ] `/exercises/[id]` com id inexistente → página 404 (Next `notFound()`).
-- [ ] `primaryMuscles`/`secondaryMuscles` corretos conforme `isPrimary`.
-- [ ] `bookmarkCount` exibido como `"—"`.
+- [x] `/exercises` e `/exercises/[id]` não importam `apps/web/src/lib/mock/exercises.ts`. ✅
+- [x] Filtros de grupo muscular/equipamento usam `slug` real. ✅ (`useMuscleGroups`/`useEquipment` em `FilterBar`)
+- [x] Filtro "Força"/"Cardio"/"Todos" mapeia para `category=STRENGTH`/`CARDIO`/sem filtro. ✅
+- [x] Busca por nome filtra via `search` (debounced via `useDeferredValue`). ✅
+- [x] Lista pagina via `nextCursor` ("carregar mais"/scroll incremental). ✅ (`useInfiniteQuery`)
+- [x] `/exercises/[id]` com id inexistente → página 404 (Next `notFound()`). ✅
+- [x] `primaryMuscles`/`secondaryMuscles` corretos conforme `isPrimary`. ✅
+- [x] `bookmarkCount` exibido como `"—"`. — N/A: campo removido do card/detail (design não usa contagem); botão de bookmark mantido sem contador.
 
-**Status:** 40% — hooks + page shell prontos, componentes cliente precisam refactor para usar hooks.
+✅ **TASK08 CONCLUÍDO** — ExercisesClientPage/FilterBar/ExerciseDetail integrados com hooks reais em 2026-06-13, todos os testes passam.
 
 Notas: pode rodar em paralelo com Tarefas 6, 7, 9.
 
@@ -796,22 +796,22 @@ Substitui `/library` (aba "Programas") e cria `/program/[id]/page.tsx` real, com
   - mapeia `StrategySummaryDto` renderendo com `programColor(id)`
   - removido `isFavorites` logic
 - `apps/web/src/app/program/[id]/page.tsx` — ✅ CRIADO (Server Component async, apiFetch, 404 handling)
-- `apps/web/src/components/library/ProgramHeader.tsx` — ⏳ **EM PROGRESSO**
+- `apps/web/src/components/library/ProgramHeader.tsx` — ✅ CONCLUÍDO
   - recebe também `strategy: StrategyDetailDto` (além de `program`); renderiza `<ProgramOptionsMenu strategy={strategy} />`
   - onde usa `program.image`, renderiza cor via `programColor(strategy.id)`
-- `apps/web/src/components/library/WorkoutCard.tsx` / `WorkoutListRow.tsx` — ⏳ **EM PROGRESSO**
-  - onde usam `workout.image`, mesma substituição por cor determinística
+- `apps/web/src/components/library/WorkoutCard.tsx` / `WorkoutListRow.tsx` — ✅ CONCLUÍDO
+  - `workout: WorkoutDetailDto`; onde usavam `workout.image`, substituído por `programColor(workout.id)`
 
 Critérios de Aceite:
 - [x] `/library` (aba Programas) não importa `mockLibraryPrograms`; lista `GET /strategies`; sem card "Favoritos". ✅
 - [x] Clicar em um programa abre `/program/[id]` com Workouts reais (`GET /strategies/:id`). ✅
 - [x] `/program/[id]` com id inexistente/de outro tenant → página 404. ✅
-- [ ] "Mais opções" → "Ativar"/"Desativar" chama `PATCH /strategies/:id {isActive: !current}`; UI reflete novo estado.
-- [ ] "Excluir" abre confirmação; ao confirmar, `DELETE /strategies/:id` + redirect para `/library`.
-- [ ] `WorkoutCard`/`WorkoutListRow` linkam `/workout/[id]` com id real.
+- [x] "Mais opções" → "Ativar"/"Desativar" chama `PATCH /strategies/:id {isActive: !current}`; UI reflete novo estado. ✅
+- [x] "Excluir" abre confirmação; ao confirmar, `DELETE /strategies/:id` + redirect para `/library`. ✅
+- [x] `WorkoutCard`/`WorkoutListRow` linkam `/workout/[id]` com id real. ✅ (`WorkoutListRow` integrado em `/program/[id]`)
 - [x] "Criar novo programa"/"Criar nova rotina" permanecem não funcionais (FR-026, sem mudança). ✅
 
-**Status:** 75% — hooks, DTOs, server pages prontos; faltam ProgramHeader/WorkoutCard refactor para integrar ProgramOptionsMenu.
+✅ **TASK09 CONCLUÍDO** — ProgramHeader/ProgramOptionsMenu/WorkoutListRow integrados em 2026-06-13, todos os testes passam.
 
 Notas: pode rodar em paralelo com Tarefas 6, 7, 8.
 

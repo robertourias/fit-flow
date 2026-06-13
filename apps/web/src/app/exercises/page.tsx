@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { mockExercises } from "@/lib/mock/exercises";
 import { ExercisesClientPage } from "@/components/exercises/ExercisesClientPage";
 
 export const metadata: Metadata = {
@@ -7,5 +6,5 @@ export const metadata: Metadata = {
 };
 
 export default function ExercisesPage() {
-  return <ExercisesClientPage exercises={mockExercises} />;
+  return <ExercisesClientPage />;
 }

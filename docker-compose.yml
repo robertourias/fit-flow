@@ -108,6 +108,9 @@ services:
       # NEXT_PUBLIC_* é compilado no bundle — deve ser acessível pelo browser (host),
       # não pela rede interna Docker. Use http://localhost:3001 em dev local.
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      # URL da API usada por código server-side (proxy BFF, Server Components) dentro
+      # do container web — hostname Docker, não localhost.
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api:3001}
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
       NEXT_TELEMETRY_DISABLED: "1"
