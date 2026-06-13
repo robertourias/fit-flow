@@ -7,6 +7,10 @@ export const SPLIT_PRESETS = {
 
 export type SplitType = keyof typeof SPLIT_PRESETS;
 
+export function isSplitType(value: string | null | undefined): value is SplitType {
+  return value != null && value in SPLIT_PRESETS;
+}
+
 export const GOAL_OPTIONS = [
   "Hipertrofia",
   "Emagrecimento",

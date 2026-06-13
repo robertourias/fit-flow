@@ -1,21 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { History, LayoutGrid, List, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ViewToggle, type ViewMode } from "@/components/library/ViewToggle";
+import { StrategyFormDialog, type StrategyFormSubmitValues } from "@/components/library/StrategyFormDialog";
 import { useStrategies } from "@/lib/api/hooks/use-strategies";
+import { useCreateStrategy } from "@/lib/api/hooks/use-create-strategy";
 import { programColor } from "@/lib/utils/program-color";
 import type { StrategySummaryDto } from "@fitflow/types";
 
 const tabs = ["Programas", "Rotinas", "Exercícios"] as const;
 type Tab = (typeof tabs)[number];
 
-function CreateNewCard() {
+function CreateNewCard({ onClick }: { onClick: () => void }) {
   return (
     <button
+      onClick={onClick}
       className="relative rounded-2xl overflow-hidden aspect-square flex flex-col items-center justify-center gap-2 border border-dashed border-border bg-muted/30 hover:bg-muted/50 transition-colors"
       aria-label="Criar novo programa"
     >
@@ -72,9 +76,17 @@ function ProgramListRow({ program }: { program: StrategySummaryDto }) {
 }
 
 export function LibraryListPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("Programas");
   const [viewMode, setViewMode] = useState<ViewMode>("grade");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
   const { data: strategies = [], isLoading } = useStrategies();
+  const createMutation = useCreateStrategy();
+
+  const handleCreate = async (values: StrategyFormSubmitValues) => {
+    const strategy = await createMutation.mutateAsync(values);
+    router.push(`/program/${strategy.id}`);
+  };
 
   return (
     <div className="flex flex-col">
@@ -110,7 +122,7 @@ export function LibraryListPage() {
           {/* Grid view */}
           {viewMode === "grade" && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 px-4 pb-8">
-              <CreateNewCard />
+              <CreateNewCard onClick={() => setShowCreateDialog(true)} />
               {strategies.map((program) => (
                 <ProgramCard key={program.id} program={program} />
               ))}
@@ -135,6 +147,13 @@ export function LibraryListPage() {
           </p>
         </div>
       )}
+
+      <StrategyFormDialog
+        open={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        mode="create"
+        onSubmit={handleCreate}
+      />
     </div>
   );
 }

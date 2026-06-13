@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MoreVertical, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +20,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { StrategyFormDialog } from "@/components/library/StrategyFormDialog";
+import { isSplitType } from "@/lib/onboarding/split-presets";
 import { useUpdateStrategy } from "@/lib/api/hooks/use-update-strategy";
 import { useDeleteStrategy } from "@/lib/api/hooks/use-delete-strategy";
 import type { StrategyDetailDto } from "@fitflow/types";
@@ -31,8 +33,13 @@ interface ProgramOptionsMenuProps {
 export function ProgramOptionsMenu({ strategy }: ProgramOptionsMenuProps) {
   const router = useRouter();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
   const updateMutation = useUpdateStrategy();
   const deleteMutation = useDeleteStrategy();
+
+  const handleEdit = async (values: { name: string; type?: string; description?: string }) => {
+    await updateMutation.mutateAsync({ id: strategy.id, data: values });
+  };
 
   const handleToggleActive = async () => {
     try {
@@ -64,6 +71,10 @@ export function ProgramOptionsMenu({ strategy }: ProgramOptionsMenuProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setTimeout(() => setShowEditDialog(true), 0)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Editar
+          </DropdownMenuItem>
           <DropdownMenuItem
             onClick={handleToggleActive}
             disabled={updateMutation.isPending}
@@ -102,6 +113,18 @@ export function ProgramOptionsMenu({ strategy }: ProgramOptionsMenuProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <StrategyFormDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        mode="edit"
+        initialValues={{
+          name: strategy.name,
+          type: isSplitType(strategy.type) ? strategy.type : "Personalizado",
+          description: strategy.description ?? "",
+        }}
+        onSubmit={handleEdit}
+      />
     </>
   );
 }
