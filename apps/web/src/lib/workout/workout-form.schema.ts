@@ -1,11 +1,5 @@
 import { z } from "zod";
-import type {
-  ExerciseDto,
-  CreatePlannedSetDto,
-  CreateWorkoutExerciseDto,
-  CreateWorkoutDto,
-  UpdateWorkoutDto,
-} from "@fitflow/types";
+import type { ExerciseDto, CreateWorkoutDto, UpdateWorkoutDto } from "@fitflow/types";
 
 /**
  * Schema for a single planned set in the workout form.
