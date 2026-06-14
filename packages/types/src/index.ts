@@ -122,6 +122,13 @@ export interface CreateWorkoutDto {
   exercises: CreateWorkoutExerciseDto[];
 }
 
+export interface UpdateWorkoutDto {
+  name?: string;
+  description?: string;
+  order?: number;
+  exercises?: CreateWorkoutExerciseDto[];
+}
+
 export interface StrategySummaryDto {
   id: string;
   name: string;
