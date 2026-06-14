@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import { apiFetch, ApiClientError } from "@/lib/api/client";
 import { programColor } from "@/lib/utils/program-color";
+import { Button } from "@/components/ui/button";
 import { ProgramHeader } from "@/components/library/ProgramHeader";
 import { WorkoutListRow } from "@/components/library/WorkoutListRow";
 import type { StrategyDetailDto } from "@fitflow/types";
@@ -23,7 +26,15 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
 
         <div className="flex flex-col gap-6 p-6">
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-semibold">Treinos</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Treinos</h2>
+              <Button asChild size="sm">
+                <Link href={`/program/${strategy.id}/workout/novo`}>
+                  <Plus className="h-4 w-4" />
+                  Adicionar treino
+                </Link>
+              </Button>
+            </div>
             {strategy.workouts.length === 0 ? (
               <p className="text-muted-foreground">Nenhum treino adicionado ainda.</p>
             ) : (
