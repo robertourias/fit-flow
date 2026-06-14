@@ -58,7 +58,7 @@ describe("useWorkout", () => {
   it("uses correct query key with workout id", async () => {
     mockApiFetch.mockResolvedValueOnce(WORKOUT_DETAIL);
     const { Wrapper } = createWrapper();
-    const { result } = renderHook(() => useWorkout("w1"), { wrapper: Wrapper });
+    renderHook(() => useWorkout("w1"), { wrapper: Wrapper });
 
     await waitFor(() => {
       expect(mockApiFetch).toHaveBeenCalled();

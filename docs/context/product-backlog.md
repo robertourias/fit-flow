@@ -55,7 +55,7 @@
 | ID | Título | Descrição | Status | Dependências | Spec |
 |----|--------|-----------|--------|--------------|------|
 | TASK08 | CRUD de Estratégia | Cadastro e edição de estratégias de treino (splits: ABC, Upper/Lower, PPL, Full Body) no frontend + endpoints de suporte | done | TASK06, TASK07 | [2026-06-13-task08-crud-estrategia](../specs/2026-06-13-task08-crud-estrategia.md) |
-| TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | spec-review | TASK08 | [2026-06-14-task09-crud-rotina-treinos](../specs/2026-06-14-task09-crud-rotina-treinos.md) |
+| TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | done | TASK08 | [2026-06-14-task09-crud-rotina-treinos](../specs/2026-06-14-task09-crud-rotina-treinos.md) |
 | TASK10 | Limites do plano gratuito | Enforce de: máx. 6 Workouts por usuário no plano FREE — validação no backend (uso case + repositório) e feedback visual no frontend | backlog | TASK09 | — |
 | TASK11 | Execução de treino | Registrar sessão em tempo real: séries/cargas/reps executados, timer de intervalo e conclusão de treino | backlog | TASK09 | — |
 | TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | backlog | TASK11 | — |

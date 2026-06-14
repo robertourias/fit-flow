@@ -126,4 +126,92 @@ describe("ExercisePicker", () => {
     expect(onSelect).toHaveBeenCalledWith(EXERCISE_2);
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it("shows the loading skeleton while exercises are loading", () => {
+    mockUseExercises.mockReturnValue(mockExercisesResult([], { isLoading: true, data: undefined }));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    expect(screen.queryByText("Nenhum exercício encontrado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Erro ao carregar exercícios")).not.toBeInTheDocument();
+  });
+
+  it("shows an error message when fetching exercises fails", () => {
+    mockUseExercises.mockReturnValue(mockExercisesResult([], { isError: true, data: undefined }));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    expect(screen.getByText("Erro ao carregar exercícios")).toBeInTheDocument();
+    expect(screen.getByText("Tente novamente em alguns instantes.")).toBeInTheDocument();
+  });
+
+  it("shows an empty state when there are no visible exercises", () => {
+    mockUseExercises.mockReturnValue(mockExercisesResult([]));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    expect(screen.getByText("Nenhum exercício encontrado")).toBeInTheDocument();
+    expect(screen.getByText("Tente ajustar os filtros ou a busca.")).toBeInTheDocument();
+  });
+
+  it("falls back to the first muscle group when none is marked primary", () => {
+    const exerciseWithoutPrimary: ExerciseDto = {
+      ...EXERCISE_3,
+      muscleGroups: [{ id: "mg-3", name: "Costas", slug: "costas", isPrimary: false }],
+    };
+    mockUseExercises.mockReturnValue(mockExercisesResult([exerciseWithoutPrimary]));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    expect(screen.getByText("Remada curvada")).toBeInTheDocument();
+    expect(screen.getByText("Costas")).toBeInTheDocument();
+  });
+
+  it("filters by muscle group when a pill is clicked and back to all when 'Todos' is clicked", async () => {
+    mockUseExercises.mockReturnValue(mockExercisesResult([EXERCISE_1]));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Peito" }));
+
+    await waitFor(() => {
+      expect(mockUseExercises).toHaveBeenCalledWith(
+        expect.objectContaining({ muscleGroupSlug: "peito" })
+      );
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: "Todos" }));
+
+    await waitFor(() => {
+      expect(mockUseExercises).toHaveBeenCalledWith(
+        expect.objectContaining({ muscleGroupSlug: undefined })
+      );
+    });
+  });
+
+  it("loads more exercises when 'Carregar mais' is clicked", async () => {
+    const fetchNextPage = jest.fn();
+    mockUseExercises.mockReturnValue(
+      mockExercisesResult([EXERCISE_1], { hasNextPage: true, fetchNextPage })
+    );
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    await userEvent.click(screen.getByRole("button", { name: /carregar mais/i }));
+
+    expect(fetchNextPage).toHaveBeenCalled();
+  });
+
+  it("renders no muscle group pills and an empty exercise list when data is undefined", () => {
+    mockUseMuscleGroups.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useMuscleGroups>);
+    mockUseExercises.mockReturnValue(mockExercisesResult([], { data: undefined }));
+
+    render(<ExercisePicker open onOpenChange={jest.fn()} onSelect={jest.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Todos" })).toBeInTheDocument();
+    expect(screen.getByText("Nenhum exercício encontrado")).toBeInTheDocument();
+  });
 });

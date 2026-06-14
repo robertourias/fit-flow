@@ -115,6 +115,40 @@ describe("WorkoutBuilder", () => {
     expect(submitted.exercises[0].plannedSets[0].targetReps).toBe("10");
   });
 
+  it("renders 'Salvar alterações' and pre-fills fields in edit mode", async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+    const initialValues = {
+      name: "Treino existente",
+      description: "Descrição existente",
+      exercises: [
+        {
+          exerciseId: EXERCISE_FIXTURE.id,
+          _exercise: EXERCISE_FIXTURE,
+          restSeconds: 60,
+          notes: "Drop set na última série",
+          plannedSets: [{ targetReps: "12", targetKg: "20" }],
+        },
+      ],
+    };
+
+    render(<WorkoutBuilder mode="edit" initialValues={initialValues} onSubmit={onSubmit} />);
+
+    expect(screen.getByRole("button", { name: /salvar alterações/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/nome/i)).toHaveValue("Treino existente");
+    expect(screen.getByText("Supino Reto")).toBeInTheDocument();
+    expect(screen.getByLabelText(/repetições da série 1/i)).toHaveValue("12");
+
+    await userEvent.click(screen.getByRole("button", { name: /salvar alterações/i }));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.name).toBe("Treino existente");
+    expect(submitted.exercises[0].restSeconds).toBe(60);
+  });
+
   it("reflects removed exercises in the submitted payload", async () => {
     const onSubmit = jest.fn().mockResolvedValue(undefined);
     render(<WorkoutBuilder mode="create" onSubmit={onSubmit} />);
