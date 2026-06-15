@@ -14,6 +14,7 @@ import { UpdateStrategyUseCase } from "./application/use-cases/update-strategy.u
 import { DeleteStrategyUseCase } from "./application/use-cases/delete-strategy.use-case";
 import { CreateWorkoutUseCase } from "./application/use-cases/create-workout.use-case";
 import { GetWorkoutUseCase } from "./application/use-cases/get-workout.use-case";
+import { GetWorkoutsLimitUseCase } from "./application/use-cases/get-workouts-limit.use-case";
 import { UpdateWorkoutUseCase } from "./application/use-cases/update-workout.use-case";
 import { DeleteWorkoutUseCase } from "./application/use-cases/delete-workout.use-case";
 import { CreateWorkoutSessionUseCase } from "./application/use-cases/create-workout-session.use-case";
@@ -50,6 +51,7 @@ export {
     DeleteStrategyUseCase,
     CreateWorkoutUseCase,
     GetWorkoutUseCase,
+    GetWorkoutsLimitUseCase,
     UpdateWorkoutUseCase,
     DeleteWorkoutUseCase,
     CreateWorkoutSessionUseCase,

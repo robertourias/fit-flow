@@ -4,18 +4,22 @@ import { ApiErrorCode } from "@fitflow/types";
 import { createTestApp, authHeader, fakeDecode } from "./e2e-utils";
 import { STRATEGIES_REPOSITORY, WORKOUTS_REPOSITORY } from "../src/training/training.tokens";
 import { EXERCISES_REPOSITORY } from "../src/catalog/catalog.tokens";
+import { USERS_REPOSITORY } from "../src/identity/identity.tokens";
 import { Workout } from "../src/training/domain/workout.entity";
 import { WorkoutExercise } from "../src/training/domain/workout-exercise.entity";
 import { PlannedSet } from "../src/training/domain/planned-set.value-object";
 import { Strategy } from "../src/training/domain/strategy.entity";
 import { Exercise } from "../src/catalog/domain/exercise.entity";
 import { ExerciseCategory } from "../src/catalog/domain/exercise-category.enum";
+import { User } from "../src/identity/domain/user.entity";
+import { Plan } from "../src/identity/domain/plan.enum";
 import type { IStrategiesRepository } from "../src/training/domain/repositories/strategies.repository.interface";
 import type {
   IWorkoutExerciseInput,
   IWorkoutsRepository,
 } from "../src/training/domain/repositories/workouts.repository.interface";
 import type { IExercisesRepository } from "../src/catalog/domain/repositories/exercises.repository.interface";
+import type { IUsersRepository } from "../src/identity/domain/repositories/users.repository.interface";
 
 jest.mock("@auth/core/jwt", () => ({
   decode: jest.fn((args: { token: string }) => fakeDecode(args)),
@@ -194,6 +198,39 @@ const exercisesRepo: IExercisesRepository = {
   archive: async () => false,
 };
 
+function usersRepoFor(planByTenant: Record<string, Plan>): IUsersRepository {
+  return {
+    findById: async (id) =>
+      planByTenant[id]
+        ? new User({
+            id,
+            email: `${id}@test.com`,
+            name: id,
+            avatarUrl: null,
+            bio: null,
+            age: 30,
+            goals: [],
+            isTrainer: false,
+            plan: planByTenant[id]!,
+            hasOnboarded: true,
+            deletedAt: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+        : null,
+    findByEmail: async () => null,
+    create: async () => {
+      throw new Error("not used");
+    },
+    update: async () => {
+      throw new Error("not used");
+    },
+    softDelete: async () => {},
+    findManyDeletedBefore: async () => [],
+    countWorkouts: async () => 0,
+  };
+}
+
 const validBody = {
   strategyId: "strategy-a1",
   name: "Treino A",
@@ -220,12 +257,16 @@ describe("Workouts CRUD nested (e2e)", () => {
   let app: INestApplication;
   let repo: FakeWorkoutsRepository;
 
-  async function boot(initial: Map<string, WorkoutRecord>): Promise<void> {
+  async function boot(
+    initial: Map<string, WorkoutRecord>,
+    plans: Record<string, Plan> = { "tenant-a": Plan.FREE, "tenant-b": Plan.FREE },
+  ): Promise<void> {
     repo = new FakeWorkoutsRepository(initial);
     app = await createTestApp([
       { token: WORKOUTS_REPOSITORY, value: repo },
       { token: STRATEGIES_REPOSITORY, value: strategiesRepo },
       { token: EXERCISES_REPOSITORY, value: exercisesRepo },
+      { token: USERS_REPOSITORY, value: usersRepoFor(plans) },
     ]);
   }
 
@@ -265,6 +306,74 @@ describe("Workouts CRUD nested (e2e)", () => {
       .send(validBody)
       .expect(422);
     expect(res.body.error.code).toBe(ApiErrorCode.PLAN_LIMIT_EXCEEDED);
+  });
+
+  it("POST /workouts creates the 7th workout for a PRO tenant (no limit)", async () => {
+    const initial = new Map<string, WorkoutRecord>();
+    for (let i = 0; i < 6; i++) {
+      initial.set(`w${i}`, {
+        id: `w${i}`,
+        strategyId: "strategy-a1",
+        tenantId: "tenant-a",
+        name: `W${i}`,
+        description: null,
+        order: i,
+        exercises: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+    await boot(initial, { "tenant-a": Plan.PRO });
+
+    await request(app.getHttpServer())
+      .post("/api/v1/workouts")
+      .set(authHeader("tenant-a"))
+      .send(validBody)
+      .expect(201);
+  });
+
+  it("GET /workouts/limit returns { count, limit: 6, plan: 'FREE' } for FREE tenant", async () => {
+    const initial = new Map<string, WorkoutRecord>();
+    for (let i = 0; i < 4; i++) {
+      initial.set(`w${i}`, {
+        id: `w${i}`,
+        strategyId: "strategy-a1",
+        tenantId: "tenant-a",
+        name: `W${i}`,
+        description: null,
+        order: i,
+        exercises: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+    await boot(initial);
+
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workouts/limit")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+    expect(res.body.data).toEqual({ count: 4, limit: 6, plan: "FREE" });
+  });
+
+  it("GET /workouts/limit returns { limit: null, plan: 'PRO' } for PRO tenant", async () => {
+    await boot(new Map(), { "tenant-a": Plan.PRO });
+
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workouts/limit")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+    expect(res.body.data).toEqual({ count: 0, limit: null, plan: "PRO" });
+  });
+
+  it("GET /workouts/limit is not shadowed by GET /workouts/:id", async () => {
+    await boot(new Map());
+
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workouts/limit")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+    expect(res.body.data).toEqual({ count: 0, limit: 6, plan: "FREE" });
   });
 
   it("POST /workouts with an unknown exerciseId returns 400 VALIDATION_ERROR", async () => {

@@ -129,6 +129,12 @@ export interface UpdateWorkoutDto {
   exercises?: CreateWorkoutExerciseDto[];
 }
 
+export interface WorkoutsLimitDto {
+  count: number;
+  limit: number | null;
+  plan: "FREE" | "PRO";
+}
+
 export interface StrategySummaryDto {
   id: string;
   name: string;
