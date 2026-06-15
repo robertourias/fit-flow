@@ -7,15 +7,19 @@ import { useParams, useRouter, notFound } from "next/navigation";
 import NewWorkoutPage from "../page";
 import { useStrategy } from "@/lib/api/hooks/use-strategy";
 import { useCreateWorkout } from "@/lib/api/hooks/use-create-workout";
+import { useWorkoutsLimit } from "@/lib/api/hooks/use-workouts-limit";
 import { ApiClientError } from "@/lib/api/client";
 import { toCreateWorkoutDto, type WorkoutFormValues } from "@/lib/workout/workout-form.schema";
-import type { ExerciseDto, StrategyDetailDto } from "@fitflow/types";
+import type { ExerciseDto, StrategyDetailDto, WorkoutsLimitDto } from "@fitflow/types";
 
 jest.mock("@/lib/api/hooks/use-strategy", () => ({
   useStrategy: jest.fn(),
 }));
 jest.mock("@/lib/api/hooks/use-create-workout", () => ({
   useCreateWorkout: jest.fn(),
+}));
+jest.mock("@/lib/api/hooks/use-workouts-limit", () => ({
+  useWorkoutsLimit: jest.fn(),
 }));
 jest.mock("next/navigation", () => ({
   useParams: jest.fn(),
@@ -45,6 +49,7 @@ jest.mock("@/components/workout/WorkoutBuilder", () => ({
 
 const mockUseStrategy = useStrategy as jest.MockedFunction<typeof useStrategy>;
 const mockUseCreateWorkout = useCreateWorkout as jest.MockedFunction<typeof useCreateWorkout>;
+const mockUseWorkoutsLimit = useWorkoutsLimit as jest.MockedFunction<typeof useWorkoutsLimit>;
 const mockUseParams = useParams as jest.MockedFunction<typeof useParams>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 const mockNotFound = notFound as jest.MockedFunction<typeof notFound>;
@@ -75,6 +80,10 @@ const SAMPLE_FORM_VALUES: WorkoutFormValues = {
     },
   ],
 };
+
+const FREE_UNDER_LIMIT: WorkoutsLimitDto = { count: 2, limit: 6, plan: "FREE" };
+const FREE_AT_LIMIT: WorkoutsLimitDto = { count: 6, limit: 6, plan: "FREE" };
+const PRO_NO_LIMIT: WorkoutsLimitDto = { count: 11, limit: null, plan: "PRO" };
 
 function buildStrategy(workoutCount: number): StrategyDetailDto {
   return {
@@ -110,6 +119,10 @@ describe("NewWorkoutPage", () => {
       mutateAsync,
       isPending: false,
     } as unknown as ReturnType<typeof useCreateWorkout>);
+    mockUseWorkoutsLimit.mockReturnValue({
+      data: FREE_UNDER_LIMIT,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useWorkoutsLimit>);
   });
 
   it("creates a workout with strategyId and order derived from strategy.workouts.length, then redirects", async () => {
@@ -181,5 +194,62 @@ describe("NewWorkoutPage", () => {
     render(<NewWorkoutPage />);
 
     expect(mockNotFound).toHaveBeenCalled();
+  });
+
+  it("renders a loading state while the workouts limit is loading", () => {
+    const strategy = buildStrategy(2);
+    mockUseStrategy.mockReturnValue({
+      data: strategy,
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useStrategy>);
+    mockUseWorkoutsLimit.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as unknown as ReturnType<typeof useWorkoutsLimit>);
+
+    render(<NewWorkoutPage />);
+
+    expect(screen.queryByTestId("mode")).not.toBeInTheDocument();
+  });
+
+  it("shows a limit-reached message with a 'Voltar' link instead of WorkoutBuilder when count >= limit (FREE)", () => {
+    const strategy = buildStrategy(6);
+    mockUseStrategy.mockReturnValue({
+      data: strategy,
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useStrategy>);
+    mockUseWorkoutsLimit.mockReturnValue({
+      data: FREE_AT_LIMIT,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useWorkoutsLimit>);
+
+    render(<NewWorkoutPage />);
+
+    expect(screen.queryByTestId("mode")).not.toBeInTheDocument();
+    expect(screen.getByText(/Limite de 6 treinos do plano gratuito atingido/)).toBeInTheDocument();
+
+    const links = screen.getAllByRole("link", { name: /Voltar/i });
+    expect(links.length).toBeGreaterThanOrEqual(2);
+    links.forEach((link) => expect(link).toHaveAttribute("href", "/program/strategy-1"));
+  });
+
+  it("renders WorkoutBuilder normally when limit is null (PRO)", () => {
+    const strategy = buildStrategy(11);
+    mockUseStrategy.mockReturnValue({
+      data: strategy,
+      isLoading: false,
+      error: null,
+    } as unknown as ReturnType<typeof useStrategy>);
+    mockUseWorkoutsLimit.mockReturnValue({
+      data: PRO_NO_LIMIT,
+      isLoading: false,
+    } as unknown as ReturnType<typeof useWorkoutsLimit>);
+
+    render(<NewWorkoutPage />);
+
+    expect(screen.getByTestId("mode")).toHaveTextContent("create");
+    expect(screen.queryByText(/Limite de/)).not.toBeInTheDocument();
   });
 });
