@@ -55,6 +55,7 @@ export class PrismaWorkoutSessionsRepository implements IWorkoutSessionsReposito
       where: {
         tenantId: opts.tenantId,
         ...(opts.startedAfter ? { startedAt: { gte: opts.startedAfter } } : {}),
+        ...(opts.workoutId ? { workoutId: opts.workoutId } : {}),
       },
       include: SESSION_INCLUDE,
       orderBy: [{ startedAt: "desc" }, { id: "desc" }],
@@ -71,6 +72,7 @@ export class PrismaWorkoutSessionsRepository implements IWorkoutSessionsReposito
       where: {
         tenantId: opts.tenantId,
         ...(opts.startedAfter ? { startedAt: { gte: opts.startedAfter } } : {}),
+        ...(opts.workoutId ? { workoutId: opts.workoutId } : {}),
       },
     });
   }

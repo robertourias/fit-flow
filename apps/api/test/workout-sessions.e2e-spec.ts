@@ -86,10 +86,15 @@ class FakeSessionsRepository implements IWorkoutSessionsRepository {
     return rec && rec.tenantId === tenantId ? toEntity(rec) : null;
   }
 
-  private _filtered(opts: { tenantId: string; startedAfter?: Date }): SessionRecord[] {
+  private _filtered(opts: {
+    tenantId: string;
+    startedAfter?: Date;
+    workoutId?: string;
+  }): SessionRecord[] {
     return [...this._sessions.values()]
       .filter((s) => s.tenantId === opts.tenantId)
       .filter((s) => !opts.startedAfter || s.startedAt.getTime() >= opts.startedAfter.getTime())
+      .filter((s) => !opts.workoutId || s.workoutId === opts.workoutId)
       .sort((a, b) => {
         const t = b.startedAt.getTime() - a.startedAt.getTime();
         return t !== 0 ? t : b.id.localeCompare(a.id);
@@ -342,6 +347,82 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
     const sets = res.body.data.exercises[0].executedSets;
     expect(sets.map((s: { setNumber: number }) => s.setNumber)).toEqual([1, 2]);
     expect(sets[1].kg).toBe(62.5);
+  });
+
+  it("POST with exercises[].executedSets: [] returns 201 (skipped exercise)", async () => {
+    await boot(new Map());
+    const res = await request(app.getHttpServer())
+      .post("/api/v1/workout-sessions")
+      .set(authHeader("tenant-a"))
+      .send({
+        ...validBody,
+        exercises: [
+          ...validBody.exercises,
+          { exerciseId: "ex-2", order: 2, executedSets: [] },
+        ],
+      })
+      .expect(201);
+    expect(res.body.data.exercises).toHaveLength(2);
+    expect(res.body.data.exercises[1].executedSets).toEqual([]);
+  });
+
+  it("GET /workout-sessions?workoutId=X returns only that workout's sessions, tenant-isolated", async () => {
+    const initial = new Map<string, SessionRecord>([
+      [
+        "s-a1",
+        {
+          id: "s-a1",
+          workoutId: "workout-a1",
+          tenantId: "tenant-a",
+          startedAt: new Date(2026, 5, 1, 10, 0, 0),
+          endedAt: null,
+          status: WorkoutSessionStatus.FINISHED,
+          comment: null,
+          difficulty: null,
+          exercises: [],
+          createdAt: new Date(),
+        },
+      ],
+      [
+        "s-a2",
+        {
+          id: "s-a2",
+          workoutId: "workout-a2",
+          tenantId: "tenant-a",
+          startedAt: new Date(2026, 5, 2, 10, 0, 0),
+          endedAt: null,
+          status: WorkoutSessionStatus.FINISHED,
+          comment: null,
+          difficulty: null,
+          exercises: [],
+          createdAt: new Date(),
+        },
+      ],
+      [
+        "s-b1",
+        {
+          id: "s-b1",
+          workoutId: "workout-a1",
+          tenantId: "tenant-b",
+          startedAt: new Date(2026, 5, 1, 10, 0, 0),
+          endedAt: null,
+          status: WorkoutSessionStatus.FINISHED,
+          comment: null,
+          difficulty: null,
+          exercises: [],
+          createdAt: new Date(),
+        },
+      ],
+    ]);
+    await boot(initial, { "tenant-a": Plan.PRO, "tenant-b": Plan.PRO });
+
+    const res = await request(app.getHttpServer())
+      .get("/api/v1/workout-sessions?workoutId=workout-a1")
+      .set(authHeader("tenant-a"))
+      .expect(200);
+
+    const ids = res.body.data.items.map((s: { id: string }) => s.id);
+    expect(ids).toEqual(["s-a1"]);
   });
 
   it("POST with invalid exerciseId returns 400", async () => {

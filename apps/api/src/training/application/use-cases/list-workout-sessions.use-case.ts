@@ -38,8 +38,10 @@ export class ListWorkoutSessionsUseCase {
           cursor: args.cursor?.id,
           skip: args.skip,
           startedAfter,
+          workoutId: query.workoutId,
         }),
-      count: () => this._sessionsRepository.count({ tenantId, startedAfter }),
+      count: () =>
+        this._sessionsRepository.count({ tenantId, startedAfter, workoutId: query.workoutId }),
       cursor: query.cursor,
       limit: query.limit,
     });

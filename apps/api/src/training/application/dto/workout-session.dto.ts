@@ -166,7 +166,6 @@ export class CreateSessionExerciseDto {
 
   @ApiProperty({ type: [CreateExecutedSetDto] })
   @IsArray()
-  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreateExecutedSetDto)
   executedSets!: CreateExecutedSetDto[];

@@ -228,6 +228,35 @@ describe("ListWorkoutSessionsUseCase", () => {
 
     expect(sessions.findManyByTenant.mock.calls[0]![0].startedAfter).toBeUndefined();
   });
+
+  it("passes workoutId through to findManyByTenant and count when provided", async () => {
+    const sessions = sessionsRepo();
+    const users = usersRepo();
+    users.findById.mockResolvedValue(makeUser(Plan.PRO));
+    sessions.findManyByTenant.mockResolvedValue([]);
+    sessions.count.mockResolvedValue(0);
+
+    await new ListWorkoutSessionsUseCase(sessions, users).execute("tenant-1", {
+      limit: 20,
+      workoutId: "workout-1",
+    });
+
+    expect(sessions.findManyByTenant.mock.calls[0]![0].workoutId).toBe("workout-1");
+    expect(sessions.count.mock.calls[0]![0].workoutId).toBe("workout-1");
+  });
+
+  it("passes workoutId as undefined when not provided", async () => {
+    const sessions = sessionsRepo();
+    const users = usersRepo();
+    users.findById.mockResolvedValue(makeUser(Plan.PRO));
+    sessions.findManyByTenant.mockResolvedValue([]);
+    sessions.count.mockResolvedValue(0);
+
+    await new ListWorkoutSessionsUseCase(sessions, users).execute("tenant-1", { limit: 20 });
+
+    expect(sessions.findManyByTenant.mock.calls[0]![0].workoutId).toBeUndefined();
+    expect(sessions.count.mock.calls[0]![0].workoutId).toBeUndefined();
+  });
 });
 
 describe("GetWorkoutSessionUseCase", () => {

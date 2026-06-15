@@ -8,7 +8,9 @@ import { format, formatDuration, intervalToDuration, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useWorkoutSessionStore } from "@/lib/stores/workout-session.store";
-import type { WorkoutDetail } from "@/lib/mock/workout";
+import { useCreateWorkoutSession } from "@/lib/api/hooks/use-create-workout-session";
+import { toCreateWorkoutSessionDto } from "@/lib/workout/workout-session.mapper";
+import type { WorkoutDetailDto } from "@fitflow/types";
 
 function calcDurationLabel(startedAt: string | null, endedAt: Date): string {
   if (!startedAt) return "—";
@@ -56,12 +58,13 @@ function DetailRow({ label, children }: { label: string; children: React.ReactNo
 }
 
 interface Props {
-  workout: WorkoutDetail;
+  workout: WorkoutDetailDto;
 }
 
 export function WorkoutFinishForm({ workout }: Props) {
   const router = useRouter();
   const { startedAt, exercises, resetSession } = useWorkoutSessionStore();
+  const createSession = useCreateWorkoutSession();
 
   // Capture endedAt once on mount so duration doesn't drift while user fills the form
   const endedAt = useRef(new Date()).current;
@@ -73,26 +76,27 @@ export function WorkoutFinishForm({ workout }: Props) {
   const [updateRoutine, setUpdateRoutine] = useState(true);
   const [stravaSync, setStravaSync] = useState(false);
   const [healthSync, setHealthSync] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   const completedSets = exercises.reduce(
     (sum, ex) => sum + ex.sets.filter((s) => s.completedAt).length,
     0
   );
 
-  function handleSave() {
-    console.log("workout session saved", {
-      workoutId: workout.id,
-      programId: workout.programId,
-      startedAt,
-      endedAt: endedAt.toISOString(),
-      durationLabel,
-      comment,
-      difficulty,
-      updateRoutine,
-      exercises,
-    });
-    resetSession();
-    router.push(`/program/${workout.programId}`);
+  async function handleSave() {
+    setError(undefined);
+    const dto = toCreateWorkoutSessionDto(
+      workout,
+      { startedAt: startedAt ?? new Date().toISOString(), exercises },
+      { endedAt: endedAt.toISOString(), comment, difficulty: difficulty || undefined }
+    );
+    try {
+      await createSession.mutateAsync(dto);
+      resetSession();
+      router.push(`/program/${workout.strategyId}`);
+    } catch {
+      setError("Não foi possível salvar o treino. Tente novamente.");
+    }
   }
 
   return (
@@ -245,11 +249,20 @@ export function WorkoutFinishForm({ workout }: Props) {
 
       {/* Fixed save CTA */}
       <div className="fixed bottom-0 left-0 right-0 px-5 pb-10 pt-6 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none">
+        {error && (
+          <p role="alert" className="text-[13px] text-destructive px-5 mb-2">
+            {error}
+          </p>
+        )}
         <button
           onClick={handleSave}
-          className="pointer-events-auto w-full bg-primary text-primary-foreground rounded-pill h-14 text-[16px] font-bold hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg"
+          disabled={createSession.isPending}
+          className={cn(
+            "pointer-events-auto w-full bg-primary text-primary-foreground rounded-pill h-14 text-[16px] font-bold hover:bg-primary/90 active:scale-[0.98] transition-all shadow-lg",
+            createSession.isPending && "opacity-60 cursor-not-allowed"
+          )}
         >
-          Salvar Treino
+          {createSession.isPending ? "Salvando..." : "Salvar Treino"}
         </button>
       </div>
     </div>

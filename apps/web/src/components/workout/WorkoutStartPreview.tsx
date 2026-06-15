@@ -1,18 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Dumbbell, Ellipsis } from "lucide-react";
 import { formatDistanceToNow, format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useWorkoutSessionStore } from "@/lib/stores/workout-session.store";
-import type { WorkoutDetail, WorkoutExercise, WorkoutSession } from "@/lib/mock/workout";
+import { ExerciseImage } from "@/components/exercises/ExerciseImage";
+import type { ExerciseDto, WorkoutDetailDto, WorkoutExerciseDto, WorkoutSessionDetailDto } from "@fitflow/types";
 
-function estimateDuration(workout: WorkoutDetail): string {
+function estimateDuration(workout: WorkoutDetailDto): string {
   let totalSeconds = 0;
   for (const ex of workout.exercises) {
-    totalSeconds += ex.sets.length * (ex.restSeconds + 45);
+    totalSeconds += ex.plannedSets.length * (ex.restSeconds + 45);
   }
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
@@ -20,30 +20,37 @@ function estimateDuration(workout: WorkoutDetail): string {
   return `~${m}m`;
 }
 
-function exerciseSubtitle(ex: WorkoutExercise): string {
-  const first = ex.sets[0];
-  if (!first) return `${ex.sets.length} Séries`;
-  const kg = first.targetKg;
-  let label = `${ex.sets.length} Séries · ${first.targetReps} reps`;
-  if (kg !== undefined && kg !== "") label += ` · ${kg}kg`;
+function exerciseSubtitle(workoutEx: WorkoutExerciseDto): string {
+  const sorted = [...workoutEx.plannedSets].sort((a, b) => a.setNumber - b.setNumber);
+  const first = sorted[0];
+  if (!first) return `${sorted.length} Séries`;
+  let label = `${sorted.length} Séries · ${first.targetReps} reps`;
+  if (first.targetKg) label += ` · ${first.targetKg}kg`;
   return label;
 }
 
 interface WorkoutStartPreviewProps {
-  workout: WorkoutDetail;
-  lastSession?: WorkoutSession;
+  workout: WorkoutDetailDto;
+  exercises: ExerciseDto[];
+  lastSession: WorkoutSessionDetailDto | null;
 }
 
-export function WorkoutStartPreview({ workout, lastSession }: WorkoutStartPreviewProps) {
+export function WorkoutStartPreview({ workout, exercises, lastSession }: WorkoutStartPreviewProps) {
   const router = useRouter();
   const startSession = useWorkoutSessionStore((s) => s.startSession);
 
-  const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+  const sortedExercises = [...workout.exercises].sort((a, b) => a.order - b.order);
+  const exercisesById = new Map(exercises.map((e) => [e.id, e]));
+
+  const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.plannedSets.length, 0);
   const durationLabel = estimateDuration(workout);
   const lastDate = lastSession ? parseISO(lastSession.startedAt) : null;
 
   function handleStart() {
-    startSession(workout.id, workout.exercises);
+    const exerciseIds = [...workout.exercises]
+      .sort((a, b) => a.order - b.order)
+      .map((e) => e.exerciseId);
+    startSession(workout.id, exerciseIds);
     router.push(`/workout/${workout.id}/session`);
   }
 
@@ -108,32 +115,37 @@ export function WorkoutStartPreview({ workout, lastSession }: WorkoutStartPrevie
 
       {/* Exercise list */}
       <div className="flex-1 overflow-y-auto pb-32">
-        {workout.exercises.map((ex) => (
-          <div
-            key={ex.id}
-            className="flex items-center gap-3 px-5 py-3.5 border-b border-border/50"
-          >
-            <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 bg-muted">
-              <Image
-                src={ex.image}
-                alt={ex.name}
-                fill
-                sizes="48px"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-semibold leading-tight truncate">{ex.name}</p>
-              <p className="text-[12px] text-muted-foreground mt-0.5">{exerciseSubtitle(ex)}</p>
-            </div>
-            <button
-              className="shrink-0 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-              aria-label="Opções"
+        {sortedExercises.map((workoutEx) => {
+          const exercise = exercisesById.get(workoutEx.exerciseId);
+          return (
+            <div
+              key={workoutEx.id}
+              className="flex items-center gap-3 px-5 py-3.5 border-b border-border/50"
             >
-              <Ellipsis className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
+              <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 bg-muted">
+                <ExerciseImage
+                  src={exercise?.imageUrl ?? null}
+                  alt={exercise?.name ?? "Exercício"}
+                  sizes="48px"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-semibold leading-tight truncate">
+                  {exercise?.name ?? "Exercício"}
+                </p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">
+                  {exerciseSubtitle(workoutEx)}
+                </p>
+              </div>
+              <button
+                className="shrink-0 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                aria-label="Opções"
+              >
+                <Ellipsis className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Fixed CTA */}
