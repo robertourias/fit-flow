@@ -1,7 +1,7 @@
 import { memo } from "react";
 import Link from "next/link";
-import { Ellipsis } from "lucide-react";
 import { programColor } from "@/lib/utils/program-color";
+import { WorkoutOptionsMenu } from "@/components/library/WorkoutOptionsMenu";
 import type { WorkoutDetailDto } from "@fitflow/types";
 
 interface WorkoutListRowProps {
@@ -30,13 +30,9 @@ export const WorkoutListRow = memo(function WorkoutListRow({ workout }: WorkoutL
       </div>
 
       {/* More — sits above the link overlay */}
-      <button
-        className="relative z-10 text-muted-foreground hover:text-foreground transition-colors"
-        aria-label="Mais opções"
-        onClick={(e) => e.preventDefault()}
-      >
-        <Ellipsis className="h-[18px] w-[18px]" />
-      </button>
+      <div className="relative z-10">
+        <WorkoutOptionsMenu workout={workout} />
+      </div>
     </div>
   );
 });

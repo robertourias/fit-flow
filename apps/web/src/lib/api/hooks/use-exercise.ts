@@ -8,5 +8,6 @@ export function useExercise(id: string) {
   return useQuery({
     queryKey: ["exercise", id],
     queryFn: () => apiFetch<ExerciseDto>(`/exercises/${id}`),
+    enabled: !!id,
   });
 }

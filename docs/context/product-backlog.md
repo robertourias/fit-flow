@@ -45,17 +45,17 @@
 
 | ID | Título | Descrição | Status | Dependências | Spec |
 |----|--------|-----------|--------|--------------|------|
-| TASK04 | Integração Dashboard | Substituição do mock data por endpoints da API (TanStack Query) | spec-approved | TASK01, TASK03 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
-| TASK05 | Integração Exercícios | Conexão da biblioteca com API e filtros dinâmicos | spec-approved | TASK02 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
-| TASK06 | Onboarding Fluxo | Implementar wizard inicial: perfil, seleção de objetivo, criação do 1º programa | spec-approved | TASK01 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
-| TASK07 | Rota /program/[id] | Gestão de programas ativos e conexão com formulário de conclusão | spec-approved | TASK03 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
+| TASK04 | Integração Dashboard | Substituição do mock data por endpoints da API (TanStack Query) | done | TASK01, TASK03 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
+| TASK05 | Integração Exercícios | Conexão da biblioteca com API e filtros dinâmicos | done | TASK02 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
+| TASK06 | Onboarding Fluxo | Implementar wizard inicial: perfil, seleção de objetivo, criação do 1º programa | done | TASK01 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
+| TASK07 | Rota /program/[id] | Gestão de programas ativos e conexão com formulário de conclusão | done | TASK03 | [2026-06-11-fase2-integracao-frontend-backend](../plans/2026-06-11-fase2-integracao-frontend-backend.md) |
 
 ## Fase 3 — Complementar
 
 | ID | Título | Descrição | Status | Dependências | Spec |
 |----|--------|-----------|--------|--------------|------|
-| TASK08 | CRUD de Estratégia | Cadastro e edição de estratégias de treino (splits: ABC, Upper/Lower, PPL, Full Body) no frontend + endpoints de suporte | backlog | TASK06, TASK07 | — |
-| TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | backlog | TASK08 | — |
+| TASK08 | CRUD de Estratégia | Cadastro e edição de estratégias de treino (splits: ABC, Upper/Lower, PPL, Full Body) no frontend + endpoints de suporte | done | TASK06, TASK07 | [2026-06-13-task08-crud-estrategia](../specs/2026-06-13-task08-crud-estrategia.md) |
+| TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | done | TASK08 | [2026-06-14-task09-crud-rotina-treinos](../specs/2026-06-14-task09-crud-rotina-treinos.md) |
 | TASK10 | Limites do plano gratuito | Enforce de: máx. 6 Workouts por usuário no plano FREE — validação no backend (uso case + repositório) e feedback visual no frontend | backlog | TASK09 | — |
 | TASK11 | Execução de treino | Registrar sessão em tempo real: séries/cargas/reps executados, timer de intervalo e conclusão de treino | backlog | TASK09 | — |
 | TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | backlog | TASK11 | — |

@@ -4,39 +4,39 @@
 > Não edite manualmente durante uma sessão ativa — use `/checkpoint` antes de fechar.
 
 **Última atualização:** 2026-06-13
-**Resumo de progresso global:** Fase 2 (T1-T9) concluída — Backend T1-T4 + Frontend T5-T9 finalizados. Catálogo de exercícios e Library/Program rodando 100% sobre API real.
-**Resumo da última sessão:** Fix bug `/api/proxy/users/me` 500 (ECONNREFUSED) via novo `API_INTERNAL_URL` server-side. TASK08 (Exercícios) e TASK09 (Library/Program) concluídas: ExercisesClientPage+FilterBar com hooks reais (slug/category/search/paginação), WorkoutCard/WorkoutListRow refatorados para `WorkoutDetailDto`+`programColor`, integrados em `/program/[id]`.
+**Resumo de progresso global:** Fase 2 (T1-T9) concluída. TASK08 (CRUD de Estratégia/Programas no frontend) concluída — usuário já pode criar, editar, ativar/desativar e excluir programas via UI.
+**Resumo da última sessão:** Implementadas as 6 tarefas de TASK08: Dialog primitive, `StrategyFormDialog` (criar/editar compartilhado), `useCreateStrategy`, integração em `/library` e `/program/[id]`. Adicionada infra de teste de componentes (jest-environment-jsdom + @testing-library/react) e 11 testes novos (77/77 total). Commitado em `cfd6548`.
 
 ---
 
-## Spec Ativo
+## Feature em andamento
 
-`docs/specs/2026-06-11-fase2-integracao-frontend-backend.md` (Status: approved) — T1-T9 concluídos.
-
----
-
-## 🔄 Em Progresso
-
-(nenhum) — Fase 2 concluída.
+**Spec ativo:** (nenhum) — `docs/specs/2026-06-13-task08-crud-estrategia.md` concluído (todas as tarefas `done`).
 
 ---
 
-## ⏭ Próximos Passos Imediatos
+## Tasks (Foco no Presente)
 
-1. Commitar mudanças pendentes (T8+T9 + fix API_INTERNAL_URL).
-2. Avaliar próxima fase do produto (ver `docs/context/product.md`/backlog).
-3. Seed script para `exercises`/`muscle_groups`/`equipment` (catálogo vazio em dev — ver README "Solução de problemas").
+### 🔄 Em progresso
 
----
+(nenhum) — TASK08 concluída e commitada.
 
-## Decisões desta Sessão
+### ⏭ Próximos passos imediatos
 
-- `API_INTERNAL_URL` (novo env, default `http://api:3001`): usado por código server-side (`apiFetch` server branch + proxy BFF) dentro do container `web`, com fallback para `NEXT_PUBLIC_API_URL`.
-- `WorkoutCard`/`WorkoutListRow` usam `programColor(workout.id)` no lugar de imagem mockada.
-- `bookmarkCount` (FR-013) considerado N/A — campo não exibido no card/detail real (fora do design atual).
+1. `/spec TASK09` — CRUD de Rotina & Treinos (próximo item do backlog, depende de TASK08 ✓).
+2. Seed script para `exercises`/`muscle_groups`/`equipment` (catálogo vazio em dev — carregado de sessões anteriores, ver README "Solução de problemas").
 
 ---
 
-## Bloqueadores / Perguntas Abertas
+## Decisões desta sessão
+
+- Test infra para componentes React adicionada (`@testing-library/react`, `@testing-library/jest-dom`, `@testing-library/user-event`, `jest-environment-jsdom`) — decisão do usuário, escalação aprovada (Tarefa 6 de TASK08 estava bloqueada sem isso).
+- `StrategyFormDialog` é um único componente controlado por `mode: "create" | "edit"` + `initialValues?`, sem lógica de navegação/mutation própria (mitigação de risco do spec).
+- `isSplitType()` em `split-presets.ts` é a fonte única de verdade para o mapeamento `type ↔ "Personalizado"`.
+- Abertura de `Dialog` a partir de item de `DropdownMenu` deve deferir o `setState` via `setTimeout` (evita focus-fight entre `FocusScope`s do Radix).
+
+---
+
+## Bloqueadores / Perguntas abertas
 
 - (nenhum)
