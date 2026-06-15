@@ -10,14 +10,15 @@ import {
   WORKOUTS_REPOSITORY,
 } from "../../training.tokens";
 import { EXERCISES_REPOSITORY } from "../../../catalog/catalog.tokens";
+import { USERS_REPOSITORY } from "../../../identity/identity.tokens";
 import type { IStrategiesRepository } from "../../domain/repositories/strategies.repository.interface";
 import type { IWorkoutsRepository } from "../../domain/repositories/workouts.repository.interface";
 import type { IExercisesRepository } from "../../../catalog/domain/repositories/exercises.repository.interface";
+import type { IUsersRepository } from "../../../identity/domain/repositories/users.repository.interface";
 import type { Workout } from "../../domain/workout.entity";
 import type { CreateWorkoutDto } from "../dto/workout.dto";
 import { validateExerciseIds } from "./validate-exercise-ids";
-
-const FREE_PLAN_WORKOUT_LIMIT = 6;
+import { FREE_PLAN_WORKOUT_LIMIT } from "./plan-limits.constants";
 
 @Injectable()
 export class CreateWorkoutUseCase {
@@ -28,6 +29,8 @@ export class CreateWorkoutUseCase {
     private readonly _workoutsRepository: IWorkoutsRepository,
     @Inject(EXERCISES_REPOSITORY)
     private readonly _exercisesRepository: IExercisesRepository,
+    @Inject(USERS_REPOSITORY)
+    private readonly _usersRepository: IUsersRepository,
   ) {}
 
   async execute(tenantId: string, dto: CreateWorkoutDto): Promise<Workout> {
@@ -36,12 +39,16 @@ export class CreateWorkoutUseCase {
       throw new NotFoundException("Strategy not found");
     }
 
-    const count = await this._workoutsRepository.countByTenant(tenantId);
-    if (count >= FREE_PLAN_WORKOUT_LIMIT) {
-      throw new UnprocessableEntityException({
-        code: ApiErrorCode.PLAN_LIMIT_EXCEEDED,
-        message: `Limite de ${FREE_PLAN_WORKOUT_LIMIT} treinos atingido`,
-      });
+    // Limite de treinos por tenant só aplica ao plano FREE; PRO não tem limite.
+    const user = await this._usersRepository.findById(tenantId);
+    if (user?.isFreePlan()) {
+      const count = await this._workoutsRepository.countByTenant(tenantId);
+      if (count >= FREE_PLAN_WORKOUT_LIMIT) {
+        throw new UnprocessableEntityException({
+          code: ApiErrorCode.PLAN_LIMIT_EXCEEDED,
+          message: `Limite de ${FREE_PLAN_WORKOUT_LIMIT} treinos atingido`,
+        });
+      }
     }
 
     await validateExerciseIds(
