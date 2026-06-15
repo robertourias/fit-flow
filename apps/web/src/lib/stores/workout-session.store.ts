@@ -1,8 +1,20 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { WorkoutExercise, ExecutedExercise, ExecutedSet } from "@/lib/mock/workout";
 
 export type SessionStatus = "idle" | "active" | "finishing";
+
+export interface ExecutedSet {
+  setNumber: number;
+  kg?: number;
+  reps?: number;
+  completedAt?: string;
+}
+
+export interface ExecutedExercise {
+  exerciseId: string;
+  notes: string;
+  sets: ExecutedSet[];
+}
 
 interface WorkoutSessionState {
   status: SessionStatus;
@@ -14,7 +26,7 @@ interface WorkoutSessionState {
 }
 
 interface WorkoutSessionActions {
-  startSession: (workoutId: string, workoutExercises: WorkoutExercise[]) => void;
+  startSession: (workoutId: string, exerciseIds: string[]) => void;
   completeSet: (exerciseIdx: number, setNumber: number, kg?: number, reps?: number) => void;
   setRestTimer: (endsAt: string) => void;
   clearRest: () => void;
@@ -41,15 +53,15 @@ export const useWorkoutSessionStore = create<WorkoutSessionStore>()(
     (set) => ({
       ...initialState,
 
-      startSession: (workoutId, workoutExercises) =>
+      startSession: (workoutId, exerciseIds) =>
         set({
           status: "active",
           workoutId,
           startedAt: new Date().toISOString(),
           currentExerciseIndex: 0,
           restEndsAt: null,
-          exercises: workoutExercises.map((ex) => ({
-            exerciseId: ex.id,
+          exercises: exerciseIds.map((exerciseId) => ({
+            exerciseId,
             notes: "",
             sets: [],
           })),

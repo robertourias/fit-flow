@@ -129,6 +129,72 @@ export interface UpdateWorkoutDto {
   exercises?: CreateWorkoutExerciseDto[];
 }
 
+export type WorkoutSessionStatus = "ACTIVE" | "FINISHED" | "ABANDONED";
+
+export interface ExecutedSetDto {
+  id: string;
+  setNumber: number;
+  kg: number | null;
+  reps: number | null;
+  completedAt: string | null;
+}
+
+export interface SessionExerciseDto {
+  id: string;
+  exerciseId: string;
+  order: number;
+  notes: string | null;
+  executedSets: ExecutedSetDto[];
+}
+
+export interface WorkoutSessionSummaryDto {
+  id: string;
+  workoutId: string;
+  startedAt: string;
+  endedAt: string | null;
+  status: WorkoutSessionStatus;
+  comment: string | null;
+  difficulty: number | null;
+  createdAt: string;
+}
+
+export interface WorkoutSessionDetailDto extends WorkoutSessionSummaryDto {
+  exercises: SessionExerciseDto[];
+}
+
+export interface CreateExecutedSetDto {
+  setNumber: number;
+  kg?: number;
+  reps?: number;
+  completedAt?: string;
+}
+
+export interface CreateSessionExerciseDto {
+  exerciseId: string;
+  order: number;
+  notes?: string;
+  executedSets: CreateExecutedSetDto[];
+}
+
+export interface CreateWorkoutSessionDto {
+  workoutId: string;
+  startedAt: string;
+  endedAt?: string;
+  status?: WorkoutSessionStatus;
+  comment?: string;
+  difficulty?: number;
+  exercises: CreateSessionExerciseDto[];
+}
+
+export interface UpdateWorkoutSessionDto {
+  startedAt?: string;
+  endedAt?: string;
+  status?: WorkoutSessionStatus;
+  comment?: string;
+  difficulty?: number;
+  exercises?: CreateSessionExerciseDto[];
+}
+
 export interface WorkoutsLimitDto {
   count: number;
   limit: number | null;

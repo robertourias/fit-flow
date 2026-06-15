@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   CheckCircle2,
   ChevronDown,
@@ -14,7 +13,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkoutSessionStore } from "@/lib/stores/workout-session.store";
-import type { WorkoutDetail, WorkoutSession } from "@/lib/mock/workout";
+import { ExerciseImage } from "@/components/exercises/ExerciseImage";
+import type { ExerciseDto, WorkoutDetailDto, WorkoutSessionDetailDto } from "@fitflow/types";
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
 
@@ -63,13 +63,17 @@ function formatRest(seconds: number): string {
 // ─── WorkoutActiveSession ─────────────────────────────────────────────────────
 
 interface Props {
-  workout: WorkoutDetail;
-  lastSession?: WorkoutSession;
+  workout: WorkoutDetailDto;
+  exercises: ExerciseDto[];
+  lastSession: WorkoutSessionDetailDto | null;
 }
 
-export function WorkoutActiveSession({ workout, lastSession }: Props) {
+export function WorkoutActiveSession({ workout, exercises, lastSession }: Props) {
   const router = useRouter();
   const isNavigating = useRef(false);
+
+  const sortedExercises = [...workout.exercises].sort((a, b) => a.order - b.order);
+  const exercisesById = new Map(exercises.map((e) => [e.id, e]));
 
   const {
     status,
@@ -99,12 +103,12 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
 
   // All exercises done → auto-finalize
   useEffect(() => {
-    if (status === "active" && currentExerciseIndex >= workout.exercises.length) {
+    if (status === "active" && currentExerciseIndex >= sortedExercises.length) {
       isNavigating.current = true;
       beginFinishing();
       router.push(`/workout/${workout.id}/finish`);
     }
-  }, [currentExerciseIndex, workout.exercises.length, status, beginFinishing, router, workout.id]);
+  }, [currentExerciseIndex, sortedExercises.length, status, beginFinishing, router, workout.id]);
 
   // Local set inputs (kg/reps before completing)
   const [inputs, setInputs] = useState<Record<number, { kg: string; reps: string }>>({});
@@ -117,23 +121,25 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
     setExtraSets(0);
   }, [currentExerciseIndex]);
 
-  const workoutEx = workout.exercises[currentExerciseIndex];
+  const workoutEx = sortedExercises[currentExerciseIndex];
   const storeEx = storeExercises[currentExerciseIndex];
 
   if (!workoutEx || !storeEx || status !== "active") {
     return <div className="min-h-dvh bg-background" />;
   }
 
-  const totalSets = workout.exercises.reduce((sum, ex) => sum + ex.sets.length, 0);
+  const exercise = exercisesById.get(workoutEx.exerciseId);
+
+  const totalSets = sortedExercises.reduce((sum, ex) => sum + ex.plannedSets.length, 0);
   const completedSets = storeExercises.reduce(
     (sum, ex) => sum + ex.sets.filter((s) => s.completedAt).length,
     0
   );
 
-  const prevExData = lastSession?.exercises.find((e) => e.exerciseId === workoutEx.id);
+  const prevExData = lastSession?.exercises.find((e) => e.exerciseId === workoutEx.exerciseId);
 
   function getPrevLabel(setNum: number): string {
-    const s = prevExData?.sets.find((s) => s.setNumber === setNum);
+    const s = prevExData?.executedSets.find((s) => s.setNumber === setNum);
     if (!s?.reps) return "—";
     return s.kg ? `${s.kg}kg × ${s.reps}` : `${s.reps} reps`;
   }
@@ -177,10 +183,18 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
     router.push(`/workout/${workout.id}/finish`);
   }
 
-  const totalSetCount = workoutEx.sets.length + extraSets;
+  const sortedPlannedSets = [...workoutEx.plannedSets].sort((a, b) => a.setNumber - b.setNumber);
+  const totalSetCount = sortedPlannedSets.length + extraSets;
   const allSetNums = Array.from({ length: totalSetCount }, (_, i) => i + 1);
-  const nextEx = workout.exercises[currentExerciseIndex + 1];
   const progressPct = totalSets > 0 ? Math.min(100, (completedSets / totalSets) * 100) : 0;
+
+  const primaryMuscle = exercise?.muscleGroups.find((m) => m.isPrimary) ?? exercise?.muscleGroups[0];
+
+  const nextWorkoutEx = sortedExercises[currentExerciseIndex + 1];
+  const nextExercise = nextWorkoutEx ? exercisesById.get(nextWorkoutEx.exerciseId) : undefined;
+  const nextSortedSets = nextWorkoutEx
+    ? [...nextWorkoutEx.plannedSets].sort((a, b) => a.setNumber - b.setNumber)
+    : [];
 
   return (
     <div className="min-h-dvh flex flex-col bg-background">
@@ -234,13 +248,13 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
       )}
 
       {/* Exercise block */}
-      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: nextEx ? 92 : 32 }}>
+      <div className="flex-1 overflow-y-auto" style={{ paddingBottom: nextWorkoutEx ? 92 : 32 }}>
         <div className="bg-card border-b border-border">
           {/* Header */}
           <div className="flex items-start justify-between px-5 pt-4 pb-2">
             <div className="flex-1 min-w-0 pr-3">
-              <h2 className="text-[17px] font-bold leading-tight">{workoutEx.name}</h2>
-              <p className="text-[13px] text-muted-foreground mt-0.5">{workoutEx.muscleGroup}</p>
+              <h2 className="text-[17px] font-bold leading-tight">{exercise?.name ?? "Exercício"}</h2>
+              <p className="text-[13px] text-muted-foreground mt-0.5">{primaryMuscle?.name}</p>
             </div>
             <button
               className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
@@ -388,7 +402,7 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
       </div>
 
       {/* Next exercise footer */}
-      {nextEx && (
+      {nextWorkoutEx && (
         <button
           onClick={handleNextExercise}
           className="fixed bottom-0 left-0 right-0 flex items-center gap-3 px-5 py-3.5 bg-card border-t border-border hover:bg-accent/30 transition-colors"
@@ -397,18 +411,16 @@ export function WorkoutActiveSession({ workout, lastSession }: Props) {
             <span className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">
               A seguir
             </span>
-            <span className="text-[14px] font-semibold truncate mt-0.5">{nextEx.name}</span>
+            <span className="text-[14px] font-semibold truncate mt-0.5">{nextExercise?.name}</span>
             <span className="text-[12px] text-muted-foreground">
-              {nextEx.sets.length} séries × {nextEx.sets[0]?.targetReps} reps
+              {nextSortedSets.length} séries × {nextSortedSets[0]?.targetReps} reps
             </span>
           </div>
           <div className="relative h-12 w-12 rounded-xl overflow-hidden shrink-0 bg-muted">
-            <Image
-              src={nextEx.image}
-              alt={nextEx.name}
-              fill
+            <ExerciseImage
+              src={nextExercise?.imageUrl ?? null}
+              alt={nextExercise?.name ?? "Exercício"}
               sizes="48px"
-              className="object-cover"
             />
           </div>
         </button>

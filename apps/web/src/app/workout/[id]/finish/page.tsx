@@ -1,14 +1,27 @@
+"use client";
+
+import { useParams } from "next/navigation";
 import { notFound } from "next/navigation";
-import { mockWorkouts } from "@/lib/mock/workout";
+import { useWorkout } from "@/lib/api/hooks/use-workout";
 import { WorkoutFinishForm } from "@/components/workout/WorkoutFinishForm";
+import { ApiClientError } from "@/lib/api/client";
 
-interface Props {
-  params: Promise<{ id: string }>;
-}
+export default function WorkoutFinishPage() {
+  const { id } = useParams<{ id: string }>();
+  const { data: workout, isLoading, error } = useWorkout(id);
 
-export default async function WorkoutFinishPage({ params }: Props) {
-  const { id } = await params;
-  const workout = mockWorkouts[id];
-  if (!workout) notFound();
+  if (error instanceof ApiClientError && error.status === 404) {
+    notFound();
+  }
+
+  if (isLoading || !workout) {
+    return (
+      <div className="flex flex-col gap-3 p-5">
+        <div className="h-16 rounded-l bg-muted animate-pulse" />
+        <div className="h-16 rounded-l bg-muted animate-pulse" />
+      </div>
+    );
+  }
+
   return <WorkoutFinishForm workout={workout} />;
 }
