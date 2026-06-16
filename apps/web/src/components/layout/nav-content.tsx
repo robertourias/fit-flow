@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings, LogOut } from "lucide-react";
+import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings, LogOut, History } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -26,6 +26,7 @@ const mainNavItems: NavItem[] = [
 const extraNavItems: NavItem[] = [
   { id: "exercicios", label: "Exercícios", icon: ListChecks, href: "/exercises" },
   { id: "biblioteca", label: "Biblioteca", icon: BookOpen, href: "/library" },
+  { id: "historico", label: "Histórico", icon: History, href: "/history" },
 ];
 
 interface NavContentProps {

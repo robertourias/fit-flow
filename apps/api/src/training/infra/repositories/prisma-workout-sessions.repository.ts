@@ -10,6 +10,7 @@ import { SessionExercise } from "../../domain/session-exercise.entity";
 import { ExecutedSet } from "../../domain/executed-set.value-object";
 
 const SESSION_INCLUDE = {
+  workout: { select: { name: true } },
   sessionExercises: {
     orderBy: { order: "asc" as const },
     include: { executedSets: { orderBy: { setNumber: "asc" as const } } },
@@ -17,7 +18,10 @@ const SESSION_INCLUDE = {
 };
 
 type SessionRow = Prisma.WorkoutSessionGetPayload<{
-  include: { sessionExercises: { include: { executedSets: true } } };
+  include: {
+    workout: { select: { name: true } };
+    sessionExercises: { include: { executedSets: true } };
+  };
 }>;
 
 function nestedExerciseCreate(
@@ -151,6 +155,7 @@ export class PrismaWorkoutSessionsRepository implements IWorkoutSessionsReposito
     return new WorkoutSession({
       id: row.id,
       workoutId: row.workoutId,
+      workoutName: row.workout.name,
       tenantId: row.tenantId,
       startedAt: row.startedAt,
       endedAt: row.endedAt,

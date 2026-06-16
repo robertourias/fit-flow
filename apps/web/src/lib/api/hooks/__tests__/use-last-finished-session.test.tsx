@@ -17,6 +17,7 @@ const mockApiFetch = apiFetch as jest.MockedFunction<typeof apiFetch>;
 const SESSION_SUMMARY: WorkoutSessionSummaryDto = {
   id: "session-1",
   workoutId: "w1",
+  workoutName: "Treino A",
   startedAt: "2026-06-10T10:00:00.000Z",
   endedAt: "2026-06-10T11:00:00.000Z",
   status: "FINISHED",

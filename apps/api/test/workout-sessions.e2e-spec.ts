@@ -32,6 +32,7 @@ jest.mock("@auth/core/jwt", () => ({
 interface SessionRecord {
   id: string;
   workoutId: string;
+  workoutName: string;
   tenantId: string;
   startedAt: Date;
   endedAt: Date | null;
@@ -46,6 +47,7 @@ function toEntity(rec: SessionRecord): WorkoutSession {
   return new WorkoutSession({
     id: rec.id,
     workoutId: rec.workoutId,
+    workoutName: rec.workoutName,
     tenantId: rec.tenantId,
     startedAt: rec.startedAt,
     endedAt: rec.endedAt,
@@ -134,6 +136,8 @@ class FakeSessionsRepository implements IWorkoutSessionsRepository {
     const rec: SessionRecord = {
       id: `session-new-${++this._seq}`,
       workoutId: data.workoutId,
+      // workoutName is resolved by the real repo via include; fake uses a placeholder
+      workoutName: "W",
       tenantId: data.tenantId,
       startedAt: data.startedAt,
       endedAt: data.endedAt ?? null,
@@ -373,6 +377,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
         {
           id: "s-a1",
           workoutId: "workout-a1",
+          workoutName: "W",
           tenantId: "tenant-a",
           startedAt: new Date(2026, 5, 1, 10, 0, 0),
           endedAt: null,
@@ -388,6 +393,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
         {
           id: "s-a2",
           workoutId: "workout-a2",
+          workoutName: "W",
           tenantId: "tenant-a",
           startedAt: new Date(2026, 5, 2, 10, 0, 0),
           endedAt: null,
@@ -403,6 +409,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
         {
           id: "s-b1",
           workoutId: "workout-a1",
+          workoutName: "W",
           tenantId: "tenant-b",
           startedAt: new Date(2026, 5, 1, 10, 0, 0),
           endedAt: null,
@@ -444,6 +451,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
       initial.set(id, {
         id,
         workoutId: "workout-a1",
+        workoutName: "W",
         tenantId: "tenant-a",
         startedAt: new Date(2026, 5, 1, 0, 0, i),
         endedAt: null,
@@ -480,6 +488,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
           {
             id: `${tenantId}-recent`,
             workoutId: "workout-a1",
+            workoutName: "W",
             tenantId,
             startedAt: daysAgo(10),
             endedAt: null,
@@ -495,6 +504,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
           {
             id: `${tenantId}-old`,
             workoutId: "workout-a1",
+            workoutName: "W",
             tenantId,
             startedAt: daysAgo(61),
             endedAt: null,
@@ -561,6 +571,7 @@ describe("WorkoutSessions CRUD nested (e2e)", () => {
         {
           id: "s-b",
           workoutId: "workout-b1",
+          workoutName: "W",
           tenantId: "tenant-b",
           startedAt: new Date(),
           endedAt: null,

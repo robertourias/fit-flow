@@ -58,7 +58,7 @@
 | TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | done | TASK08 | [2026-06-14-task09-crud-rotina-treinos](../specs/2026-06-14-task09-crud-rotina-treinos.md) |
 | TASK10 | Limites do plano gratuito | Enforce de: máx. 6 Workouts por usuário no plano FREE — validação no backend (uso case + repositório) e feedback visual no frontend | done | TASK09 | [2026-06-14-task10-limites-plano-gratuito](../specs/2026-06-14-task10-limites-plano-gratuito.md) |
 | TASK11 | Execução de treino | Registrar sessão em tempo real: séries/cargas/reps executados, timer de intervalo e conclusão de treino | done | TASK09 | [2026-06-15-task11-execucao-treino](../specs/2026-06-15-task11-execucao-treino.md) |
-| TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | backlog | TASK11 | — |
+| TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | done | TASK11 | [2026-06-15-task12-historico-sessoes](../specs/2026-06-15-task12-historico-sessoes.md) |
 
 ## Fase 4 — Polimento
 

@@ -35,6 +35,7 @@ function makeSession(startedAt: Date, exercises: SessionExercise[]): WorkoutSess
   return new WorkoutSession({
     id: "session-1",
     workoutId: "workout-1",
+    workoutName: "Treino A",
     tenantId: "tenant-1",
     startedAt,
     endedAt: new Date(startedAt.getTime() + 3600000),

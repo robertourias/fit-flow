@@ -25,6 +25,7 @@ class ApiClientError extends Error {
 const CREATED_SESSION: WorkoutSessionDetailDto = {
   id: "session-1",
   workoutId: "w1",
+  workoutName: "Treino A",
   startedAt: "2026-06-15T10:00:00.000Z",
   endedAt: "2026-06-15T11:00:00.000Z",
   status: "FINISHED",

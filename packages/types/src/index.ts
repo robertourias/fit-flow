@@ -150,6 +150,7 @@ export interface SessionExerciseDto {
 export interface WorkoutSessionSummaryDto {
   id: string;
   workoutId: string;
+  workoutName: string;
   startedAt: string;
   endedAt: string | null;
   status: WorkoutSessionStatus;
