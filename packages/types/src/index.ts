@@ -263,3 +263,47 @@ export interface ActiveWorkoutDto {
   workout: { id: string; nome: string; exercicios: string[]; order: number };
   proximos: Array<{ id: string; nome: string; numExercicios: number; order: number }>;
 }
+
+export interface BodyMeasurementDto {
+  id: string;
+  tenantId: string;
+  measuredAt: string;
+  weight: number | null;
+  neck: number | null;
+  chest: number | null;
+  waist: number | null;
+  hip: number | null;
+  leftArm: number | null;
+  rightArm: number | null;
+  leftThigh: number | null;
+  rightThigh: number | null;
+  calf: number | null;
+  bodyFatPct: number | null;
+  muscleMassPct: number | null;
+  visceralFat: number | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBodyMeasurementDto {
+  measuredAt: string;
+  weight?: number;
+  neck?: number;
+  chest?: number;
+  waist?: number;
+  hip?: number;
+  leftArm?: number;
+  rightArm?: number;
+  leftThigh?: number;
+  rightThigh?: number;
+  calf?: number;
+  bodyFatPct?: number;
+  muscleMassPct?: number;
+  visceralFat?: number;
+  notes?: string;
+}
+
+export interface UpdateBodyMeasurementDto extends Partial<Omit<CreateBodyMeasurementDto, "measuredAt">> {
+  measuredAt?: string;
+}

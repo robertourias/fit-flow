@@ -65,7 +65,7 @@
 | ID | Título | Descrição | Status | Dependências | Spec |
 |----|--------|-----------|--------|--------------|------|
 | TASK13 | Dashboards de Progresso | Dashboards de volume, duração, dias de treino no mês, músculos trabalhados na semana e heatmap de atividade | done | TASK12 | [2026-06-16-task13-dashboards-progresso](../specs/2026-06-16-task13-dashboards-progresso.md) |
-| TASK14 | Medidas Corporais | Cadastro e histórico (60 dias) de peso, medidas corporais e avaliação de bioimpedância | backlog | TASK12 | — |
+| TASK14 | Medidas Corporais | Cadastro e histórico (60 dias) de peso, medidas corporais e avaliação de bioimpedância | done | TASK12 | [2026-06-16-task14-medidas-corporais](../specs/2026-06-16-task14-medidas-corporais.md) |
 | TASK15 | Explorar (Templates) | Área para explorar e importar estratégias/rotinas pré-criadas (Catalog templates) | backlog | TASK09, TASK13 | — |
 | TASK16 | Compartilhamento | Gerador de card/imagem com resumo do treino ou progresso para redes sociais | backlog | TASK13, TASK14 | — |
 | TASK17 | Área do Preparador: Alunos | Bounded context Coaching: vínculo aluno ↔ preparador, criação/atribuição de rotinas e acompanhamento de evolução | backlog | TASK09, TASK13 | — |

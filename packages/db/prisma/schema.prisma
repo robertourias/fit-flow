@@ -68,6 +68,9 @@ model User {
   workouts        Workout[]
   workoutSessions WorkoutSession[]
 
+  // Measurements
+  bodyMeasurements BodyMeasurement[]
+
   // Vínculos preparador-aluno
   studentsAsTrainer TrainerStudentRelationship[] @relation("TrainerLinks")
   trainersAsStudent TrainerStudentRelationship[] @relation("StudentLinks")
@@ -340,4 +343,40 @@ model ExecutedSet {
 
   @@index([sessionExerciseId])
   @@map("executed_sets")
+}
+
+// ─── Measurements ─────────────────────────────────────────────────────────────
+
+model BodyMeasurement {
+  id            String   @id @default(cuid())
+  tenantId      String
+  measuredAt    DateTime
+
+  // Peso (kg)
+  weight        Decimal? @db.Decimal(5, 2)
+
+  // Circunferências (cm)
+  neck          Decimal? @db.Decimal(5, 2)
+  chest         Decimal? @db.Decimal(5, 2)
+  waist         Decimal? @db.Decimal(5, 2)
+  hip           Decimal? @db.Decimal(5, 2)
+  leftArm       Decimal? @db.Decimal(5, 2)
+  rightArm      Decimal? @db.Decimal(5, 2)
+  leftThigh     Decimal? @db.Decimal(5, 2)
+  rightThigh    Decimal? @db.Decimal(5, 2)
+  calf          Decimal? @db.Decimal(5, 2)
+
+  // Bioimpedância
+  bodyFatPct    Decimal? @db.Decimal(4, 2)
+  muscleMassPct Decimal? @db.Decimal(4, 2)
+  visceralFat   Int?
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant User @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, measuredAt])
+  @@map("body_measurements")
 }
