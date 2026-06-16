@@ -82,6 +82,7 @@ const SESSION_STATE = {
 const SESSION_RESPONSE: WorkoutSessionDetailDto = {
   id: "session-99",
   workoutId: "workout-1",
+  workoutName: "Treino A",
   startedAt: "2026-06-15T10:00:00.000Z",
   endedAt: "2026-06-15T11:00:00.000Z",
   status: "FINISHED",

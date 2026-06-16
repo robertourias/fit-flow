@@ -307,6 +307,141 @@ describe("GetDashboardSummaryUseCase", () => {
     // sum = 150%, which is OK (distributed, not partitioned)
   });
 
+  it("accumulates durationData and semanalDuracao for sessions this week", async () => {
+    const sessionsRepo = workoutSessionsRepo();
+    const workouts = workoutsRepo();
+    const exercises = exercisesRepo();
+
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    monday.setHours(10, 0, 0, 0);
+
+    const wednesday = new Date(monday);
+    wednesday.setDate(wednesday.getDate() + 2);
+    wednesday.setHours(10, 0, 0, 0);
+
+    // 60 min session on Monday
+    const s1 = new WorkoutSession({
+      id: "s1", workoutId: "w1", workoutName: "A", tenantId: "t1",
+      startedAt: monday,
+      endedAt: new Date(monday.getTime() + 60 * 60000),
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: monday, exercises: [],
+    });
+
+    // 45 min session on Wednesday
+    const s2 = new WorkoutSession({
+      id: "s2", workoutId: "w1", workoutName: "B", tenantId: "t1",
+      startedAt: wednesday,
+      endedAt: new Date(wednesday.getTime() + 45 * 60000),
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: wednesday, exercises: [],
+    });
+
+    sessionsRepo.findFinishedSince.mockResolvedValue([s1, s2]);
+    workouts.countByTenant.mockResolvedValue(0);
+
+    const result = await new GetDashboardSummaryUseCase(sessionsRepo, workouts, exercises).execute("t1");
+
+    expect(result.durationData).toHaveLength(7);
+    expect(result.durationData[0].totalMinutos).toBe(60); // Seg
+    expect(result.durationData[2].totalMinutos).toBe(45); // Qua
+    expect(result.semanalDuracao).toBe(105);
+  });
+
+  it("sessions without endedAt contribute 0 minutes to durationData", async () => {
+    const sessionsRepo = workoutSessionsRepo();
+    const workouts = workoutsRepo();
+    const exercises = exercisesRepo();
+
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+    monday.setHours(10, 0, 0, 0);
+
+    const s1 = new WorkoutSession({
+      id: "s1", workoutId: "w1", workoutName: "A", tenantId: "t1",
+      startedAt: monday,
+      endedAt: null, // no endedAt
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: monday, exercises: [],
+    });
+
+    sessionsRepo.findFinishedSince.mockResolvedValue([s1]);
+    workouts.countByTenant.mockResolvedValue(0);
+
+    const result = await new GetDashboardSummaryUseCase(sessionsRepo, workouts, exercises).execute("t1");
+
+    expect(result.semanalDuracao).toBe(0);
+    expect(result.durationData.every((d) => d.totalMinutos === 0)).toBe(true);
+  });
+
+  it("heatmapData contains exactly 84 entries ordered oldest first", async () => {
+    const sessionsRepo = workoutSessionsRepo();
+    const workouts = workoutsRepo();
+    const exercises = exercisesRepo();
+
+    sessionsRepo.findFinishedSince.mockResolvedValue([]);
+    workouts.countByTenant.mockResolvedValue(0);
+
+    const result = await new GetDashboardSummaryUseCase(sessionsRepo, workouts, exercises).execute("t1");
+
+    expect(result.heatmapData).toHaveLength(84);
+    expect(result.heatmapData.every((h) => h.count === 0)).toBe(true);
+    // oldest first: first entry is 83 days ago
+    const firstDate = new Date(result.heatmapData[0].date);
+    const lastDate = new Date(result.heatmapData[83].date);
+    expect(firstDate < lastDate).toBe(true);
+  });
+
+  it("heatmapData increments count for days with sessions", async () => {
+    const sessionsRepo = workoutSessionsRepo();
+    const workouts = workoutsRepo();
+    const exercises = exercisesRepo();
+
+    const now = new Date();
+    const today = new Date(now);
+    today.setHours(10, 0, 0, 0);
+
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(10, 0, 0, 0);
+
+    const s1 = new WorkoutSession({
+      id: "s1", workoutId: "w1", workoutName: "A", tenantId: "t1",
+      startedAt: today, endedAt: new Date(today.getTime() + 3600000),
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: today, exercises: [],
+    });
+    const s2 = new WorkoutSession({
+      id: "s2", workoutId: "w1", workoutName: "B", tenantId: "t1",
+      startedAt: today, endedAt: new Date(today.getTime() + 3600000),
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: today, exercises: [],
+    });
+    const s3 = new WorkoutSession({
+      id: "s3", workoutId: "w1", workoutName: "C", tenantId: "t1",
+      startedAt: yesterday, endedAt: new Date(yesterday.getTime() + 3600000),
+      status: WorkoutSessionStatus.FINISHED,
+      comment: null, difficulty: null, createdAt: yesterday, exercises: [],
+    });
+
+    sessionsRepo.findFinishedSince.mockResolvedValue([s1, s2, s3]);
+    workouts.countByTenant.mockResolvedValue(0);
+
+    const result = await new GetDashboardSummaryUseCase(sessionsRepo, workouts, exercises).execute("t1");
+
+    const todayKey = today.toISOString().slice(0, 10);
+    const yesterdayKey = yesterday.toISOString().slice(0, 10);
+
+    const todayEntry = result.heatmapData.find((h) => h.date === todayKey);
+    const yesterdayEntry = result.heatmapData.find((h) => h.date === yesterdayKey);
+
+    expect(todayEntry?.count).toBe(2);
+    expect(yesterdayEntry?.count).toBe(1);
+  });
+
   it("handles secondary muscle groups (filters out isPrimary: false)", async () => {
     const sessions = workoutSessionsRepo();
     const workouts = workoutsRepo();

@@ -18,7 +18,7 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { id: "rotina", label: "Rotina", icon: Dumbbell, href: "/dashboard" },
-  { id: "progresso", label: "Progresso", icon: TrendingUp },
+  { id: "progresso", label: "Progresso", icon: TrendingUp, href: "/progress" },
   { id: "explorar", label: "Explorar", icon: Compass },
   { id: "personal", label: "Personal", icon: User },
 ];

@@ -230,6 +230,16 @@ export interface UpdateStrategyDto {
   isActive?: boolean;
 }
 
+export interface DurationDataDto {
+  dia: string;
+  totalMinutos: number;
+}
+
+export interface HeatmapDataDto {
+  date: string;
+  count: number;
+}
+
 export interface DashboardSummaryDto {
   diasEstaSemana: number;
   treinosNoMes: number;
@@ -243,6 +253,9 @@ export interface DashboardSummaryDto {
   muscleGroups: Array<{ nome: string; percentual: number }>;
   trainDates: number[];
   workoutsCount: number;
+  durationData: DurationDataDto[];
+  semanalDuracao: number;
+  heatmapData: HeatmapDataDto[];
 }
 
 export interface ActiveWorkoutDto {
