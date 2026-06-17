@@ -17,8 +17,12 @@
     "db:generate": "prisma generate",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:validate": "prisma validate"
+  },
+  "prisma": {
+    "seed": "ts-node --project tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0"
@@ -27,6 +31,7 @@
     "@fitflow/config": "workspace:*",
     "@types/node": "^20.0.0",
     "prisma": "^6.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.0"
   }
 }

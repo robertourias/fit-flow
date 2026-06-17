@@ -10,9 +10,10 @@ import { IdentityModule } from "./identity/identity.module";
 import { CatalogModule } from "./catalog/catalog.module";
 import { TrainingModule } from "./training/training.module";
 import { MeasurementsModule } from "./measurements/measurements.module";
+import { ExploreModule } from "./explore/explore.module";
 
 @Module({
-  imports: [HealthModule, IdentityModule, CatalogModule, TrainingModule, MeasurementsModule],
+  imports: [HealthModule, IdentityModule, CatalogModule, TrainingModule, MeasurementsModule, ExploreModule],
   controllers: [AppController],
   providers: [
     AppService,

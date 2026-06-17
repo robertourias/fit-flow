@@ -307,3 +307,13 @@ export interface CreateBodyMeasurementDto {
 export interface UpdateBodyMeasurementDto extends Partial<Omit<CreateBodyMeasurementDto, "measuredAt">> {
   measuredAt?: string;
 }
+
+export interface StrategyTemplateDto {
+  id: string;
+  name: string;
+  type: string | null;
+  description: string | null;
+  workoutsCount: number;
+  workoutNames: string[];
+  muscleGroups: string[];
+}
