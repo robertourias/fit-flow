@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { SessionDetailPage } from "../SessionDetailPage";
 import type { WorkoutSessionDetailDto, ExerciseDto } from "@fitflow/types";
 
@@ -16,6 +17,22 @@ jest.mock("@/components/exercises/ExerciseImage", () => ({
   ExerciseImage: ({ src, alt }: { src: string | null; alt: string }) => (
     <img src={src ?? ""} alt={alt} />
   ),
+}));
+
+jest.mock("@/components/share/ShareCardDialog", () => ({
+  ShareCardDialog: ({
+    open,
+    children,
+  }: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    filename: string;
+    children: React.ReactNode;
+  }) => (open ? <div data-testid="share-dialog">{children}</div> : null),
+}));
+
+jest.mock("@/components/share/ShareCardSessionTemplate", () => ({
+  ShareCardSessionTemplate: () => <div data-testid="share-card-template" />,
 }));
 
 const SESSION: WorkoutSessionDetailDto = {
@@ -142,5 +159,31 @@ describe("SessionDetailPage", () => {
     };
     render(<SessionDetailPage session={sessionWithSkippedExercise} exercises={EXERCISES} />);
     expect(screen.getByText("Exercício pulado")).toBeInTheDocument();
+  });
+
+  it("não exibe o botão 'Compartilhar' quando a sessão está ACTIVE", () => {
+    const activeSession: WorkoutSessionDetailDto = { ...SESSION, status: "ACTIVE" };
+    render(<SessionDetailPage session={activeSession} exercises={EXERCISES} />);
+    expect(screen.queryByRole("button", { name: /Compartilhar/ })).not.toBeInTheDocument();
+  });
+
+  it("não exibe o botão 'Compartilhar' quando a sessão está ABANDONED", () => {
+    const abandonedSession: WorkoutSessionDetailDto = { ...SESSION, status: "ABANDONED" };
+    render(<SessionDetailPage session={abandonedSession} exercises={EXERCISES} />);
+    expect(screen.queryByRole("button", { name: /Compartilhar/ })).not.toBeInTheDocument();
+  });
+
+  it("exibe o botão 'Compartilhar' e abre o dialog quando a sessão está FINISHED", async () => {
+    const user = userEvent.setup();
+    render(<SessionDetailPage session={SESSION} exercises={EXERCISES} />);
+
+    const shareButton = screen.getByRole("button", { name: /Compartilhar/ });
+    expect(shareButton).toBeInTheDocument();
+    expect(screen.queryByTestId("share-dialog")).not.toBeInTheDocument();
+
+    await user.click(shareButton);
+
+    expect(screen.getByTestId("share-dialog")).toBeInTheDocument();
+    expect(screen.getByTestId("share-card-template")).toBeInTheDocument();
   });
 });

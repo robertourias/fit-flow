@@ -1,14 +1,29 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { Share2 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ExerciseImage } from "@/components/exercises/ExerciseImage";
+import { Button } from "@/components/ui/button";
+import { ShareCardDialog } from "@/components/share/ShareCardDialog";
+import { ShareCardSessionTemplate } from "@/components/share/ShareCardSessionTemplate";
 import type { WorkoutSessionDetailDto, ExerciseDto } from "@fitflow/types";
 
 interface SessionDetailPageProps {
   session: WorkoutSessionDetailDto;
   exercises: ExerciseDto[];
+}
+
+function sanitizeFilename(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-zA-Z0-9-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toLowerCase();
 }
 
 function formatDuration(startedAt: string, endedAt: string): string {
@@ -23,18 +38,33 @@ function formatDuration(startedAt: string, endedAt: string): string {
 }
 
 export function SessionDetailPage({ session, exercises }: SessionDetailPageProps) {
+  const [shareOpen, setShareOpen] = useState(false);
   const exercisesById = new Map(exercises.map((e) => [e.id, e]));
   const sortedSessionExercises = [...session.exercises].sort((a, b) => a.order - b.order);
 
   return (
     <main className="flex flex-col gap-6 p-5">
       <header className="flex flex-col gap-2">
-        <Link
-          href="/history"
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← Histórico
-        </Link>
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href="/history"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            ← Histórico
+          </Link>
+
+          {session.status === "FINISHED" && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => setShareOpen(true)}
+            >
+              <Share2 className="h-4 w-4" />
+              Compartilhar
+            </Button>
+          )}
+        </div>
 
         <h1 className="text-2xl font-semibold font-secondary">{session.workoutName}</h1>
 
@@ -132,6 +162,16 @@ export function SessionDetailPage({ session, exercises }: SessionDetailPageProps
           })}
         </ol>
       </section>
+
+      {session.status === "FINISHED" && (
+        <ShareCardDialog
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          filename={`treino-${sanitizeFilename(session.workoutName)}.png`}
+        >
+          <ShareCardSessionTemplate session={session} />
+        </ShareCardDialog>
+      )}
     </main>
   );
 }

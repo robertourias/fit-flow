@@ -4,6 +4,7 @@ import { ProgressChartClient } from "@/components/dashboard/ProgressChartClient"
 import { MuscleCard } from "@/components/dashboard/MuscleCard";
 import { DurationChartClient } from "@/components/progress/DurationChartClient";
 import { ActivityHeatmapClient } from "@/components/progress/ActivityHeatmapClient";
+import { ShareProgressButton } from "@/components/progress/ShareProgressButton";
 import type { DashboardSummaryDto } from "@fitflow/types";
 
 export default async function ProgressPage() {
@@ -20,6 +21,10 @@ export default async function ProgressPage() {
 
     return (
       <div className="flex flex-col">
+        <div className="flex justify-end px-5 pt-4 lg:px-7 lg:pt-6">
+          <ShareProgressButton summary={summary} />
+        </div>
+
         <MetricsStrip metrics={metrics} />
 
         {/* DESKTOP */}
