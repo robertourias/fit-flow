@@ -29,6 +29,7 @@ const profileSchema = z.object({
   age: z.number().int().min(10).max(100).nullable().optional(),
   goals: z.array(z.enum([...GOAL_OPTIONS] as [GoalOption, ...GoalOption[]])).optional(),
   avatarUrl: z.string().url().nullable().optional(),
+  isTrainer: z.boolean().optional(),
 })
 
 export type ProfileUpdateInput = z.infer<typeof profileSchema>

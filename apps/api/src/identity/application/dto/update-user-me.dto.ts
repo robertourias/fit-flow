@@ -46,4 +46,9 @@ export class UpdateUserMeDto {
   @IsOptional()
   @IsBoolean()
   hasOnboarded?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isTrainer?: boolean;
 }

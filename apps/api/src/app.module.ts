@@ -11,9 +11,18 @@ import { CatalogModule } from "./catalog/catalog.module";
 import { TrainingModule } from "./training/training.module";
 import { MeasurementsModule } from "./measurements/measurements.module";
 import { ExploreModule } from "./explore/explore.module";
+import { CoachingModule } from "./coaching/coaching.module";
 
 @Module({
-  imports: [HealthModule, IdentityModule, CatalogModule, TrainingModule, MeasurementsModule, ExploreModule],
+  imports: [
+    HealthModule,
+    IdentityModule,
+    CatalogModule,
+    TrainingModule,
+    MeasurementsModule,
+    ExploreModule,
+    CoachingModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

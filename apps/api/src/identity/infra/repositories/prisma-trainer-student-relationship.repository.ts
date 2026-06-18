@@ -3,6 +3,7 @@ import { prisma, Prisma } from "@fitflow/db";
 import { ITrainerStudentRelationshipRepository } from "../../domain/repositories/trainer-student-relationship.repository.interface";
 import { TrainerStudentRelationship } from "../../domain/trainer-student-relationship.entity";
 import { RelationshipStatus } from "../../domain/relationship-status.enum";
+import { RelationshipInitiator } from "../../domain/relationship-initiator.enum";
 
 type RelationshipRow = Prisma.TrainerStudentRelationshipGetPayload<Record<string, never>>;
 
@@ -10,6 +11,13 @@ type RelationshipRow = Prisma.TrainerStudentRelationshipGetPayload<Record<string
 export class PrismaTrainerStudentRelationshipRepository
   implements ITrainerStudentRelationshipRepository
 {
+  async findById(id: string): Promise<TrainerStudentRelationship | null> {
+    const row = await prisma.trainerStudentRelationship.findUnique({
+      where: { id },
+    });
+    return row ? this.toDomain(row) : null;
+  }
+
   async findByTrainerAndStudent(
     trainerId: string,
     studentId: string,
@@ -40,9 +48,13 @@ export class PrismaTrainerStudentRelationshipRepository
     return rows.map((r) => this.toDomain(r));
   }
 
-  async create(trainerId: string, studentId: string): Promise<TrainerStudentRelationship> {
+  async create(
+    trainerId: string,
+    studentId: string,
+    initiatedBy: RelationshipInitiator,
+  ): Promise<TrainerStudentRelationship> {
     const row = await prisma.trainerStudentRelationship.create({
-      data: { trainerId, studentId },
+      data: { trainerId, studentId, initiatedBy },
     });
     return this.toDomain(row);
   }
@@ -69,6 +81,7 @@ export class PrismaTrainerStudentRelationshipRepository
       trainerId: row.trainerId,
       studentId: row.studentId,
       status: row.status as RelationshipStatus,
+      initiatedBy: row.initiatedBy as RelationshipInitiator,
       startedAt: row.startedAt,
       endedAt: row.endedAt,
     });

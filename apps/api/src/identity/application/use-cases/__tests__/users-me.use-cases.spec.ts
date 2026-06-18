@@ -107,6 +107,27 @@ describe("UpdateMeUseCase", () => {
     expect(repo.update).toHaveBeenCalledWith("user-1", { name: "Novo Nome" });
   });
 
+  it("passes isTrainer through when provided", async () => {
+    const repo = makeRepo();
+    repo.findById.mockResolvedValue(makeUser({ isTrainer: false }));
+    repo.update.mockResolvedValue(makeUser({ isTrainer: true }));
+
+    const result = await new UpdateMeUseCase(repo).execute("user-1", { isTrainer: true });
+
+    expect(repo.update).toHaveBeenCalledWith("user-1", { isTrainer: true });
+    expect(result.isTrainer).toBe(true);
+  });
+
+  it("does not touch isTrainer when not provided", async () => {
+    const repo = makeRepo();
+    repo.findById.mockResolvedValue(makeUser());
+    repo.update.mockResolvedValue(makeUser());
+
+    await new UpdateMeUseCase(repo).execute("user-1", { name: "Novo Nome" });
+
+    expect(repo.update).toHaveBeenCalledWith("user-1", { name: "Novo Nome" });
+  });
+
   it("throws NotFound for missing user", async () => {
     const repo = makeRepo();
     repo.findById.mockResolvedValue(null);

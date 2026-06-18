@@ -308,6 +308,32 @@ export interface UpdateBodyMeasurementDto extends Partial<Omit<CreateBodyMeasure
   measuredAt?: string;
 }
 
+export type RelationshipStatus = "PENDING" | "ACTIVE" | "REVOKED";
+
+export type RelationshipInitiator = "TRAINER" | "STUDENT";
+
+export interface RelationshipDto {
+  id: string;
+  trainerId: string;
+  trainerName: string;
+  studentId: string;
+  studentName: string;
+  status: RelationshipStatus;
+  initiatedBy: RelationshipInitiator;
+  startedAt: string;
+  endedAt: string | null;
+}
+
+export interface InviteRelationshipDto {
+  targetEmail: string;
+}
+
+export type RelationshipAction = "ACCEPT" | "REJECT" | "REVOKE";
+
+export interface RespondRelationshipDto {
+  action: RelationshipAction;
+}
+
 export interface StrategyTemplateDto {
   id: string;
   name: string;

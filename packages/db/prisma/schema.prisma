@@ -20,6 +20,11 @@ enum RelationshipStatus {
   REVOKED
 }
 
+enum RelationshipInitiator {
+  TRAINER
+  STUDENT
+}
+
 enum ExerciseCategory {
   STRENGTH
   CARDIO
@@ -141,12 +146,13 @@ model UserDevice {
 }
 
 model TrainerStudentRelationship {
-  id        String             @id @default(cuid())
-  trainerId String
-  studentId String
-  status    RelationshipStatus @default(PENDING)
-  startedAt DateTime           @default(now())
-  endedAt   DateTime?
+  id          String                @id @default(cuid())
+  trainerId   String
+  studentId   String
+  status      RelationshipStatus    @default(PENDING)
+  initiatedBy RelationshipInitiator
+  startedAt   DateTime              @default(now())
+  endedAt     DateTime?
 
   trainer User @relation("TrainerLinks", fields: [trainerId], references: [id])
   student User @relation("StudentLinks", fields: [studentId], references: [id])
