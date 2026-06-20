@@ -54,7 +54,7 @@ model User {
   passwordHash  String?
   bio           String?   @db.VarChar(300)
   age           Int?
-  goals         String[]
+  goals         String[]  @default([])
   deletedAt     DateTime?
   isTrainer     Boolean   @default(false)
   plan          Plan      @default(FREE)
