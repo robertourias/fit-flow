@@ -9,7 +9,7 @@ import { User } from "../../../../identity/domain/user.entity";
 import { Plan } from "../../../../identity/domain/plan.enum";
 import type { IBodyMeasurementsRepository } from "../../../domain/repositories/body-measurements.repository.interface";
 import type { IUsersRepository } from "../../../../identity/domain/repositories/users.repository.interface";
-import type { CreateBodyMeasurementDto } from "../../dto/body-measurement.dto";
+import type { CreateBodyMeasurementDto, UpdateBodyMeasurementDto } from "../../dto/body-measurement.dto";
 
 function makeMeasurement(overrides: Partial<ConstructorParameters<typeof BodyMeasurement>[0]> = {}): BodyMeasurement {
   return new BodyMeasurement({
@@ -140,6 +140,54 @@ describe("GetBodyMeasurementUseCase", () => {
     const repo = makeRepo({ findById: jest.fn().mockResolvedValue(measurement) });
     const uc = new GetBodyMeasurementUseCase(repo);
     await expect(uc.execute("m-1", "tenant-1")).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+describe("UpdateBodyMeasurementUseCase", () => {
+  it("updates own measurement with only provided fields", async () => {
+    const measurement = makeMeasurement();
+    const updated = makeMeasurement({ weight: 82 });
+    const repo = makeRepo({
+      findById: jest.fn().mockResolvedValue(measurement),
+      update: jest.fn().mockResolvedValue(updated),
+    });
+    const uc = new UpdateBodyMeasurementUseCase(repo);
+    const dto: UpdateBodyMeasurementDto = { weight: 82 };
+
+    const result = await uc.execute("m-1", "tenant-1", dto);
+
+    expect(repo.update).toHaveBeenCalledWith("m-1", { weight: 82 });
+    expect(result.weight).toBe(82);
+  });
+
+  it("converts measuredAt string to Date when provided", async () => {
+    const measurement = makeMeasurement();
+    const repo = makeRepo({
+      findById: jest.fn().mockResolvedValue(measurement),
+      update: jest.fn().mockResolvedValue(measurement),
+    });
+    const uc = new UpdateBodyMeasurementUseCase(repo);
+    const dto: UpdateBodyMeasurementDto = { measuredAt: "2026-07-01" };
+
+    await uc.execute("m-1", "tenant-1", dto);
+
+    const call = (repo.update as jest.Mock).mock.calls[0][1];
+    expect(call.measuredAt).toBeInstanceOf(Date);
+  });
+
+  it("throws NotFoundException for non-existent id", async () => {
+    const repo = makeRepo({ findById: jest.fn().mockResolvedValue(null) });
+    const uc = new UpdateBodyMeasurementUseCase(repo);
+    await expect(uc.execute("bad-id", "tenant-1", { weight: 80 })).rejects.toBeInstanceOf(NotFoundException);
+    expect(repo.update).not.toHaveBeenCalled();
+  });
+
+  it("throws NotFoundException for different tenant", async () => {
+    const measurement = makeMeasurement({ tenantId: "other-tenant" });
+    const repo = makeRepo({ findById: jest.fn().mockResolvedValue(measurement) });
+    const uc = new UpdateBodyMeasurementUseCase(repo);
+    await expect(uc.execute("m-1", "tenant-1", { weight: 80 })).rejects.toBeInstanceOf(NotFoundException);
+    expect(repo.update).not.toHaveBeenCalled();
   });
 });
 

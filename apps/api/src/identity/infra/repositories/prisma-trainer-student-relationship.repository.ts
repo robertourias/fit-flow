@@ -75,6 +75,18 @@ export class PrismaTrainerStudentRelationshipRepository
     return row?.status === RelationshipStatus.ACTIVE;
   }
 
+  async markRead(
+    relationshipId: string,
+    side: "TRAINER" | "STUDENT",
+    at: Date,
+  ): Promise<TrainerStudentRelationship> {
+    const row = await prisma.trainerStudentRelationship.update({
+      where: { id: relationshipId },
+      data: side === "TRAINER" ? { trainerLastReadAt: at } : { studentLastReadAt: at },
+    });
+    return this.toDomain(row);
+  }
+
   private toDomain(row: RelationshipRow): TrainerStudentRelationship {
     return new TrainerStudentRelationship({
       id: row.id,
@@ -84,6 +96,8 @@ export class PrismaTrainerStudentRelationshipRepository
       initiatedBy: row.initiatedBy as RelationshipInitiator,
       startedAt: row.startedAt,
       endedAt: row.endedAt,
+      trainerLastReadAt: row.trainerLastReadAt,
+      studentLastReadAt: row.studentLastReadAt,
     });
   }
 }

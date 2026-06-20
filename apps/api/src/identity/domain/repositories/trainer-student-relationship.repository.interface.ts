@@ -23,4 +23,9 @@ export interface ITrainerStudentRelationshipRepository {
   ): Promise<TrainerStudentRelationship>;
   updateStatus(id: string, status: RelationshipStatus): Promise<TrainerStudentRelationship>;
   trainerHasAccessToStudent(trainerId: string, studentId: string): Promise<boolean>;
+  markRead(
+    relationshipId: string,
+    side: "TRAINER" | "STUDENT",
+    at: Date,
+  ): Promise<TrainerStudentRelationship>;
 }

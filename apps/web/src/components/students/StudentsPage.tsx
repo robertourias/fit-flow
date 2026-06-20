@@ -63,15 +63,19 @@ export function StudentsPage() {
           isLoading={trainers.isLoading}
           isError={trainers.isError}
           currentUserId={user?.id ?? ""}
+          onSelectActive={(relationship) => setSelected(relationship)}
         />
       )}
 
       {selected && (
         <StudentDetailSheet
           studentId={selected.studentId}
-          studentName={selected.studentName}
+          studentName={tab === "trainers" ? selected.trainerName : selected.studentName}
           open={!!selected}
           onOpenChange={(open) => { if (!open) setSelected(null); }}
+          relationshipId={selected.id}
+          currentUserId={user?.id ?? ""}
+          chatOnly={tab === "trainers"}
         />
       )}
     </main>

@@ -1,8 +1,8 @@
-import { Bell, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import type { DashboardUser } from "@/lib/mock/dashboard";
 
 interface TopHeaderProps {
@@ -30,14 +30,7 @@ export function TopHeader({ sectionTitle, user }: TopHeaderProps) {
 
       <ThemeToggle />
 
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-9 w-9 rounded-m bg-accent hover:bg-accent/80 shrink-0"
-        aria-label="Notificações"
-      >
-        <Bell className="h-[18px] w-[18px]" />
-      </Button>
+      <NotificationBell />
     </header>
   );
 }

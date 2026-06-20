@@ -122,7 +122,7 @@ export function RelationshipList({
           {relationships.map((relationship) => {
             const name = otherPartyName(relationship);
             const isActive = relationship.status === "ACTIVE";
-            const clickable = role === "trainer" && isActive && !!onSelectActive;
+            const clickable = isActive && !!onSelectActive;
 
             return (
               <li key={relationship.id} className="border-b border-border px-5 py-4 flex items-center gap-3">

@@ -1,9 +1,9 @@
 import { Test } from "@nestjs/testing";
-import type { INestApplication } from "@nestjs/common";
+import type { INestApplication, InjectionToken } from "@nestjs/common";
 import { AppModule } from "../src/app.module";
 
 export interface IProviderOverride {
-  token: symbol;
+  token: InjectionToken;
   value: unknown;
 }
 
@@ -23,7 +23,7 @@ export async function createTestApp(overrides: IProviderOverride[]): Promise<INe
   const moduleRef = await builder.compile();
 
   const app = moduleRef.createNestApplication();
-  app.setGlobalPrefix("api/v1");
+  app.setGlobalPrefix("api/v1", { exclude: ["metrics"] });
   await app.init();
   return app;
 }

@@ -1,0 +1,76 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+jobs:
+  deploy-web:
+    name: Deploy web (Vercel)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check VERCEL_TOKEN secret
+        id: check-secret
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::secret VERCEL_TOKEN não configurado, pulando deploy — configure em Settings > Secrets"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.check-secret.outputs.skip == 'false'
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        if: steps.check-secret.outputs.skip == 'false'
+        run: corepack enable
+
+      - name: Setup Node 20 + pnpm
+        if: steps.check-secret.outputs.skip == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.check-secret.outputs.skip == 'false'
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy to Vercel
+        if: steps.check-secret.outputs.skip == 'false'
+        run: pnpm dlx vercel deploy --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes --cwd apps/web
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  deploy-api:
+    name: Deploy api (Railway)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check RAILWAY_TOKEN secret
+        id: check-secret
+        run: |
+          if [ -z "${{ secrets.RAILWAY_TOKEN }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::secret RAILWAY_TOKEN não configurado, pulando deploy — configure em Settings > Secrets"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.check-secret.outputs.skip == 'false'
+        uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        if: steps.check-secret.outputs.skip == 'false'
+        run: npx -y @railway/cli up --service api
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

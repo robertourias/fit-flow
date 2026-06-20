@@ -81,4 +81,6 @@ USER nestjs
 EXPOSE 3001
 
 # SKIP_MIGRATIONS=1 para desabilitar migrations (ex: réplicas de leitura)
-CMD ["sh", "-c", "[ \"$SKIP_MIGRATIONS\" != \"1\" ] && prisma migrate deploy; node dist/main.js"]
+# Falha de `prisma migrate deploy` deve impedir o processo Node de subir —
+# nunca rodar em produção com schema inconsistente (exit code propagado via `|| exit 1`).
+CMD ["sh", "-c", "if [ \"$SKIP_MIGRATIONS\" != \"1\" ]; then prisma migrate deploy || exit 1; fi; exec node dist/main.js"]

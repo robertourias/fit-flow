@@ -343,3 +343,38 @@ export interface StrategyTemplateDto {
   workoutNames: string[];
   muscleGroups: string[];
 }
+
+export interface MessageDto {
+  id: string;
+  relationshipId: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface MessageListResponseDto {
+  items: MessageDto[];
+  total: number;
+}
+
+export interface SendMessageDto {
+  content: string;
+}
+
+export interface MarkMessagesReadResponseDto {
+  lastReadAt: string;
+}
+
+export type NotificationType = "NEW_MESSAGE";
+
+export interface NotificationDto {
+  id: string;
+  type: NotificationType;
+  payload: Record<string, unknown>;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface MarkAllNotificationsReadResponseDto {
+  updated: number;
+}

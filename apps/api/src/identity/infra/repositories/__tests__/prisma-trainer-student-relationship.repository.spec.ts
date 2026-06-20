@@ -148,4 +148,34 @@ describe("PrismaTrainerStudentRelationshipRepository", () => {
       expect(await repo.trainerHasAccessToStudent("trainer-1", "student-1")).toBe(false);
     });
   });
+
+  describe("markRead()", () => {
+    it("sets trainerLastReadAt when side is TRAINER", async () => {
+      const at = new Date("2026-06-18T12:00:00Z");
+      prisma.trainerStudentRelationship.update.mockResolvedValue({
+        ...mockRow,
+        trainerLastReadAt: at,
+      });
+      const rel = await repo.markRead("rel-1", "TRAINER", at);
+      expect(prisma.trainerStudentRelationship.update).toHaveBeenCalledWith({
+        where: { id: "rel-1" },
+        data: { trainerLastReadAt: at },
+      });
+      expect(rel.trainerLastReadAt).toEqual(at);
+    });
+
+    it("sets studentLastReadAt when side is STUDENT", async () => {
+      const at = new Date("2026-06-18T12:00:00Z");
+      prisma.trainerStudentRelationship.update.mockResolvedValue({
+        ...mockRow,
+        studentLastReadAt: at,
+      });
+      const rel = await repo.markRead("rel-1", "STUDENT", at);
+      expect(prisma.trainerStudentRelationship.update).toHaveBeenCalledWith({
+        where: { id: "rel-1" },
+        data: { studentLastReadAt: at },
+      });
+      expect(rel.studentLastReadAt).toEqual(at);
+    });
+  });
 });

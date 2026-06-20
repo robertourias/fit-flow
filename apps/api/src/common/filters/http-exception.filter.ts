@@ -8,6 +8,7 @@ import {
 } from "@nestjs/common";
 import { ApiErrorCode } from "@fitflow/types";
 import type { ApiResponse } from "@fitflow/types";
+import { captureException } from "../observability/sentry";
 
 interface JsonResponse {
   status(code: number): JsonResponse;
@@ -41,6 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     this._logger.error("Unhandled exception", {
       error: exception instanceof Error ? exception.stack : exception,
     });
+    captureException(exception);
     const body: ApiResponse<never> = {
       data: null,
       error: { code: ApiErrorCode.INTERNAL_ERROR, message: "Internal server error" },

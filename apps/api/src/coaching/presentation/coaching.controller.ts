@@ -19,6 +19,13 @@ import { RelationshipDto } from "../application/dto/relationship.dto";
 import { InviteRelationshipDto } from "../application/dto/invite-relationship.dto";
 import { RespondRelationshipDto } from "../application/dto/respond-relationship.dto";
 import { FindRelationshipsQueryDto } from "../application/dto/find-relationships-query.dto";
+import { SendMessageDto } from "../application/dto/send-message.dto";
+import { ListMessagesQueryDto } from "../application/dto/list-messages-query.dto";
+import {
+  ListMessagesResponseDto,
+  MarkMessagesReadResponseDto,
+  MessageDto,
+} from "../application/dto/message.dto";
 import { InviteRelationshipUseCase } from "../application/use-cases/invite-relationship.use-case";
 import { RespondRelationshipUseCase } from "../application/use-cases/respond-relationship.use-case";
 import { RevokeRelationshipUseCase } from "../application/use-cases/revoke-relationship.use-case";
@@ -27,6 +34,9 @@ import { ListMyTrainersUseCase } from "../application/use-cases/list-my-trainers
 import { CreateStudentStrategyUseCase } from "../application/use-cases/create-student-strategy.use-case";
 import { CreateStudentWorkoutUseCase } from "../application/use-cases/create-student-workout.use-case";
 import { GetStudentDashboardUseCase } from "../application/use-cases/get-student-dashboard.use-case";
+import { SendMessageUseCase } from "../application/use-cases/send-message.use-case";
+import { ListMessagesUseCase } from "../application/use-cases/list-messages.use-case";
+import { MarkMessagesReadUseCase } from "../application/use-cases/mark-messages-read.use-case";
 
 @ApiTags("coaching")
 @ApiBearerAuth()
@@ -41,6 +51,9 @@ export class CoachingController {
     private readonly _createStudentStrategy: CreateStudentStrategyUseCase,
     private readonly _createStudentWorkout: CreateStudentWorkoutUseCase,
     private readonly _getStudentDashboard: GetStudentDashboardUseCase,
+    private readonly _sendMessage: SendMessageUseCase,
+    private readonly _listMessages: ListMessagesUseCase,
+    private readonly _markMessagesRead: MarkMessagesReadUseCase,
   ) {}
 
   @Post("relationships")
@@ -134,5 +147,51 @@ export class CoachingController {
   ): Promise<WorkoutDetailDto> {
     const workout = await this._createStudentWorkout.execute(user.id, studentId, dto);
     return WorkoutDetailDto.fromEntity(workout);
+  }
+
+  @Post("relationships/:id/messages")
+  @ApiOperation({ summary: "Envia uma mensagem para o outro lado de um vínculo ACTIVE" })
+  @ApiCreatedResponse({ type: MessageDto })
+  @ApiResponse({ status: 404, description: "Vínculo não ACTIVE ou usuário não participa dele" })
+  @ApiResponse({ status: 422, description: "Conteúdo bloqueado pela moderação (FR-002)" })
+  async sendMessage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id") id: string,
+    @Body() dto: SendMessageDto,
+  ): Promise<MessageDto> {
+    const message = await this._sendMessage.execute(user.id, id, dto.content);
+    return MessageDto.fromEntity(message);
+  }
+
+  @Get("relationships/:id/messages")
+  @ApiOperation({ summary: "Lista o histórico de mensagens de um vínculo, paginado" })
+  @ApiOkResponse({ type: ListMessagesResponseDto })
+  @ApiResponse({ status: 404, description: "Vínculo não ACTIVE ou usuário não participa dele" })
+  async listMessages(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id") id: string,
+    @Query() query: ListMessagesQueryDto,
+  ): Promise<ListMessagesResponseDto> {
+    const { items, total } = await this._listMessages.execute(user.id, id, {
+      limit: query.limit,
+      offset: query.offset,
+    });
+    return { items: items.map((item) => MessageDto.fromEntity(item)), total };
+  }
+
+  @Patch("relationships/:id/messages/read")
+  @ApiOperation({ summary: "Marca as mensagens do vínculo como lidas para o usuário autenticado" })
+  @ApiOkResponse({ type: MarkMessagesReadResponseDto })
+  @ApiResponse({ status: 404, description: "Vínculo não ACTIVE ou usuário não participa dele" })
+  async markMessagesRead(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param("id") id: string,
+  ): Promise<MarkMessagesReadResponseDto> {
+    const relationship = await this._markMessagesRead.execute(user.id, id);
+    const lastReadAt =
+      relationship.trainerId === user.id
+        ? relationship.trainerLastReadAt
+        : relationship.studentLastReadAt;
+    return { lastReadAt: (lastReadAt ?? new Date()).toISOString() };
   }
 }

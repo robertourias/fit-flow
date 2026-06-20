@@ -9,6 +9,8 @@ export interface ITrainerStudentRelationshipProps {
   initiatedBy: RelationshipInitiator;
   startedAt: Date;
   endedAt?: Date | null;
+  trainerLastReadAt?: Date | null;
+  studentLastReadAt?: Date | null;
 }
 
 export class TrainerStudentRelationship {
@@ -21,6 +23,8 @@ export class TrainerStudentRelationship {
   get initiatedBy() { return this.props.initiatedBy; }
   get startedAt() { return this.props.startedAt; }
   get endedAt() { return this.props.endedAt; }
+  get trainerLastReadAt() { return this.props.trainerLastReadAt ?? null; }
+  get studentLastReadAt() { return this.props.studentLastReadAt ?? null; }
 
   isActive(): boolean {
     return this.props.status === RelationshipStatus.ACTIVE;

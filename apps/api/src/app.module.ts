@@ -1,5 +1,6 @@
 import { Module, ValidationPipe } from "@nestjs/common";
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { LoggerModule } from "nestjs-pino";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { JwtAuthGuard } from "./common/auth/jwt-auth.guard";
@@ -12,16 +13,26 @@ import { TrainingModule } from "./training/training.module";
 import { MeasurementsModule } from "./measurements/measurements.module";
 import { ExploreModule } from "./explore/explore.module";
 import { CoachingModule } from "./coaching/coaching.module";
+import { NotificationsModule } from "./notifications/notifications.module";
+import { MetricsModule } from "./metrics/metrics.module";
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env["NODE_ENV"] === "production" ? "info" : "debug",
+        autoLogging: false,
+      },
+    }),
     HealthModule,
+    MetricsModule,
     IdentityModule,
     CatalogModule,
     TrainingModule,
     MeasurementsModule,
     ExploreModule,
     CoachingModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

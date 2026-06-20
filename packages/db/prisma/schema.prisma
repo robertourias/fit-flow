@@ -38,6 +38,10 @@ enum WorkoutSessionStatus {
   ABANDONED
 }
 
+enum NotificationType {
+  NEW_MESSAGE
+}
+
 // ─── Identity ─────────────────────────────────────────────────────────────────
 
 model User {
@@ -79,6 +83,10 @@ model User {
   // Vínculos preparador-aluno
   studentsAsTrainer TrainerStudentRelationship[] @relation("TrainerLinks")
   trainersAsStudent TrainerStudentRelationship[] @relation("StudentLinks")
+
+  // Comunicação
+  sentMessages  Message[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -146,21 +154,54 @@ model UserDevice {
 }
 
 model TrainerStudentRelationship {
-  id          String                @id @default(cuid())
-  trainerId   String
-  studentId   String
-  status      RelationshipStatus    @default(PENDING)
-  initiatedBy RelationshipInitiator
-  startedAt   DateTime              @default(now())
-  endedAt     DateTime?
+  id                String                @id @default(cuid())
+  trainerId         String
+  studentId         String
+  status            RelationshipStatus    @default(PENDING)
+  initiatedBy       RelationshipInitiator
+  startedAt         DateTime              @default(now())
+  endedAt           DateTime?
+  trainerLastReadAt DateTime?
+  studentLastReadAt DateTime?
 
-  trainer User @relation("TrainerLinks", fields: [trainerId], references: [id])
-  student User @relation("StudentLinks", fields: [studentId], references: [id])
+  trainer  User      @relation("TrainerLinks", fields: [trainerId], references: [id])
+  student  User      @relation("StudentLinks", fields: [studentId], references: [id])
+  messages Message[]
 
   @@unique([trainerId, studentId])
   @@index([trainerId])
   @@index([studentId])
   @@map("trainer_student_relationships")
+}
+
+// ─── Comunicação ──────────────────────────────────────────────────────────────
+
+model Message {
+  id             String   @id @default(cuid())
+  relationshipId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+
+  relationship TrainerStudentRelationship @relation(fields: [relationshipId], references: [id])
+  sender       User                       @relation(fields: [senderId], references: [id])
+
+  @@index([relationshipId, createdAt])
+  @@map("messages")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  payload   Json
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@map("notifications")
 }
 
 // ─── Catálogo ─────────────────────────────────────────────────────────────────

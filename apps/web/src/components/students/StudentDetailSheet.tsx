@@ -9,17 +9,32 @@ import { DurationChartClient } from "@/components/progress/DurationChartClient";
 import { ActivityHeatmapClient } from "@/components/progress/ActivityHeatmapClient";
 import { useStudentDashboard } from "@/lib/api/hooks/use-student-dashboard";
 import { CreateStudentRoutineForm } from "./CreateStudentRoutineForm";
+import { ChatPanel } from "./ChatPanel";
 
 interface StudentDetailSheetProps {
   studentId: string;
   studentName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Vínculo ACTIVE entre os dois lados — habilita a aba de conversa (T7). */
+  relationshipId?: string;
+  /** Usuário autenticado, usado para alinhar as bolhas de mensagem por remetente. */
+  currentUserId?: string;
+  /** true quando quem abriu é o aluno olhando o preparador — dashboard/criar rotina não se aplicam, mostra só a conversa. */
+  chatOnly?: boolean;
 }
 
-export function StudentDetailSheet({ studentId, studentName, open, onOpenChange }: StudentDetailSheetProps) {
-  const { data: summary, isLoading, isError } = useStudentDashboard(studentId);
-  const [tab, setTab] = useState<"dashboard" | "routine">("dashboard");
+export function StudentDetailSheet({
+  studentId,
+  studentName,
+  open,
+  onOpenChange,
+  relationshipId,
+  currentUserId,
+  chatOnly = false,
+}: StudentDetailSheetProps) {
+  const { data: summary, isLoading, isError } = useStudentDashboard(chatOnly ? "" : studentId);
+  const [tab, setTab] = useState<"dashboard" | "routine" | "chat">(chatOnly ? "chat" : "dashboard");
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -29,27 +44,42 @@ export function StudentDetailSheet({ studentId, studentName, open, onOpenChange 
         </SheetHeader>
 
         <div className="flex gap-2 border-b border-border mt-4" role="tablist" aria-label="Detalhe do aluno">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "dashboard"}
-            className={`px-3 py-2 text-sm font-medium border-b-2 ${tab === "dashboard" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}
-            onClick={() => setTab("dashboard")}
-          >
-            Progresso
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "routine"}
-            className={`px-3 py-2 text-sm font-medium border-b-2 ${tab === "routine" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}
-            onClick={() => setTab("routine")}
-          >
-            Criar rotina
-          </button>
+          {!chatOnly && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "dashboard"}
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${tab === "dashboard" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}
+              onClick={() => setTab("dashboard")}
+            >
+              Progresso
+            </button>
+          )}
+          {!chatOnly && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "routine"}
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${tab === "routine" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}
+              onClick={() => setTab("routine")}
+            >
+              Criar rotina
+            </button>
+          )}
+          {relationshipId && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "chat"}
+              className={`px-3 py-2 text-sm font-medium border-b-2 ${tab === "chat" ? "border-primary text-primary" : "border-transparent text-muted-foreground"}`}
+              onClick={() => setTab("chat")}
+            >
+              Conversa
+            </button>
+          )}
         </div>
 
-        {tab === "dashboard" && (
+        {tab === "dashboard" && !chatOnly && (
           <div className="flex flex-col gap-4 pt-4">
             {isLoading && (
               <div className="flex flex-col gap-3">
@@ -84,10 +114,14 @@ export function StudentDetailSheet({ studentId, studentName, open, onOpenChange 
           </div>
         )}
 
-        {tab === "routine" && (
+        {tab === "routine" && !chatOnly && (
           <div className="pt-4">
             <CreateStudentRoutineForm studentId={studentId} onCreated={() => setTab("dashboard")} />
           </div>
+        )}
+
+        {tab === "chat" && relationshipId && (
+          <ChatPanel relationshipId={relationshipId} currentUserId={currentUserId ?? ""} />
         )}
       </SheetContent>
     </Sheet>
