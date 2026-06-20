@@ -150,6 +150,7 @@ export interface SessionExerciseDto {
 export interface WorkoutSessionSummaryDto {
   id: string;
   workoutId: string;
+  workoutName: string;
   startedAt: string;
   endedAt: string | null;
   status: WorkoutSessionStatus;
@@ -229,6 +230,16 @@ export interface UpdateStrategyDto {
   isActive?: boolean;
 }
 
+export interface DurationDataDto {
+  dia: string;
+  totalMinutos: number;
+}
+
+export interface HeatmapDataDto {
+  date: string;
+  count: number;
+}
+
 export interface DashboardSummaryDto {
   diasEstaSemana: number;
   treinosNoMes: number;
@@ -242,10 +253,128 @@ export interface DashboardSummaryDto {
   muscleGroups: Array<{ nome: string; percentual: number }>;
   trainDates: number[];
   workoutsCount: number;
+  durationData: DurationDataDto[];
+  semanalDuracao: number;
+  heatmapData: HeatmapDataDto[];
 }
 
 export interface ActiveWorkoutDto {
   estrategiaNome: string;
   workout: { id: string; nome: string; exercicios: string[]; order: number };
   proximos: Array<{ id: string; nome: string; numExercicios: number; order: number }>;
+}
+
+export interface BodyMeasurementDto {
+  id: string;
+  tenantId: string;
+  measuredAt: string;
+  weight: number | null;
+  neck: number | null;
+  chest: number | null;
+  waist: number | null;
+  hip: number | null;
+  leftArm: number | null;
+  rightArm: number | null;
+  leftThigh: number | null;
+  rightThigh: number | null;
+  calf: number | null;
+  bodyFatPct: number | null;
+  muscleMassPct: number | null;
+  visceralFat: number | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBodyMeasurementDto {
+  measuredAt: string;
+  weight?: number;
+  neck?: number;
+  chest?: number;
+  waist?: number;
+  hip?: number;
+  leftArm?: number;
+  rightArm?: number;
+  leftThigh?: number;
+  rightThigh?: number;
+  calf?: number;
+  bodyFatPct?: number;
+  muscleMassPct?: number;
+  visceralFat?: number;
+  notes?: string;
+}
+
+export interface UpdateBodyMeasurementDto extends Partial<Omit<CreateBodyMeasurementDto, "measuredAt">> {
+  measuredAt?: string;
+}
+
+export type RelationshipStatus = "PENDING" | "ACTIVE" | "REVOKED";
+
+export type RelationshipInitiator = "TRAINER" | "STUDENT";
+
+export interface RelationshipDto {
+  id: string;
+  trainerId: string;
+  trainerName: string;
+  studentId: string;
+  studentName: string;
+  status: RelationshipStatus;
+  initiatedBy: RelationshipInitiator;
+  startedAt: string;
+  endedAt: string | null;
+}
+
+export interface InviteRelationshipDto {
+  targetEmail: string;
+}
+
+export type RelationshipAction = "ACCEPT" | "REJECT" | "REVOKE";
+
+export interface RespondRelationshipDto {
+  action: RelationshipAction;
+}
+
+export interface StrategyTemplateDto {
+  id: string;
+  name: string;
+  type: string | null;
+  description: string | null;
+  workoutsCount: number;
+  workoutNames: string[];
+  muscleGroups: string[];
+}
+
+export interface MessageDto {
+  id: string;
+  relationshipId: string;
+  senderId: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface MessageListResponseDto {
+  items: MessageDto[];
+  total: number;
+}
+
+export interface SendMessageDto {
+  content: string;
+}
+
+export interface MarkMessagesReadResponseDto {
+  lastReadAt: string;
+}
+
+export type NotificationType = "NEW_MESSAGE";
+
+export interface NotificationDto {
+  id: string;
+  type: NotificationType;
+  payload: Record<string, unknown>;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface MarkAllNotificationsReadResponseDto {
+  updated: number;
 }

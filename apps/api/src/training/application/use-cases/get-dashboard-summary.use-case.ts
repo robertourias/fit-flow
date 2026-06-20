@@ -5,7 +5,7 @@ import type { IWorkoutSessionsRepository } from "../../domain/repositories/worko
 import type { IWorkoutsRepository } from "../../domain/repositories/workouts.repository.interface";
 import type { IExercisesRepository } from "../../../catalog/domain/repositories/exercises.repository.interface";
 import type { Exercise } from "../../../catalog/domain/exercise.entity";
-import { DashboardSummaryDto } from "../dto/dashboard-summary.dto";
+import { DashboardSummaryDto, DurationDataDto, HeatmapDataDto } from "../dto/dashboard-summary.dto";
 
 @Injectable()
 export class GetDashboardSummaryUseCase {
@@ -29,9 +29,13 @@ export class GetDashboardSummaryUseCase {
     const monthStart = this.startOfMonth(now);
     const prevMonthStart = this.startOfMonth(now, -1);
 
-    const sessions = await this._workoutSessionsRepository.findFinishedSince(tenantId, prevMonthStart);
+    // lookback extended to 12 weeks for heatmap; streak capped at 84 days
+    const lookbackStart = new Date(now.getTime() - 84 * 24 * 60 * 60 * 1000);
+    const sessions = await this._workoutSessionsRepository.findFinishedSince(tenantId, lookbackStart);
 
     const volumeData = this.WEEKDAY_LABELS.map((dia) => ({ dia, volume: 0 }));
+    const durationData = this.WEEKDAY_LABELS.map((dia) => ({ dia, totalMinutos: 0 }));
+    let semanalDuracao = 0;
     const trainDatesSet = new Set<number>();
     const weekDaysSet = new Set<string>();
     let treinosNoMes = 0;
@@ -56,6 +60,13 @@ export class GetDashboardSummaryUseCase {
       if (inWeek) {
         weekDaysSet.add(this.dateKey(started));
         const dayIdx = (started.getDay() + 6) % 7;
+        if (session.endedAt) {
+          const durationMinutes = Math.floor(
+            (session.endedAt.getTime() - session.startedAt.getTime()) / 60000,
+          );
+          durationData[dayIdx].totalMinutos += durationMinutes;
+          semanalDuracao += durationMinutes;
+        }
         for (const ex of session.exercises) {
           for (const set of ex.executedSets) {
             const setVolume = (set.kg ?? 0) * (set.reps ?? 0);
@@ -88,6 +99,20 @@ export class GetDashboardSummaryUseCase {
       cursor.setDate(cursor.getDate() - 1);
     }
 
+    const heatmapMap = new Map<string, number>();
+    for (const session of sessions) {
+      const key = this.dateKey(session.startedAt);
+      heatmapMap.set(key, (heatmapMap.get(key) ?? 0) + 1);
+    }
+    const heatmapData: HeatmapDataDto[] = [];
+    const DAY_MS = 24 * 60 * 60 * 1000;
+    for (let i = 83; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * DAY_MS);
+      d.setHours(0, 0, 0, 0);
+      const date = this.dateKey(d);
+      heatmapData.push({ date, count: heatmapMap.get(date) ?? 0 });
+    }
+
     const muscleGroups = [...muscleSetCounts.entries()]
       .map(([nome, count]) => ({ nome, percentual: totalSets ? Math.round((count / totalSets) * 100) : 0 }))
       .sort((a, b) => b.percentual - a.percentual);
@@ -104,6 +129,9 @@ export class GetDashboardSummaryUseCase {
     dto.muscleGroups = muscleGroups;
     dto.trainDates = [...trainDatesSet].sort((a, b) => a - b);
     dto.workoutsCount = workoutsCount;
+    dto.durationData = durationData;
+    dto.semanalDuracao = semanalDuracao;
+    dto.heatmapData = heatmapData;
 
     return dto;
   }

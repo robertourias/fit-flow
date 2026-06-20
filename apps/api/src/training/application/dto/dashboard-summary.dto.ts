@@ -8,6 +8,22 @@ export class VolumeDataDto {
   volume!: number;
 }
 
+export class DurationDataDto {
+  @ApiProperty()
+  dia!: string;
+
+  @ApiProperty()
+  totalMinutos!: number;
+}
+
+export class HeatmapDataDto {
+  @ApiProperty()
+  date!: string;
+
+  @ApiProperty()
+  count!: number;
+}
+
 export class MuscleGroupDto {
   @ApiProperty()
   nome!: string;
@@ -43,4 +59,13 @@ export class DashboardSummaryDto {
 
   @ApiProperty()
   workoutsCount!: number;
+
+  @ApiProperty({ type: [DurationDataDto] })
+  durationData!: DurationDataDto[];
+
+  @ApiProperty()
+  semanalDuracao!: number;
+
+  @ApiProperty({ type: [HeatmapDataDto] })
+  heatmapData!: HeatmapDataDto[];
 }

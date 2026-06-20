@@ -4,6 +4,7 @@ import { SessionExercise } from "./session-exercise.entity";
 export interface IWorkoutSessionProps {
   id: string;
   workoutId: string;
+  workoutName: string;
   tenantId: string;
   startedAt: Date;
   endedAt?: Date | null;
@@ -19,6 +20,7 @@ export class WorkoutSession {
 
   get id() { return this.props.id; }
   get workoutId() { return this.props.workoutId; }
+  get workoutName() { return this.props.workoutName; }
   get tenantId() { return this.props.tenantId; }
   get startedAt() { return this.props.startedAt; }
   get endedAt() { return this.props.endedAt; }

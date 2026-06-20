@@ -1,0 +1,13 @@
+{
+  "extends": "../config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true
+  },
+  "include": ["prisma/**/*.ts", "src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

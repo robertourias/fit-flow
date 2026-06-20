@@ -86,6 +86,7 @@ const WORKOUT_FIXTURE: WorkoutDetailDto = {
 const LAST_SESSION_FIXTURE: WorkoutSessionDetailDto = {
   id: "session-1",
   workoutId: "workout-1",
+  workoutName: "Treino A",
   startedAt: "2026-06-01T10:00:00.000Z",
   endedAt: "2026-06-01T11:00:00.000Z",
   status: "FINISHED",

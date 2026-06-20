@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings, LogOut } from "lucide-react";
+import { Dumbbell, TrendingUp, Compass, User, ListChecks, BookOpen, Zap, Settings, LogOut, History, Ruler, Users } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -18,14 +18,17 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { id: "rotina", label: "Rotina", icon: Dumbbell, href: "/dashboard" },
-  { id: "progresso", label: "Progresso", icon: TrendingUp },
-  { id: "explorar", label: "Explorar", icon: Compass },
+  { id: "progresso", label: "Progresso", icon: TrendingUp, href: "/progress" },
+  { id: "explorar", label: "Explorar", icon: Compass, href: "/explore" },
   { id: "personal", label: "Personal", icon: User },
 ];
 
 const extraNavItems: NavItem[] = [
   { id: "exercicios", label: "Exercícios", icon: ListChecks, href: "/exercises" },
   { id: "biblioteca", label: "Biblioteca", icon: BookOpen, href: "/library" },
+  { id: "historico", label: "Histórico", icon: History, href: "/history" },
+  { id: "medidas", label: "Medidas", icon: Ruler, href: "/measurements" },
+  { id: "alunos", label: "Alunos", icon: Users, href: "/students" },
 ];
 
 interface NavContentProps {

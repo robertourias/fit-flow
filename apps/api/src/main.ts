@@ -1,12 +1,19 @@
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { Logger } from "nestjs-pino";
 import { AppModule } from "./app.module";
+import { initSentry } from "./common/observability/sentry";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  initSentry();
+
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
 
   // ValidationPipe global registrado via APP_PIPE no AppModule (vale também nos testes e2e)
-  app.setGlobalPrefix("api/v1");
+  // /metrics fica fora do prefixo (rota de infra) — /health já é checado em
+  // /api/v1/health pelo docker-compose, mantido como está.
+  app.setGlobalPrefix("api/v1", { exclude: ["metrics"] });
   app.enableCors();
 
   const swaggerConfig = new DocumentBuilder()

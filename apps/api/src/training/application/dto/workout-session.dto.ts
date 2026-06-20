@@ -81,6 +81,9 @@ export class WorkoutSessionSummaryDto {
   workoutId!: string;
 
   @ApiProperty()
+  workoutName!: string;
+
+  @ApiProperty()
   startedAt!: string;
 
   @ApiProperty({ nullable: true, type: String })
@@ -102,6 +105,7 @@ export class WorkoutSessionSummaryDto {
     const dto = new WorkoutSessionSummaryDto();
     dto.id = entity.id;
     dto.workoutId = entity.workoutId;
+    dto.workoutName = entity.workoutName;
     dto.startedAt = entity.startedAt.toISOString();
     dto.endedAt = entity.endedAt ? entity.endedAt.toISOString() : null;
     dto.status = entity.status;

@@ -20,6 +20,11 @@ enum RelationshipStatus {
   REVOKED
 }
 
+enum RelationshipInitiator {
+  TRAINER
+  STUDENT
+}
+
 enum ExerciseCategory {
   STRENGTH
   CARDIO
@@ -31,6 +36,10 @@ enum WorkoutSessionStatus {
   ACTIVE
   FINISHED
   ABANDONED
+}
+
+enum NotificationType {
+  NEW_MESSAGE
 }
 
 // ─── Identity ─────────────────────────────────────────────────────────────────
@@ -68,9 +77,16 @@ model User {
   workouts        Workout[]
   workoutSessions WorkoutSession[]
 
+  // Measurements
+  bodyMeasurements BodyMeasurement[]
+
   // Vínculos preparador-aluno
   studentsAsTrainer TrainerStudentRelationship[] @relation("TrainerLinks")
   trainersAsStudent TrainerStudentRelationship[] @relation("StudentLinks")
+
+  // Comunicação
+  sentMessages  Message[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -138,20 +154,54 @@ model UserDevice {
 }
 
 model TrainerStudentRelationship {
-  id        String             @id @default(cuid())
-  trainerId String
-  studentId String
-  status    RelationshipStatus @default(PENDING)
-  startedAt DateTime           @default(now())
-  endedAt   DateTime?
+  id                String                @id @default(cuid())
+  trainerId         String
+  studentId         String
+  status            RelationshipStatus    @default(PENDING)
+  initiatedBy       RelationshipInitiator
+  startedAt         DateTime              @default(now())
+  endedAt           DateTime?
+  trainerLastReadAt DateTime?
+  studentLastReadAt DateTime?
 
-  trainer User @relation("TrainerLinks", fields: [trainerId], references: [id])
-  student User @relation("StudentLinks", fields: [studentId], references: [id])
+  trainer  User      @relation("TrainerLinks", fields: [trainerId], references: [id])
+  student  User      @relation("StudentLinks", fields: [studentId], references: [id])
+  messages Message[]
 
   @@unique([trainerId, studentId])
   @@index([trainerId])
   @@index([studentId])
   @@map("trainer_student_relationships")
+}
+
+// ─── Comunicação ──────────────────────────────────────────────────────────────
+
+model Message {
+  id             String   @id @default(cuid())
+  relationshipId String
+  senderId       String
+  content        String
+  createdAt      DateTime @default(now())
+
+  relationship TrainerStudentRelationship @relation(fields: [relationshipId], references: [id])
+  sender       User                       @relation(fields: [senderId], references: [id])
+
+  @@index([relationshipId, createdAt])
+  @@map("messages")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  payload   Json
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, read])
+  @@map("notifications")
 }
 
 // ─── Catálogo ─────────────────────────────────────────────────────────────────
@@ -228,18 +278,20 @@ model ExerciseEquipment {
 
 model Strategy {
   id          String   @id @default(cuid())
-  tenantId    String
+  tenantId    String?
   name        String
   type        String?
   description String?
   isActive    Boolean  @default(true)
+  isTemplate  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  tenant   User      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant   User?     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   workouts Workout[]
 
   @@index([tenantId])
+  @@index([isTemplate])
   @@map("strategies")
 }
 
@@ -247,7 +299,7 @@ model Strategy {
 model Workout {
   id          String   @id @default(cuid())
   strategyId  String
-  tenantId    String
+  tenantId    String?
   name        String
   description String?
   order       Int
@@ -255,7 +307,7 @@ model Workout {
   updatedAt   DateTime @updatedAt
 
   strategy         Strategy          @relation(fields: [strategyId], references: [id], onDelete: Cascade)
-  tenant           User              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  tenant           User?             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   workoutExercises WorkoutExercise[]
   sessions         WorkoutSession[]
 
@@ -340,4 +392,40 @@ model ExecutedSet {
 
   @@index([sessionExerciseId])
   @@map("executed_sets")
+}
+
+// ─── Measurements ─────────────────────────────────────────────────────────────
+
+model BodyMeasurement {
+  id            String   @id @default(cuid())
+  tenantId      String
+  measuredAt    DateTime
+
+  // Peso (kg)
+  weight        Decimal? @db.Decimal(5, 2)
+
+  // Circunferências (cm)
+  neck          Decimal? @db.Decimal(5, 2)
+  chest         Decimal? @db.Decimal(5, 2)
+  waist         Decimal? @db.Decimal(5, 2)
+  hip           Decimal? @db.Decimal(5, 2)
+  leftArm       Decimal? @db.Decimal(5, 2)
+  rightArm      Decimal? @db.Decimal(5, 2)
+  leftThigh     Decimal? @db.Decimal(5, 2)
+  rightThigh    Decimal? @db.Decimal(5, 2)
+  calf          Decimal? @db.Decimal(5, 2)
+
+  // Bioimpedância
+  bodyFatPct    Decimal? @db.Decimal(4, 2)
+  muscleMassPct Decimal? @db.Decimal(4, 2)
+  visceralFat   Int?
+
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant User @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, measuredAt])
+  @@map("body_measurements")
 }

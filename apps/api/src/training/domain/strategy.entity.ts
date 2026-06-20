@@ -2,7 +2,7 @@ import { Workout } from "./workout.entity";
 
 export interface IStrategyProps {
   id: string;
-  tenantId: string;
+  tenantId: string | null;
   name: string;
   type?: string | null;
   description?: string | null;

@@ -62,6 +62,13 @@ export {
     GetActiveWorkoutUseCase,
     GetDashboardSummaryUseCase,
   ],
-  exports: [STRATEGIES_REPOSITORY, WORKOUTS_REPOSITORY, WORKOUT_SESSIONS_REPOSITORY],
+  exports: [
+    STRATEGIES_REPOSITORY,
+    WORKOUTS_REPOSITORY,
+    WORKOUT_SESSIONS_REPOSITORY,
+    CreateStrategyUseCase,
+    CreateWorkoutUseCase,
+    GetDashboardSummaryUseCase,
+  ],
 })
 export class TrainingModule {}

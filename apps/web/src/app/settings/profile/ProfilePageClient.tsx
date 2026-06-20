@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Switch } from '@/components/ui/switch'
 import { PasswordStrengthBar, calculateStrength } from '@fitflow/ui'
 import {
   updateProfile,
@@ -33,6 +34,7 @@ export interface ProfileUser {
   avatarUrl: string | null
   image: string | null
   hasPassword: boolean
+  isTrainer: boolean
 }
 
 interface ProfilePageClientProps {
@@ -195,6 +197,7 @@ function PersonalInfoSection({ user }: { user: ProfileUser }) {
   const [bio, setBio] = useState(user.bio ?? '')
   const [age, setAge] = useState(user.age !== null ? String(user.age) : '')
   const [goals, setGoals] = useState<string[]>(user.goals)
+  const [isTrainer, setIsTrainer] = useState(user.isTrainer)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -236,6 +239,7 @@ function PersonalInfoSection({ user }: { user: ProfileUser }) {
         bio: bio.trim() || null,
         age: ageNum,
         goals: goals as GoalOption[],
+        isTrainer,
       })
       if (result.success) {
         setFeedback({ msg: 'Perfil atualizado com sucesso.', type: 'success' })
@@ -351,6 +355,18 @@ function PersonalInfoSection({ user }: { user: ProfileUser }) {
               )
             })}
           </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 rounded-m border border-border bg-muted/40 px-4 py-3">
+          <div>
+            <label htmlFor="is-trainer" className="text-sm font-medium text-foreground">
+              Tornar-se preparador
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Permite oferecer acompanhamento e criar rotinas para alunos vinculados.
+            </p>
+          </div>
+          <Switch id="is-trainer" checked={isTrainer} onCheckedChange={setIsTrainer} />
         </div>
 
         <div className="flex items-center gap-4 pt-2">

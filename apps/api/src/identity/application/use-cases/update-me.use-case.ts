@@ -22,6 +22,7 @@ export class UpdateMeUseCase {
       ...(dto.age !== undefined && { age: dto.age }),
       ...(dto.goals !== undefined && { goals: dto.goals }),
       ...(dto.hasOnboarded !== undefined && { hasOnboarded: dto.hasOnboarded }),
+      ...(dto.isTrainer !== undefined && { isTrainer: dto.isTrainer }),
     });
   }
 }

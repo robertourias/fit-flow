@@ -3,7 +3,7 @@ import { WorkoutExercise } from "./workout-exercise.entity";
 export interface IWorkoutProps {
   id: string;
   strategyId: string;
-  tenantId: string;
+  tenantId: string | null;
   name: string;
   description?: string | null;
   order: number;

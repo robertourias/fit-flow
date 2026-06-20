@@ -31,27 +31,28 @@ type StrategyRow = Prisma.StrategyGetPayload<{
 @Injectable()
 export class PrismaStrategiesRepository implements IStrategiesRepository {
   async findByTenant(tenantId: string): Promise<Strategy[]> {
-    const rows = await prisma.strategy.findMany({
-      where: { tenantId },
+    // isTemplate pending migration + prisma generate — cast until types are regenerated
+    const rows = await (prisma.strategy as any).findMany({
+      where: { tenantId, isTemplate: false },
       include: STRATEGY_INCLUDE,
       orderBy: { createdAt: "desc" },
-    });
+    }) as StrategyRow[];
     return rows.map((r) => this.toDomain(r));
   }
 
   async findById(id: string, tenantId: string): Promise<Strategy | null> {
-    const row = await prisma.strategy.findFirst({
-      where: { id, tenantId },
+    const row = await (prisma.strategy as any).findFirst({
+      where: { id, tenantId, isTemplate: false },
       include: STRATEGY_INCLUDE,
-    });
+    }) as StrategyRow | null;
     return row ? this.toDomain(row) : null;
   }
 
   async findActiveByTenant(tenantId: string): Promise<Strategy | null> {
-    const row = await prisma.strategy.findFirst({
-      where: { tenantId, isActive: true },
+    const row = await (prisma.strategy as any).findFirst({
+      where: { tenantId, isActive: true, isTemplate: false },
       include: STRATEGY_INCLUDE,
-    });
+    }) as StrategyRow | null;
     return row ? this.toDomain(row) : null;
   }
 

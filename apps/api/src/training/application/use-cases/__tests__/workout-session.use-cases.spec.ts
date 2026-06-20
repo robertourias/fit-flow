@@ -6,6 +6,7 @@ import { UpdateWorkoutSessionUseCase } from "../update-workout-session.use-case"
 import { DeleteWorkoutSessionUseCase } from "../delete-workout-session.use-case";
 import { WorkoutSession } from "../../../domain/workout-session.entity";
 import { WorkoutSessionStatus } from "../../../domain/workout-session-status.enum";
+import { WorkoutSessionSummaryDto, WorkoutSessionDetailDto } from "../../dto/workout-session.dto";
 import { Workout } from "../../../domain/workout.entity";
 import { User } from "../../../../identity/domain/user.entity";
 import { Plan } from "../../../../identity/domain/plan.enum";
@@ -23,6 +24,7 @@ function makeSession(
   return new WorkoutSession({
     id: "session-1",
     workoutId: "workout-1",
+    workoutName: "Treino A",
     tenantId: "tenant-1",
     startedAt: new Date("2026-06-01"),
     endedAt: null,
@@ -315,5 +317,24 @@ describe("DeleteWorkoutSessionUseCase", () => {
     await new DeleteWorkoutSessionUseCase(sessions).execute("session-1", "tenant-1");
 
     expect(sessions.delete).toHaveBeenCalledWith("session-1", "tenant-1");
+  });
+});
+
+describe("WorkoutSessionSummaryDto.fromEntity — workoutName mapping", () => {
+  it("maps workoutName from entity to DTO", () => {
+    const session = makeSession({ workoutName: "Treino de Peito" });
+    const dto = WorkoutSessionSummaryDto.fromEntity(session);
+
+    expect(dto.workoutName).toBe("Treino de Peito");
+    expect(dto.workoutId).toBe("workout-1");
+    expect(dto.id).toBe("session-1");
+  });
+
+  it("WorkoutSessionDetailDto inherits workoutName via fromEntity", () => {
+    const session = makeSession({ workoutName: "Treino Full Body" });
+    const dto = WorkoutSessionDetailDto.fromEntity(session);
+
+    expect(dto.workoutName).toBe("Treino Full Body");
+    expect(dto.exercises).toEqual([]);
   });
 });

@@ -22,6 +22,7 @@ export default async function ProfilePage() {
       avatarUrl: true,
       image: true,
       passwordHash: true,
+      isTrainer: true,
     },
   })
 
@@ -39,6 +40,7 @@ export default async function ProfilePage() {
         avatarUrl: user.avatarUrl,
         image: user.image,
         hasPassword: user.passwordHash !== null,
+        isTrainer: user.isTrainer,
       }}
     />
   )

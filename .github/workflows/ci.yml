@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
+jobs:
+  ci:
+    name: Lint, typecheck, test & build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node 20 + pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm turbo lint
+
+      # Nenhum pacote do monorepo tem script `check-types`: o `lint` de apps/api
+      # e packages/* já é `tsc --noEmit` (coberto pelo step acima). apps/web usa
+      # `next lint` (eslint puro, sem typecheck) — roda tsc explicitamente aqui.
+      - name: Typecheck (apps/web)
+        run: pnpm --filter @fitflow/web exec tsc --noEmit
+
+      - name: Test (with coverage)
+        run: pnpm turbo test -- --coverage
+
+      - name: Build
+        run: pnpm turbo build

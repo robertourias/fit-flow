@@ -58,16 +58,16 @@
 | TASK09 | CRUD de Rotina & Treinos | Cadastro de rotina semanal com treinos: seleção de exercícios, séries, reps, carga e técnicas avançadas (drop set, bi-set, etc.) | done | TASK08 | [2026-06-14-task09-crud-rotina-treinos](../specs/2026-06-14-task09-crud-rotina-treinos.md) |
 | TASK10 | Limites do plano gratuito | Enforce de: máx. 6 Workouts por usuário no plano FREE — validação no backend (uso case + repositório) e feedback visual no frontend | done | TASK09 | [2026-06-14-task10-limites-plano-gratuito](../specs/2026-06-14-task10-limites-plano-gratuito.md) |
 | TASK11 | Execução de treino | Registrar sessão em tempo real: séries/cargas/reps executados, timer de intervalo e conclusão de treino | done | TASK09 | [2026-06-15-task11-execucao-treino](../specs/2026-06-15-task11-execucao-treino.md) |
-| TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | backlog | TASK11 | — |
+| TASK12 | Histórico de sessões | Listar e exibir histórico de sessões com retenção de 60 dias (plano gratuito) | done | TASK11 | [2026-06-15-task12-historico-sessoes](../specs/2026-06-15-task12-historico-sessoes.md) |
 
 ## Fase 4 — Polimento
 
 | ID | Título | Descrição | Status | Dependências | Spec |
 |----|--------|-----------|--------|--------------|------|
-| TASK13 | Dashboards de Progresso | Dashboards de volume, duração, dias de treino no mês, músculos trabalhados na semana e heatmap de atividade | backlog | TASK12 | — |
-| TASK14 | Medidas Corporais | Cadastro e histórico (60 dias) de peso, medidas corporais e avaliação de bioimpedância | backlog | TASK12 | — |
-| TASK15 | Explorar (Templates) | Área para explorar e importar estratégias/rotinas pré-criadas (Catalog templates) | backlog | TASK09, TASK13 | — |
-| TASK16 | Compartilhamento | Gerador de card/imagem com resumo do treino ou progresso para redes sociais | backlog | TASK13, TASK14 | — |
-| TASK17 | Área do Preparador: Alunos | Bounded context Coaching: vínculo aluno ↔ preparador, criação/atribuição de rotinas e acompanhamento de evolução | backlog | TASK09, TASK13 | — |
-| TASK18 | Personal (Comunicação) | Canal de comunicação preparador → aluno: orientações, moderação de conteúdo e notificações assíncronas via BullMQ | backlog | TASK17 | — |
-| TASK19 | Hardening & Release | Observabilidade (Pino, Sentry, Prometheus), cobertura de testes, CI/CD completo e deploy em produção (Vercel + Railway) | backlog | TASK18 | — |
+| TASK13 | Dashboards de Progresso | Dashboards de volume, duração, dias de treino no mês, músculos trabalhados na semana e heatmap de atividade | done | TASK12 | [2026-06-16-task13-dashboards-progresso](../specs/2026-06-16-task13-dashboards-progresso.md) |
+| TASK14 | Medidas Corporais | Cadastro e histórico (60 dias) de peso, medidas corporais e avaliação de bioimpedância | done | TASK12 | [2026-06-16-task14-medidas-corporais](../specs/2026-06-16-task14-medidas-corporais.md) |
+| TASK15 | Explorar (Templates) | Área para explorar e importar estratégias/rotinas pré-criadas (Catalog templates) | done | TASK09, TASK13 | [2026-06-16-task15-explorar-templates](../specs/2026-06-16-task15-explorar-templates.md) |
+| TASK16 | Compartilhamento | Gerador de card/imagem com resumo do treino ou progresso para redes sociais | done | TASK13, TASK14 | [2026-06-17-task16-compartilhamento](../specs/2026-06-17-task16-compartilhamento.md) |
+| TASK17 | Área do Preparador: Alunos | Bounded context Coaching: vínculo aluno ↔ preparador, criação/atribuição de rotinas e acompanhamento de evolução | done | TASK09, TASK13 | [2026-06-17-task17-area-preparador-alunos](../specs/2026-06-17-task17-area-preparador-alunos.md) |
+| TASK18 | Personal (Comunicação) | Canal de comunicação preparador → aluno: orientações, moderação de conteúdo e notificações assíncronas via BullMQ | done | TASK17 | [2026-06-18-task18-personal-comunicacao](../specs/2026-06-18-task18-personal-comunicacao.md) |
+| TASK19 | Hardening & Release | Observabilidade (Pino, Sentry, Prometheus), cobertura de testes, CI/CD completo e deploy em produção (Vercel + Railway) | done | TASK18 | [2026-06-19-task19-hardening-release](../specs/2026-06-19-task19-hardening-release.md) |

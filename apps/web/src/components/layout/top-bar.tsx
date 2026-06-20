@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { NavContent } from "@/components/layout/nav-content";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import type { DashboardUser } from "@/lib/mock/dashboard";
 
 function getGreeting(): string {
@@ -58,6 +59,8 @@ export function TopBar({ user, activeTab, onTabChange }: TopBarProps) {
         </span>
         <span className="text-[13px] text-muted-foreground capitalize">{today}</span>
       </div>
+
+      <NotificationBell />
 
       <Avatar className="h-10 w-10 shrink-0">
         <AvatarFallback className="bg-primary text-primary-foreground font-bold text-base">
