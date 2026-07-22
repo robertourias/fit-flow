@@ -87,10 +87,12 @@ docker compose down -v
 | NestJS | http://localhost:3001 | Backend API (`/api/v1/`) |
 | PostgreSQL | localhost:5432 | Banco de dados |
 | Redis | localhost:6379 | Cache / filas BullMQ |
+| MinIO API | http://localhost:9000 | Object storage (S3-compatible) |
+| MinIO Console | http://localhost:9001 | UI de gerenciamento (usuário/senha: minioadmin) |
 | Maildev (UI) | http://localhost:1080 | Visualizador de e-mails (profile: tools) |
 
-> Dentro da rede Docker, o NestJS acessa o banco via hostname `db` (não `localhost`).
-> O `DATABASE_URL` para uso fora do Docker usa `localhost:5432`.
+> Dentro da rede Docker: banco via `db:5432`, Redis via `redis:6379`, MinIO via `minio:9000`.
+> Fora do Docker: use `localhost:5432`, `localhost:6379`, `localhost:9000`.
 
 ---
 

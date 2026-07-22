@@ -20,7 +20,7 @@ Registradas aqui para que agentes não inventem convenções não acordadas.
 - `synchronize: false` em produção — migrations obrigatórias para toda mudança de schema
 
 ### Object Storage
-- **Supabase Storage** para uploads de arquivos (imagens, assets)
+- **MinIO** para uploads de arquivos (imagens, assets) — S3-compatible, self-hosted
 
 ### API
 - REST com Swagger (`@nestjs/swagger`)
