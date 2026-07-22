@@ -36,7 +36,7 @@ export function CalendarSection({ trainDates, today: todayProp }: CalendarSectio
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-2.5">
+    <div className="bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-2.5">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-bold capitalize">
           {format(today, "MMMM 'de' yyyy", { locale: ptBR })}

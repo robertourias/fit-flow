@@ -39,7 +39,7 @@ export function ActivityHeatmapClient({ data }: Props) {
   });
 
   return (
-    <div className="bg-card rounded-xl border border-border p-5 flex flex-col gap-3">
+    <div className="bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-3">
       <h2 className="text-base font-semibold">Atividade</h2>
 
       <div className="flex gap-1">

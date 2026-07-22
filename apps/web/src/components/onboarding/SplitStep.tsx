@@ -46,7 +46,7 @@ export function SplitStep({
       {splitType && (
         <div>
           <p className="text-sm text-muted-foreground mb-2">Treinos que serão criados:</p>
-          <div className="bg-muted p-3 rounded-md">
+          <div className="bg-muted p-3 rounded-m">
             <ul className="list-disc list-inside space-y-1 text-sm">
               {SPLIT_PRESETS[splitType].map((workout) => (
                 <li key={workout}>{workout}</li>

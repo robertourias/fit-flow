@@ -91,7 +91,7 @@ function SectionCard({
   className?: string
 }) {
   return (
-    <div className={cn('rounded-l bg-card border border-border p-6', className)}>
+    <div className={cn('rounded-l bg-card border border-border/70 p-6', className)}>
       <div className="mb-5">
         <h2 className="text-base font-semibold text-foreground">{title}</h2>
         {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
@@ -440,7 +440,7 @@ function ChangePasswordSection({ userEmail }: { userEmail: string }) {
   }
 
   return (
-    <div className="rounded-l bg-card border border-border overflow-hidden">
+    <div className="rounded-l bg-card border border-border/70 overflow-hidden">
       <button
         type="button"
         onClick={handleToggle}
@@ -607,7 +607,7 @@ function DeleteAccountSection({ hasPassword }: { hasPassword: boolean }) {
 
             <DialogPrimitive.Portal>
               <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-              <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-l border border-border bg-card p-6 shadow-lg focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
+              <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-l border border-border/70 bg-card p-6 shadow-lg focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
                 <DialogPrimitive.Title className="text-lg font-semibold text-foreground">
                   Excluir conta
                 </DialogPrimitive.Title>

@@ -51,7 +51,7 @@ export function DurationChart({ data, semanalDuracao, className }: DurationChart
   const colors = useChartColors();
 
   return (
-    <div className={`bg-card rounded-xl border border-border p-5 flex flex-col gap-4 ${className ?? ""}`}>
+    <div className={`bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-4 ${className ?? ""}`}>
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">Duração semanal</h2>
         <span className="text-sm text-muted-foreground">{formatMinutes(semanalDuracao)}</span>

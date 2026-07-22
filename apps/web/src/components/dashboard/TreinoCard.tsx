@@ -13,7 +13,7 @@ export function TreinoCard({ treino, className }: TreinoCardProps) {
   if (!treino) {
     return (
       <div className={cn(
-        "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border items-center justify-center",
+        "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border/70 items-center justify-center",
         className
       )}>
         <div className="text-center space-y-3">
@@ -36,7 +36,7 @@ export function TreinoCard({ treino, className }: TreinoCardProps) {
 
   return (
     <div className={cn(
-      "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border",
+      "rounded-xl p-5 flex flex-col gap-4 bg-card border border-border/70 shadow-sm",
       className
     )}>
       {/* Header: strategy badge + duration */}

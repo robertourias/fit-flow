@@ -9,7 +9,7 @@ interface MuscleCardProps {
 export function MuscleCard({ muscles, className }: MuscleCardProps) {
   return (
     <div className={cn(
-      "bg-card rounded-xl border border-border p-5 flex flex-col gap-3.5",
+      "bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-3.5",
       className
     )}>
       <h2 className="text-base font-semibold">Grupos musculares esta semana</h2>

@@ -51,9 +51,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6" suppressHydrationWarning>
       {registered && (
-        <div className="rounded-md border border-[var(--color-success)] bg-[var(--color-success-bg)] px-4 py-3 text-sm text-[var(--color-success-text)]">
+        <div className="rounded-m border border-[var(--color-success)] bg-[var(--color-success-bg)] px-4 py-3 text-sm text-[var(--color-success-text)]">
           Conta criada com sucesso! Entre com suas credenciais.
         </div>
       )}

@@ -20,7 +20,7 @@ function CreateNewCard({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="relative rounded-2xl overflow-hidden aspect-square flex flex-col items-center justify-center gap-2 border border-dashed border-border bg-muted/30 hover:bg-muted/50 transition-colors"
+      className="relative rounded-xl overflow-hidden aspect-square flex flex-col items-center justify-center gap-2 border border-dashed border-border bg-muted/30 hover:bg-muted/50 transition-colors"
       aria-label="Criar novo programa"
     >
       <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
@@ -37,7 +37,7 @@ function ProgramCard({ program }: { program: StrategySummaryDto }) {
   return (
     <Link
       href={`/program/${program.id}`}
-      className="relative rounded-2xl overflow-hidden aspect-square block group"
+      className="relative rounded-xl overflow-hidden aspect-square block group"
     >
       <div
         className="absolute inset-0"

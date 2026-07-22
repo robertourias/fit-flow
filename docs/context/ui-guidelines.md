@@ -15,26 +15,28 @@
 Use variáveis semânticas — nunca valores hex diretos em componentes.
 
 ```css
-/* Core brand */
---primary: #10B981                        /* verde esmeralda */
---primary-foreground: #0D2B1F
---ring: #10B981                           /* focus ring */
+/* Core brand — verde profundo + dourado (decisão 2026-07-03) */
+--primary: light=hsl(163 42% 22%)  dark=hsl(158 52% 46%)   /* verde-esmeralda profundo */
+--primary-foreground: light=hsl(150 40% 97%)  dark=hsl(166 45% 8%)
+--ring: light=hsl(163 42% 30%)  dark=hsl(158 52% 46%)      /* focus ring */
+--gold: light=hsl(42 48% 50%)   dark=hsl(43 52% 58%)       /* acento premium */
+--gold-foreground: light=hsl(40 45% 12%)  dark=hsl(42 55% 12%)
 
 /* Backgrounds / surfaces */
---background:            light=#FFFFFF       dark=#091420
---foreground:            light=#0F172A       dark=#D9EAF7
---card:                  light=#FFFFFF       dark=#0D1D2E
---card-foreground:       light=#0F172A       dark=#D9EAF7
---muted:                 light=#F1F5F9       dark=#122338
---muted-foreground:      light=#4F6278       dark=#7BA4C0
---accent:                light=#F1F5F9       dark=#122338
---accent-foreground:     light=#0F172A       dark=#D9EAF7
---secondary:             light=#F1F5F9       dark=#122338
---secondary-foreground:  light=#0F172A       dark=#D9EAF7
+--background:            light=hsl(150 25% 98%)   dark=hsl(166 38% 7%)
+--foreground:            light=hsl(168 35% 10%)   dark=hsl(148 22% 92%)
+--card:                  light=hsl(0 0% 100%)     dark=hsl(164 32% 10%)
+--card-foreground:       light=hsl(168 35% 10%)   dark=hsl(148 22% 92%)
+--muted:                 light=hsl(152 20% 94%)   dark=hsl(163 26% 14%)
+--muted-foreground:      light=hsl(162 12% 38%)   dark=hsl(152 14% 63%)
+--accent:                light=hsl(152 26% 91%)   dark=hsl(162 28% 17%)
+--accent-foreground:     light=hsl(168 35% 13%)   dark=hsl(148 22% 92%)
+--secondary:             light=hsl(152 22% 94%)   dark=hsl(163 26% 14%)
+--secondary-foreground:  light=hsl(168 35% 13%)   dark=hsl(148 22% 92%)
 
 /* Borders / inputs */
---border: light=#E2E8F0  dark=#1C3550
---input:  light=#E2E8F0  dark=#1C3550
+--border: light=hsl(152 16% 88%)  dark=hsl(161 22% 19%)
+--input:  light=hsl(152 16% 88%)  dark=hsl(161 22% 19%)
 
 /* Feedback — success */
 --color-success: #10B981
@@ -71,12 +73,18 @@ Dark mode: implementado via CSS variables com tema `mode: light | dark`. Contras
 
 ```css
 --radius-none: 0px
---radius-s:    4px
---radius-m:    8px
---radius-l:    12px
---radius-xl:   16px
+--radius-s:    6px
+--radius-m:    10px   /* default */
+--radius-l:    14px   /* botões */
+--radius-xl:   18px   /* cards */
 --radius-pill: 9999px
 ```
+
+## Sombras & Superfícies
+
+- Sombras suaves com tom esverdeado — `shadow-sm` (cards em repouso), `shadow-md` (hover), `shadow-lg` (modals/popovers); definidas em `packages/config/tailwind`
+- Cards: `rounded-xl border border-border/70 bg-card shadow-sm` — usar o componente `Card` (`components/ui/card.tsx`), padding interno p-5
+- Bordas de cards sempre com opacidade reduzida (`border-border/70`); bordas 100% opacas reservadas para divisores estruturais (`border-b`/`border-t` de headers e nav)
 
 ## Espaçamento & Layout
 
@@ -99,7 +107,8 @@ Usar escala de tipo do Tailwind (`text-sm`, `text-base`, `text-lg` etc.) — sem
 
 ### Buttons
 
-Quatro variantes: `primary` (máximo um por seção de tela), `secondary`, `destructive` (sempre pedir confirmação antes de executar), `ghost`.
+Variantes: `primary` (sólido — máximo um por seção de tela), `secondary` (tonal: `bg-primary/5` + borda `primary/20`), `outline`, `ghost`, `destructive` (outline vermelho, preenche no hover — sempre pedir confirmação antes de executar), `gold` (acento premium — CTAs de upgrade/plano).
+Preferir variantes outline/ghost/tonal como padrão; sólido reservado para a ação primária.
 Sempre exibir loading state durante ações assíncronas (spinner ou skeleton).
 
 ### Forms

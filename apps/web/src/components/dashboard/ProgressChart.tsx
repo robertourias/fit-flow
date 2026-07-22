@@ -56,7 +56,7 @@ export function ProgressChart({ data, className }: ProgressChartProps) {
   const colors = useChartColors();
 
   return (
-    <div className={`bg-card rounded-xl border border-border p-5 flex flex-col gap-4 ${className ?? ""}`}>
+    <div className={`bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-4 ${className ?? ""}`}>
       <h2 className="text-base font-semibold">Volume semanal (kg)</h2>
 
       <div className="flex-1 min-h-[160px]">

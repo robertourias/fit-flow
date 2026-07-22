@@ -137,7 +137,7 @@ export function WorkoutFinishForm({ workout }: Props) {
       {/* Scrollable form */}
       <div className="flex-1 overflow-y-auto pb-36 px-5 space-y-3">
         {/* Comment */}
-        <div className="bg-card rounded-xl border border-border p-4">
+        <div className="bg-card rounded-xl border border-border/70 p-4">
           <label
             htmlFor="workout-comment"
             className="block text-[13px] font-semibold mb-2"
@@ -157,7 +157,7 @@ export function WorkoutFinishForm({ workout }: Props) {
         {/* Media button — UI only */}
         <button
           disabled
-          className="w-full flex items-center justify-center gap-2 bg-card border border-border rounded-xl py-3.5 text-[14px] font-medium text-muted-foreground cursor-not-allowed opacity-60"
+          className="w-full flex items-center justify-center gap-2 bg-card border border-border/70 rounded-xl py-3.5 text-[14px] font-medium text-muted-foreground cursor-not-allowed opacity-60"
           aria-label="Adicionar Fotos/Vídeos (em breve)"
         >
           <Camera className="h-4 w-4" />
@@ -165,7 +165,7 @@ export function WorkoutFinishForm({ workout }: Props) {
         </button>
 
         {/* Difficulty */}
-        <div className="bg-card rounded-xl border border-border p-4">
+        <div className="bg-card rounded-xl border border-border/70 p-4">
           <p className="text-[13px] font-semibold mb-3">Dificuldade</p>
           <div className="flex gap-2" role="group" aria-label="Selecionar dificuldade">
             {[1, 2, 3, 4, 5].map((n) => (
@@ -175,7 +175,7 @@ export function WorkoutFinishForm({ workout }: Props) {
                 aria-label={`Dificuldade ${n}`}
                 aria-pressed={difficulty >= n}
                 className={cn(
-                  "flex-1 flex items-center justify-center py-2.5 rounded-lg border transition-colors",
+                  "flex-1 flex items-center justify-center py-2.5 rounded-l border transition-colors",
                   difficulty >= n
                     ? "bg-primary/10 border-primary/30 text-primary"
                     : "border-border text-muted-foreground hover:border-primary/30"
@@ -191,7 +191,7 @@ export function WorkoutFinishForm({ workout }: Props) {
         </div>
 
         {/* Details accordion */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-card rounded-xl border border-border/70 overflow-hidden">
           <button
             onClick={() => setDetailsOpen((o) => !o)}
             className="w-full flex items-center justify-between px-4 py-3.5 text-[14px] font-semibold"
@@ -221,7 +221,7 @@ export function WorkoutFinishForm({ workout }: Props) {
         </div>
 
         {/* Update routine toggle */}
-        <div className="bg-card rounded-xl border border-border flex items-center justify-between px-4 py-4 gap-4">
+        <div className="bg-card rounded-xl border border-border/70 flex items-center justify-between px-4 py-4 gap-4">
           <div className="min-w-0">
             <p className="text-[14px] font-semibold">Atualizar valores da rotina</p>
             <p className="text-[12px] text-muted-foreground mt-0.5 leading-snug">
@@ -232,7 +232,7 @@ export function WorkoutFinishForm({ workout }: Props) {
         </div>
 
         {/* Integrations */}
-        <div className="bg-card rounded-xl border border-border overflow-hidden">
+        <div className="bg-card rounded-xl border border-border/70 overflow-hidden">
           <p className="px-4 pt-3.5 pb-2 text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">
             Integrações
           </p>

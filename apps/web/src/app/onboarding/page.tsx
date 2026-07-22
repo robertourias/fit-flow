@@ -6,7 +6,7 @@ export default async function OnboardingPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8">
+      <div className="w-full max-w-md rounded-xl border border-border/70 bg-card shadow-sm p-6">
         <OnboardingWizard userName={session?.user?.name} />
       </div>
     </main>

@@ -12,7 +12,7 @@ const ProgressChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-card rounded-xl border border-border animate-pulse h-full min-h-[160px]" />
+      <div className="bg-card rounded-xl border border-border/70 animate-pulse h-full min-h-[160px]" />
     ),
   }
 );

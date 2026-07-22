@@ -9,7 +9,7 @@ interface UpcomingCardProps {
 
 export function UpcomingCard({ workouts, className }: UpcomingCardProps) {
   return (
-    <div className={cn("bg-card rounded-xl border border-border p-5 flex flex-col gap-3.5", className)}>
+    <div className={cn("bg-card rounded-xl border border-border/70 p-5 flex flex-col gap-3.5", className)}>
       <h2 className="text-base font-semibold">Próximos treinos</h2>
 
       <div className="flex flex-col gap-0">

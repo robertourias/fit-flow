@@ -210,7 +210,7 @@ function ExerciseBlock({ id, index, exercise, control, register, errors, onRemov
         zIndex: isDragging ? 50 : undefined,
         position: "relative",
       }}
-      className="flex flex-col gap-3 rounded-l border border-border bg-card p-3"
+      className="flex flex-col gap-3 rounded-l border border-border/70 bg-card shadow-sm p-3"
     >
       {/* Header */}
       <div className="flex items-center gap-3">

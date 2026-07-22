@@ -95,7 +95,7 @@ export function MeasurementsPage() {
       {user?.plan === "FREE" && (
         <div
           role="alert"
-          className="mx-5 mt-5 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning)] px-4 py-3 text-sm text-[var(--color-warning-text)]"
+          className="mx-5 mt-5 rounded-l bg-[var(--color-warning-bg)] border border-[var(--color-warning)] px-4 py-3 text-sm text-[var(--color-warning-text)]"
         >
           Medidas com mais de 60 dias não aparecem aqui no plano gratuito.
         </div>

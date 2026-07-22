@@ -1,0 +1,78 @@
+# fit-flow — Docker Compose para produção com Traefik
+#
+# Dependências:
+#   - postgres network (external: postgres_default)
+#   - redis network (external: redis_network)
+#   - Traefik rodando (reverse proxy com suporte a TLS)
+#
+# Env necessário:
+#   apps/api/.env.production.local — DATABASE_URL, REDIS_URL, AUTH_SECRET, etc.
+#   apps/web/.env.production.local — NEXT_PUBLIC_API_URL, AUTH_SECRET, GOOGLE_*, RESEND_*, etc.
+#
+# Deploy (primeira vez ou após `git pull`):
+#   cd /opt/docker/fit-flow && git pull && docker compose -f docker-compose.prod.yml up -d --build
+#
+# Parar:
+#   docker compose -f docker-compose.prod.yml down
+
+name: fit-flow-prod
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: fitflow-api:latest
+    container_name: fitflow-api
+    restart: unless-stopped
+    env_file:
+      - apps/api/.env.production.local
+    networks:
+      - postgres_default
+      - redis_network
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fitflow-api.rule=Host(`api.fitflow.app`)"
+      - "traefik.http.routers.fitflow-api.entrypoints=websecure"
+      - "traefik.http.routers.fitflow-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fitflow-api.loadbalancer.server.port=3001"
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://api.fitflow.app/api
+        API_INTERNAL_URL: http://api:3001
+    image: fitflow-web:latest
+    container_name: fitflow-web
+    restart: unless-stopped
+    env_file:
+      - apps/web/.env.production.local
+    networks:
+      - postgres_default
+      - redis_network
+      - traefik
+    depends_on:
+      - api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fitflow-web.rule=Host(`fitflow.app`)"
+      - "traefik.http.routers.fitflow-web.entrypoints=websecure"
+      - "traefik.http.routers.fitflow-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fitflow-web.loadbalancer.server.port=3000"
+
+networks:
+  postgres_default:
+    external: true
+  redis_network:
+    external: true
+  traefik:
+    external: true

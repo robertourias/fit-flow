@@ -14,7 +14,7 @@ export const ExerciseCard = memo(function ExerciseCard({ exercise }: ExerciseCar
 
   return (
     <Link href={`/exercises/${exercise.id}`} className="block group">
-      <div className="relative bg-card rounded-l border border-border overflow-hidden flex flex-col transition-shadow group-hover:shadow-md">
+      <div className="relative bg-card rounded-xl border border-border/70 shadow-sm overflow-hidden flex flex-col transition-shadow group-hover:shadow-md">
         {/* Thumbnail */}
         <div className="relative h-[120px] w-full overflow-hidden">
           <ExerciseImage

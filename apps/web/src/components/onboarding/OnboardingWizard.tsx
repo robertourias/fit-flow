@@ -147,7 +147,7 @@ export function OnboardingWizard({ userName }: OnboardingWizardProps) {
       </div>
 
       {state.error && (
-        <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+        <div className="bg-destructive/10 text-destructive p-3 rounded-m text-sm">
           {state.error}
         </div>
       )}

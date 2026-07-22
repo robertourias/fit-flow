@@ -16,7 +16,7 @@ interface MetricTile {
 
 function TileCard({ label, icon: Icon, value, unit, delta, deltaPositive }: MetricTile) {
   return (
-    <div className="bg-card rounded-l border border-border p-[18px] h-full flex flex-col
+    <div className="bg-card rounded-xl border border-border/70 shadow-sm p-4 h-full flex flex-col
       /* Mobile/tablet: center-aligned, icon on top */
       items-center text-center gap-3
       /* Desktop: left-aligned, icon on right of label */

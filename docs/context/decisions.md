@@ -90,3 +90,11 @@ Registradas aqui para que agentes não inventem convenções não acordadas.
 - MSW para mock de rede — sem mocks manuais de fetch
 - Playwright para E2E
 - Cobertura mínima: componentes 70%, hooks e utils 90%, fluxos P0 (E2E) 100%
+
+### Identidade visual (2026-07-03)
+- **Paleta "verde profundo + dourado"**: primary é verde-esmeralda profundo (light: `hsl(163 42% 22%)`; dark: `hsl(158 52% 46%)`); dourado (`--gold`) como cor de acento premium (badges, destaques, variante `gold` de botão)
+- Dark mode com fundo verde-esmeralda escuro (`hsl(166 38% 7%)`) — substituiu a base azul-marinho anterior
+- **Componentes "menos sólidos"**: cards com borda `border-border/70` + `shadow-sm` suave; botões `secondary` e `destructive` em estilo tonal/outline (preenchimento só no hover do destructive); primary segue sólido (máx. 1 por seção)
+- **Radius ampliado**: escala s=6 / m=10 (default) / l=14 / xl=18 — cards usam `rounded-xl`, botões `rounded-l`
+- **Sombras suaves**: `shadow-sm/md/lg` redefinidas no config compartilhado com tom esverdeado e opacidade baixa
+- Padronização: novo componente `Card` em `apps/web/src/components/ui/card.tsx` (padding p-5, grid de 4px) — usar em vez de recriar `div.bg-card` manualmente

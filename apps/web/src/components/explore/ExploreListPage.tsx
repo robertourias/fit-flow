@@ -32,7 +32,7 @@ function TemplateCard({
   const hiddenCount = template.workoutNames.length - visibleWorkouts.length;
 
   return (
-    <article className="rounded-xl border border-border bg-card p-5 flex flex-col gap-4">
+    <article className="rounded-xl border border-border/70 bg-card shadow-sm p-5 flex flex-col gap-4">
       <div>
         <div className="flex items-start gap-2 flex-wrap">
           <h2 className="text-base font-semibold text-foreground leading-tight">
@@ -151,7 +151,7 @@ export function ExploreListPage() {
       {showUpgradeBanner && (
         <div
           role="alert"
-          className="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950 dark:text-yellow-200"
+          className="mb-6 rounded-l border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950 dark:text-yellow-200"
         >
           Limite de treinos atingido. Faça upgrade para PRO para importar mais programas.
         </div>
@@ -162,7 +162,7 @@ export function ExploreListPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4" aria-label="Carregando templates">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-5 space-y-3">
+            <div key={i} className="rounded-xl border border-border/70 bg-card shadow-sm p-5 space-y-3">
               <div className="h-5 w-40 rounded bg-muted animate-pulse" />
               <div className="h-4 w-24 rounded bg-muted animate-pulse" />
               <div className="h-4 w-full rounded bg-muted animate-pulse" />
