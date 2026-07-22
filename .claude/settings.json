@@ -3,7 +3,8 @@
     "allow": [
       "Read(//c/Users/Rober/projetos/negocios-condominio/**)",
       "Bash(rtk pnpm *)",
-      "Bash(rtk grep *)"
+      "Bash(rtk grep *)",
+      "Bash(rtk ls *)"
     ]
   }
 }

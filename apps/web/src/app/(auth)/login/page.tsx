@@ -65,8 +65,8 @@ function LoginForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1.5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" suppressHydrationWarning>
+        <div className="flex flex-col gap-1.5" suppressHydrationWarning>
           <label htmlFor="email" className="text-sm font-medium">
             Email <span aria-hidden="true" className="text-destructive">*</span>
           </label>
